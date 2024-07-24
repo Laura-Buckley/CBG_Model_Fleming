@@ -120,14 +120,20 @@ class Config(object):
             self.config_file = Path(config_file).resolve()
             with self.config_file.open("r") as f:
                 conf = yaml.safe_load(f)
+                print(f"Loaded config file content: {conf}")  # Debugging statement
         else:
             self.config_file = None
             conf = {}
 
         v = Validator(require_all=False)
+        is_valid = v.validate(conf, self.schema)
+        print(f"Validation result: {is_valid}")  # Debugging statement
+        print(f"Validation errors: {v.errors}")  # Debugging statement
 
-        if not v.validate(conf, self.schema):
+        if not is_valid:
             raise RuntimeError(f"Invalid configuration file:\n{v.errors}")
+        # if not v.validate(conf, self.schema):
+        #     raise RuntimeError(f"Invalid configuration file:\n{v.errors}")
 
         for key, value in v.document.items():
             self.__setattr__(key, value)
