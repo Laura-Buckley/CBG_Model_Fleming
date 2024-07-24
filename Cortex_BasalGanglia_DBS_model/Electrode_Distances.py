@@ -101,3 +101,84 @@ def collateral_distances_to_electrode(src_electrode, tgt_pop, L, nseg):
             )
 
     return segment_electrode_distances
+
+def axon_distances_to_electrode(src_electrode, tgt_pop, node_L, myelin_L, ais_L, soma_L,myelin_L_0,
+                                num_axon_compartments, ais_nseg, soma_nseg):
+    """
+        Return an nd-array of the Euclidian distances from a point source
+        electrode to a population of cells. Each row corresponds to an axon
+        from the cortical population. Each column corresponds to the segments
+        of the nodes in the axon, with 0 being the furthest node from the 2d
+        plane the cells are distributed in.
+        'src_electrode' is the electrode positon in xyz co-ordinates.
+        'tgt_pop' is the target population of cells.
+        'node_L' is the length of the Nodes of Ranvier in each cortical cell.
+        'myelin_L' is the length of the myelin compartments in each cortical cell.
+        'num_axon_compartments' is the number of Nodes of Ranvier per cortical cell.
+        'nseg' is the number of segments in each Node of Ranvier.
+        'segment_electrode_distances' is the distance from the centre of each
+         segment to the stimulating electrode. Each row corresponds to an
+        axon of a single cortical cell. Each column corresponds to a segment.
+        """
+
+    #initialise array for storage of electrode distances for each segment for every compartment
+    segment_electrode_distances_nodes = np.zeros((tgt_pop.local_size, num_axon_compartments))
+
+    Y_coords_nodes = np.zeros(num_axon_compartments)
+    for n in np.arange(num_axon_compartments):
+        Y_coords_nodes[n] = (num_axon_compartments-1-n)*(node_L*myelin_L) + (node_L*0.5)
+
+    for ii, tgt_cell in enumerate(tgt_pop):
+        for n in np.arange(num_axon_compartments):
+            tgt_cell.position = np.array(
+                [tgt_cell.position[0], (tgt_cell.position[1] + Y_coords_nodes[n]),
+                 tgt_cell.position[2]]
+            )
+            segment_electrode_distances_nodes[ii][n] = distance_to_electrode(
+                src_electrode, tgt_cell
+            )
+
+    axon_L = Y_coords_nodes[0] + node_L + myelin_L_0
+
+    # initialise array for storage of electrode distances for each segment for every compartment
+    segment_electrode_distances_ais = np.zeros((tgt_pop.local_size, ais_nseg))
+
+    segment_centres_ais = np.arange(0, nseg + 3 - 1) * (1 / ais_nseg)
+    segment_centres_ais = segment_centres_ais - (1 / (2 * ais_nseg))
+    segment_centres_ais[0] = 0
+    segment_centres_ais[-1] = 1
+    segment_centres_ais = segment_centres_ais[1: len(segment_centres_ais) - 1]
+
+    Y_coords_ais = ais_L*segment_centres_ais
+
+    for ii, tgt_cell in enumerate(tgt_pop):
+        for seg in np.arange(ais_nseg):
+            tgt_cell.position = np.array(
+                [tgt_cell.position[0], (Y_coords_ais[seg] + axon_L), tgt_cell.position[2]]
+            )
+            segment_electrode_distances_ais[ii][seg] = distance_to_electrode(
+                src_electrode, tgt_cell
+            )
+
+        # initialise array for storage of electrode distances for each segment for every compartment
+        segment_electrode_distances_soma = np.zeros((tgt_pop.local_size, soma_nseg))
+
+        segment_centres_soma = np.arange(0, nseg + 3 - 1) * (1 / soma_nseg)
+        segment_centres_soma = segment_centres_soma - (1 / (2 * soma_nseg))
+        segment_centres_soma[0] = 0
+        segment_centres_soma[-1] = 1
+        segment_centres_soma = segment_centres_soma[1: len(segment_centres_soma) - 1]
+
+        Y_coords_soma = soma_L * segment_centres_soma
+        total_L = axon_L + ais_L
+        for ii, tgt_cell in enumerate(tgt_pop):
+            for seg in np.arange(soma_nseg):
+                tgt_cell.position = np.array(
+                    [tgt_cell.position[0], (Y_coords_soma[seg] + total_L), tgt_cell.position[2]]
+                )
+                segment_electrode_distances_soma[ii][seg] = distance_to_electrode(
+                    src_electrode, tgt_cell
+                )
+
+    return segment_electrode_distances_nodes, segment_electrode_distances_ais, segment_electrode_distances_soma
+

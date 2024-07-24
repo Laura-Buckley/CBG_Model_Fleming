@@ -44,12 +44,24 @@ import argparse
 from utils import make_beta_cheby1_filter, calculate_avg_beta_power
 from model import create_network, load_network, electrode_distance
 from config import Config, get_controller_kwargs
+from Cortical_Basal_Ganglia_Cell_Classes import Cortical_Neuron_Type
 
 # Import global variables for GPe DBS
 import Global_Variables as GV
 
 h = neuron.h
 comm = MPI.COMM_WORLD
+
+# Accessing default parameters of Cortical_Neuron_Type
+soma_L = Cortical_Neuron_Type.default_parameters["soma_L"]
+ais_L = Cortical_Neuron_Type.default_parameters["ais_L"]
+myelin_L = Cortical_Neuron_Type.default_parameters["myelin_L"]
+node_L = Cortical_Neuron_Type.default_parameters["node_L"]
+myelin_L_0 = Cortical_Neuron_Type.default_parameters["myelin_L_0"]
+ais_nseg = Cortical_Neuron_Type.default_parameters["ais_nseg"]
+soma_nseg = Cortical_Neuron_Type.default_parameters["soma_nseg"]
+num_axon_compartments = Cortical_Neuron_Type.default_parameters["num_axon_compartments"]
+
 
 if __name__ == "__main__":
     os.chdir(oldpwd)
@@ -78,6 +90,9 @@ if __name__ == "__main__":
     controller_sampling_time = 1000 * c.ts
     ctx_slow_modulation_amplitude = c.ctx_slow_modulation_amplitude
     ctx_slow_modulation_step_count = c.ctx_slow_modulation_step_count
+    ctx_stimulation = c.ctx_stimulation
+    DBS_stimulation = c.DBS_stimulation
+
 
     sim_total_time = (
         steady_state_duration + simulation_runtime + timestep
@@ -196,21 +211,40 @@ if __name__ == "__main__":
     GPi_Pop.record("soma(0.5).v", sampling_interval=rec_sampling_interval)
     Thalamic_Pop.record("soma(0.5).v", sampling_interval=rec_sampling_interval)
 
+    if ctx_stimulation:
+        Cortical_Pop.record("soma(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
+        Cortical_Pop.record("ais(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
+        for n in num_axon_compartments:
+            Cortical_Pop.record("node[n](0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
+
+
     # Assign Positions for recording and stimulating electrode point sources
     recording_electrode_1_position = np.array([0, -1500, 250])
     recording_electrode_2_position = np.array([0, 1500, 250])
     stimulating_electrode_position = np.array([0, 0, 250])
 
+    # Call the electrode_distance function with the required parameters
     (
         STN_recording_electrode_1_distances,
         STN_recording_electrode_2_distances,
         Cortical_Collateral_stimulating_electrode_distances,
+        segment_electrode_distances_nodes,
+        segment_electrode_distances_ais,
+        segment_electrode_distances_soma
     ) = electrode_distance(
         recording_electrode_1_position,
         recording_electrode_2_position,
         STN_Pop,
         stimulating_electrode_position,
         Cortical_Pop,
+        soma_L,
+        ais_L,
+        myelin_L,
+        node_L,
+        myelin_L_0,
+        ais_nseg,
+        soma_nseg,
+        num_axon_compartments,
     )
 
     # Conductivity and resistivity values for homogenous, isotropic medium
@@ -218,25 +252,72 @@ if __name__ == "__main__":
     # rho needs units of ohm cm for xtra mechanism (S/m -> S/cm)
     rho = 1 / (sigma * 1e-2)
 
-    # Calculate transfer resistances for each collateral segment for xtra
-    # units are Mohms
-    collateral_rx = (
-        0.01
-        * (rho / (4 * math.pi))
-        * (1 / Cortical_Collateral_stimulating_electrode_distances)
-    )
+    # Only calculate and apply extracellular mechanism if DBS Stimulation case
+    if DBS_stimulation:
+        # Calculate transfer resistances for each collateral segment for xtra
+        # units are Mohms
+        collateral_rx = (
+            0.01
+            * (rho / (4 * math.pi))
+            * (1 / Cortical_Collateral_stimulating_electrode_distances)
+        )
 
-    # Convert ndarray to array of Sequence objects - needed to set cortical
-    # collateral transfer resistances
-    collateral_rx_seq = np.ndarray(
-        shape=(1, Cortical_Pop.local_size), dtype=Sequence
-    ).flatten()
-    for ii in range(0, Cortical_Pop.local_size):
-        collateral_rx_seq[ii] = Sequence(collateral_rx[ii, :].flatten())
+        # Convert ndarray to array of Sequence objects - needed to set cortical
+        # collateral transfer resistances
+        collateral_rx_seq = np.ndarray(
+            shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        ).flatten()
+        for ii in range(0, Cortical_Pop.local_size):
+            collateral_rx_seq[ii] = Sequence(collateral_rx[ii, :].flatten())
 
-    # Assign transfer resistances values to collaterals
-    for ii, cell in enumerate(Cortical_Pop):
-        cell.collateral_rx = collateral_rx_seq[ii]
+        # Assign transfer resistances values to collaterals
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.collateral_rx = collateral_rx_seq[ii]
+
+    if ctx_stimulation:
+
+        # Calculate transfer resistances for each node segment for xtra
+        nodes_rx = (
+            0.01
+            * (rho / (4 * math.pi))
+            * (1 / segment_electrode_distances_nodes)
+        )
+
+        # Calculate transfer resistances for each ais segment for xtra
+        ais_rx = (
+                0.01
+                * (rho / (4 * math.pi))
+                * (1 / segment_electrode_distances_ais)
+        )
+        # Convert ndarray to array of Sequence objects - needed to set cortical
+        # collateral transfer resistances
+        ais_rx_seq = np.ndarray(
+            shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        ).flatten()
+        for ii in range(0, Cortical_Pop.local_size):
+            ais_rx_seq[ii] = Sequence(ais_rx[ii, :].flatten())
+
+        # Assign transfer resistances values to ais
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.ais_rx = ais_rx_seq[ii]
+
+            # Calculate transfer resistances for each soma segments for xtra
+            soma_rx = (
+                    0.01
+                    * (rho / (4 * math.pi))
+                    * (1 / segment_electrode_distances_soma)
+            )
+            # Convert ndarray to array of Sequence objects - needed to set cortical
+            # soma transfer resistances
+            soma_rx_seq = np.ndarray(
+                shape=(1, Cortical_Pop.local_size), dtype=Sequence
+            ).flatten()
+            for ii in range(0, Cortical_Pop.local_size):
+                soma_rx_seq[ii] = Sequence(soma_rx[ii, :].flatten())
+
+            # Assign transfer resistances values to somas
+            for ii, cell in enumerate(Cortical_Pop):
+                cell.soma_rx = soma_rx_seq[ii]
 
     # Create times for when the DBS controller will be called
     # Window length for filtering biomarker
@@ -289,114 +370,149 @@ if __name__ == "__main__":
         print(f"Output directory: {simulation_output_dir}")
         simulation_output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Generate a square wave which represents the DBS signal
-    # Needs to be initialized to zero when unused to prevent
-    # open-circuit of cortical collateral extracellular mechanism
-    if c.Modulation == "frequency":
-        last_pulse_time_prior = steady_state_duration
-    else:
-        last_pulse_time_prior = 0
-    (
-        DBS_Signal,
-        DBS_times,
-        next_DBS_pulse_time,
-        last_DBS_pulse_time,
-    ) = controller.generate_dbs_signal(
-        start_time=steady_state_duration + 10 + simulator.state.dt,
-        stop_time=sim_total_time,
-        last_pulse_time_prior=last_pulse_time_prior,
-        dt=simulator.state.dt,
-        amplitude=-1.0,
-        frequency=130.0,
-        pulse_width=0.06,
-        offset=0,
-    )
+    # Include check that DBS stimulation is switched on
+    if DBS_stimulation:
 
-    DBS_Signal = np.hstack((np.array([0, 0]), DBS_Signal))
-    DBS_times = np.hstack((np.array([0, steady_state_duration + 10]), DBS_times))
-
-    # Get DBS time indexes which corresponds to controller call times
-    controller_DBS_indices = []
-    for call_time in controller_call_times:
-        indices = np.where(DBS_times == call_time)[0]
-        if len(indices) > 0:
-            controller_DBS_indices.extend([indices[0]])
-
-    # Set first portion of DBS signal (Up to first controller call after
-    # steady state) to zero amplitude
-    DBS_Signal[0:] = 0
-    next_DBS_pulse_time = controller_call_times[0]
-
-    DBS_Signal_neuron = h.Vector(DBS_Signal)
-    DBS_times_neuron = h.Vector(DBS_times)
-
-    # Play DBS signal to global variable is_xtra
-    DBS_Signal_neuron.play(h._ref_is_xtra, DBS_times_neuron, 1)
-
-    # Get DBS_Signal_neuron as a numpy array for easy updating
-    updated_DBS_signal = DBS_Signal_neuron.as_numpy()
-
-    # Initialize tracking the frequencies calculated by the controller
-    last_freq_calculated = 0
-    last_DBS_pulse_time = steady_state_duration
-
-    # GPe DBS current stimulations - precalculated for % of collaterals
-    # entrained for varying DBS amplitude
-    interp_DBS_amplitudes = np.array(
-        [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2, 2.25, 2.50, 3, 4, 5]
-    )
-    interp_collaterals_entrained = np.array(
-        [0, 0, 0, 1, 4, 8, 19, 30, 43, 59, 82, 100, 100, 100]
-    )
-
-    if c.Modulation == "frequency":
-        last_pulse_time_prior = steady_state_duration
-    else:
-        last_pulse_time_prior = 0
-
-    # Make new GPe DBS vector for each GPe neuron - each GPe neuron needs a
-    # pointer to its own DBS signal
-    GPe_DBS_Signal_neuron = []
-    GPe_DBS_times_neuron = []
-    updated_GPe_DBS_signal = []
-    for i in range(0, Cortical_Pop.local_size):
+        # Generate a square wave which represents the DBS signal
+        # Needs to be initialized to zero when unused to prevent
+        # open-circuit of cortical collateral extracellular mechanism
+        if c.Modulation == "frequency":
+            last_pulse_time_prior = steady_state_duration
+        else:
+            last_pulse_time_prior = 0
         (
-            GPe_DBS_Signal,
-            GPe_DBS_times,
-            GPe_next_DBS_pulse_time,
-            GPe_last_DBS_pulse_time,
+            DBS_Signal,
+            DBS_times,
+            next_DBS_pulse_time,
+            last_DBS_pulse_time,
         ) = controller.generate_dbs_signal(
             start_time=steady_state_duration + 10 + simulator.state.dt,
             stop_time=sim_total_time,
             last_pulse_time_prior=last_pulse_time_prior,
             dt=simulator.state.dt,
-            amplitude=100.0,
+            amplitude=-1.0,
             frequency=130.0,
             pulse_width=0.06,
             offset=0,
         )
 
-        GPe_DBS_Signal = np.hstack((np.array([0, 0]), GPe_DBS_Signal))
-        GPe_DBS_times = np.hstack(
-            (np.array([0, steady_state_duration + 10]), GPe_DBS_times)
+        DBS_Signal = np.hstack((np.array([0, 0]), DBS_Signal))
+        DBS_times = np.hstack((np.array([0, steady_state_duration + 10]), DBS_times))
+
+        # Get DBS time indexes which corresponds to controller call times
+        controller_DBS_indices = []
+        for call_time in controller_call_times:
+            indices = np.where(DBS_times == call_time)[0]
+            if len(indices) > 0:
+                controller_DBS_indices.extend([indices[0]])
+
+        # Set first portion of DBS signal (Up to first controller call after
+        # steady state) to zero amplitude
+        DBS_Signal[0:] = 0
+        next_DBS_pulse_time = controller_call_times[0]
+
+        DBS_Signal_neuron = h.Vector(DBS_Signal)
+        DBS_times_neuron = h.Vector(DBS_times)
+
+        # Play DBS signal to global variable is_xtra
+        DBS_Signal_neuron.play(h._ref_is_xtra, DBS_times_neuron, 1)
+
+        # Get DBS_Signal_neuron as a numpy array for easy updating
+        updated_DBS_signal = DBS_Signal_neuron.as_numpy()
+
+        # Initialize tracking the frequencies calculated by the controller
+        last_freq_calculated = 0
+        last_DBS_pulse_time = steady_state_duration
+
+        # GPe DBS current stimulations - precalculated for % of collaterals
+        # entrained for varying DBS amplitude
+        interp_DBS_amplitudes = np.array(
+            [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2, 2.25, 2.50, 3, 4, 5]
+        )
+        interp_collaterals_entrained = np.array(
+            [0, 0, 0, 1, 4, 8, 19, 30, 43, 59, 82, 100, 100, 100]
         )
 
-        # Set the GPe DBS signals to zero amplitude
-        GPe_DBS_Signal[0:] = 0
-        GPe_next_DBS_pulse_time = controller_call_times[0]
+        if c.Modulation == "frequency":
+            last_pulse_time_prior = steady_state_duration
+        else:
+            last_pulse_time_prior = 0
 
-        # Neuron vector of GPe DBS signals
-        GPe_DBS_Signal_neuron.append(h.Vector(GPe_DBS_Signal))
-        GPe_DBS_times_neuron.append(h.Vector(GPe_DBS_times))
+        # Make new GPe DBS vector for each GPe neuron - each GPe neuron needs a
+        # pointer to its own DBS signal
+        GPe_DBS_Signal_neuron = []
+        GPe_DBS_times_neuron = []
+        updated_GPe_DBS_signal = []
+        for i in range(0, Cortical_Pop.local_size):
+            (
+                GPe_DBS_Signal,
+                GPe_DBS_times,
+                GPe_next_DBS_pulse_time,
+                GPe_last_DBS_pulse_time,
+            ) = controller.generate_dbs_signal(
+                start_time=steady_state_duration + 10 + simulator.state.dt,
+                stop_time=sim_total_time,
+                last_pulse_time_prior=last_pulse_time_prior,
+                dt=simulator.state.dt,
+                amplitude=100.0,
+                frequency=130.0,
+                pulse_width=0.06,
+                offset=0,
+            )
 
-        # Play the stimulation into each GPe neuron
-        GPe_DBS_Signal_neuron[i].play(
-            GV.GPe_stimulation_iclamps[i]._ref_amp, GPe_DBS_times_neuron[i], 1
+            GPe_DBS_Signal = np.hstack((np.array([0, 0]), GPe_DBS_Signal))
+            GPe_DBS_times = np.hstack(
+                (np.array([0, steady_state_duration + 10]), GPe_DBS_times)
+            )
+
+            # Set the GPe DBS signals to zero amplitude
+            GPe_DBS_Signal[0:] = 0
+            GPe_next_DBS_pulse_time = controller_call_times[0]
+
+            # Neuron vector of GPe DBS signals
+            GPe_DBS_Signal_neuron.append(h.Vector(GPe_DBS_Signal))
+            GPe_DBS_times_neuron.append(h.Vector(GPe_DBS_times))
+
+            # Play the stimulation into each GPe neuron
+            GPe_DBS_Signal_neuron[i].play(
+                GV.GPe_stimulation_iclamps[i]._ref_amp, GPe_DBS_times_neuron[i], 1
+            )
+
+            # Hold a reference to the signal as a numpy array, and append to list
+            # of GPe stimulation signals
+            updated_GPe_DBS_signal.append(GPe_DBS_Signal_neuron[i].as_numpy())
+
+    if ctx_stimulation:
+
+        # Generate an equivalent signal for the cortex
+        if c.Modulation == "frequency":
+            last_pulse_time_prior = steady_state_duration
+        else:
+            last_pulse_time_prior = 0
+        (
+            ctx_Signal,
+            ctx_times,
+            next_ctx_pulse_time,
+            last_ctx_pulse_time,
+        ) = controller.generate_dbs_signal(
+            start_time=steady_state_duration + 10 + simulator.state.dt,
+            stop_time=sim_total_time,
+            last_pulse_time_prior=last_pulse_time_prior,
+            dt=simulator.state.dt,
+            amplitude=-1.0, #apply relevant values for cortical stimulation
+            frequency=130.0,
+            pulse_width=0.06,
+            offset=0,
         )
 
-        # Hold a reference to the signal as a numpy array, and append to list
-        # of GPe stimulation signals
-        updated_GPe_DBS_signal.append(GPe_DBS_Signal_neuron[i].as_numpy())
+        ctx_Signal = np.hstack((np.array([0, 0]), ctx_Signal))
+        ctx_times = np.hstack((np.array([0, steady_state_duration + 10]), ctx_times))
+
+        ctx_Signal_neuron = h.Vector(ctx_Signal)
+        ctx_times_neuron = h.Vector(ctx_times)
+
+        # Play ctx signal to global variable is_xtra
+        ctx_Signal_neuron.play(h._ref_is_xtra, ctx_times_neuron, 1)
 
     # Initialise STN LFP list
     STN_LFP = []
@@ -522,100 +638,102 @@ if __name__ == "__main__":
         if rank == 0:
             print("Beta Average: %f" % lfp_beta_average_value)
 
-        if c.Modulation == "frequency":
-            # Calculate the updated DBS Frequency
-            DBS_amp = 1.5
-            DBS_freq = controller.update(
-                state_value=lfp_beta_average_value, current_time=simulator.state.t
-            )
-        else:
-            # Calculate the updated DBS amplitude
-            DBS_amp = controller.update(
-                state_value=lfp_beta_average_value, current_time=simulator.state.t
-            )
-            DBS_freq = 130.0
-
-        # Update the DBS Signal
-        if call_index + 1 < len(controller_call_times):
+        if DBS_stimulation:
 
             if c.Modulation == "frequency":
-                last_pulse_time_prior = last_DBS_pulse_time
-                # Check if the frequency needs to change before the last time that was calculated
-                if DBS_freq != last_freq_calculated:
-                    if DBS_freq == 0.0:  # Check if DBS wants to turn off
-                        next_DBS_pulse_time = 1e9
-                    else:  # Calculate new next pulse time if DBS is on
-                        T = (1.0 / DBS_freq) * 1e3
-                        next_DBS_pulse_time = last_DBS_pulse_time + T - 0.06
-
-                        # Need to check for situation when new DBS time is less than the current time
-                        if next_DBS_pulse_time <= simulator.state.t:
-                            next_DBS_pulse_time = simulator.state.t
-            else:
-                last_pulse_time_prior = 0
-
-            # Calculate new DBS segment from the next DBS pulse time
-            if next_DBS_pulse_time < controller_call_times[call_index + 1]:
-
-                GPe_next_DBS_pulse_time = next_DBS_pulse_time
-
-                # DBS Cortical Collateral Stimulation
-                (
-                    new_DBS_Signal_Segment,
-                    new_DBS_times_Segment,
-                    next_DBS_pulse_time,
-                    last_DBS_pulse_time,
-                ) = controller.generate_dbs_signal(
-                    start_time=next_DBS_pulse_time,
-                    stop_time=controller_call_times[call_index + 1],
-                    last_pulse_time_prior=last_pulse_time_prior,
-                    dt=simulator.state.dt,
-                    amplitude=-DBS_amp,
-                    frequency=DBS_freq,
-                    pulse_width=0.06,
-                    offset=0,
+                # Calculate the updated DBS Frequency
+                DBS_amp = 1.5
+                DBS_freq = controller.update(
+                    state_value=lfp_beta_average_value, current_time=simulator.state.t
                 )
+            else:
+                # Calculate the updated DBS amplitude
+                DBS_amp = controller.update(
+                    state_value=lfp_beta_average_value, current_time=simulator.state.t
+                )
+                DBS_freq = 130.0
 
-                # Update DBS segment - replace original DBS array values with
-                # updated ones
-                indices = np.where(DBS_times == new_DBS_times_Segment[0])[0]
-                if len(indices) > 0:
-                    window_start_index = indices[0]
+            # Update the DBS Signal
+            if call_index + 1 < len(controller_call_times):
+
+                if c.Modulation == "frequency":
+                    last_pulse_time_prior = last_DBS_pulse_time
+                    # Check if the frequency needs to change before the last time that was calculated
+                    if DBS_freq != last_freq_calculated:
+                        if DBS_freq == 0.0:  # Check if DBS wants to turn off
+                            next_DBS_pulse_time = 1e9
+                        else:  # Calculate new next pulse time if DBS is on
+                            T = (1.0 / DBS_freq) * 1e3
+                            next_DBS_pulse_time = last_DBS_pulse_time + T - 0.06
+
+                            # Need to check for situation when new DBS time is less than the current time
+                            if next_DBS_pulse_time <= simulator.state.t:
+                                next_DBS_pulse_time = simulator.state.t
                 else:
-                    window_start_index = 0
-                new_window_sample_length = len(new_DBS_Signal_Segment)
-                window_end_index = window_start_index + new_window_sample_length
-                updated_DBS_signal[
-                    window_start_index:window_end_index
-                ] = new_DBS_Signal_Segment
+                    last_pulse_time_prior = 0
 
-                # DBS GPe neuron stimulation
-                num_GPe_Neurons_entrained = int(
-                    np.interp(
-                        DBS_amp, interp_DBS_amplitudes, interp_collaterals_entrained
+                # Calculate new DBS segment from the next DBS pulse time
+                if next_DBS_pulse_time < controller_call_times[call_index + 1]:
+
+                    GPe_next_DBS_pulse_time = next_DBS_pulse_time
+
+                    # DBS Cortical Collateral Stimulation
+                    (
+                        new_DBS_Signal_Segment,
+                        new_DBS_times_Segment,
+                        next_DBS_pulse_time,
+                        last_DBS_pulse_time,
+                    ) = controller.generate_dbs_signal(
+                        start_time=next_DBS_pulse_time,
+                        stop_time=controller_call_times[call_index + 1],
+                        last_pulse_time_prior=last_pulse_time_prior,
+                        dt=simulator.state.dt,
+                        amplitude=-DBS_amp,
+                        frequency=DBS_freq,
+                        pulse_width=0.06,
+                        offset=0,
                     )
-                )
 
-                # Make copy of current DBS segment and rescale for GPe neuron
-                # stimulation
-                GPe_DBS_Segment = new_DBS_Signal_Segment.copy()
-                GPe_DBS_Segment *= -1
-                GPe_DBS_Segment[GPe_DBS_Segment > 0] = 100
+                    # Update DBS segment - replace original DBS array values with
+                    # updated ones
+                    indices = np.where(DBS_times == new_DBS_times_Segment[0])[0]
+                    if len(indices) > 0:
+                        window_start_index = indices[0]
+                    else:
+                        window_start_index = 0
+                    new_window_sample_length = len(new_DBS_Signal_Segment)
+                    window_end_index = window_start_index + new_window_sample_length
+                    updated_DBS_signal[
+                        window_start_index:window_end_index
+                    ] = new_DBS_Signal_Segment
 
-                # Stimulate the entrained GPe neurons
-                for i in np.arange(0, num_GPe_Neurons_entrained):
-                    cellid = Cortical_Pop[GPe_stimulation_order[i]]
-                    if Cortical_Pop.is_local(cellid):
-                        index = Cortical_Pop.id_to_local_index(cellid)
-                        updated_GPe_DBS_signal[index][
-                            window_start_index:window_end_index
-                        ] = GPe_DBS_Segment
+                    # DBS GPe neuron stimulation
+                    num_GPe_Neurons_entrained = int(
+                        np.interp(
+                            DBS_amp, interp_DBS_amplitudes, interp_collaterals_entrained
+                        )
+                    )
 
-                # Remember the last frequency that was calculated
-                last_freq_calculated = DBS_freq
+                    # Make copy of current DBS segment and rescale for GPe neuron
+                    # stimulation
+                    GPe_DBS_Segment = new_DBS_Signal_Segment.copy()
+                    GPe_DBS_Segment *= -1
+                    GPe_DBS_Segment[GPe_DBS_Segment > 0] = 100
 
-            else:
-                pass
+                    # Stimulate the entrained GPe neurons
+                    for i in np.arange(0, num_GPe_Neurons_entrained):
+                        cellid = Cortical_Pop[GPe_stimulation_order[i]]
+                        if Cortical_Pop.is_local(cellid):
+                            index = Cortical_Pop.id_to_local_index(cellid)
+                            updated_GPe_DBS_signal[index][
+                                window_start_index:window_end_index
+                            ] = GPe_DBS_Segment
+
+                    # Remember the last frequency that was calculated
+                    last_freq_calculated = DBS_freq
+
+                else:
+                    pass
 
         # Write population data to file
         if save_stn_voltage:
@@ -752,28 +870,53 @@ if __name__ == "__main__":
     # w = neo.io.NeoMatlabIO(filename=str(simulation_output_dir / "STN_LFP_GABAa.mat"))
     # w.write_block(STN_LFP_GABAa_Block)
 
-    # Write the DBS Signal to .mat file
-    # DBS Amplitude
-    DBS_Block = neo.Block(name="DBS_Signal")
-    DBS_Signal_seg = neo.Segment(name="segment_0")
-    DBS_Block.segments.append(DBS_Signal_seg)
-    DBS_signal = neo.AnalogSignal(
-        DBS_Signal_neuron,
-        units="mA",
-        t_start=0 * pq.ms,
-        sampling_rate=pq.Quantity(1.0 / simulator.state.dt, "1/ms"),
-    )
-    DBS_Signal_seg.analogsignals.append(DBS_signal)
-    DBS_times = neo.AnalogSignal(
-        DBS_times_neuron,
-        units="ms",
-        t_start=DBS_times_neuron * pq.ms,
-        sampling_rate=pq.Quantity(1.0 / simulator.state.dt, "1/ms"),
-    )
-    DBS_Signal_seg.analogsignals.append(DBS_times)
+    if DBS_stimulation:
+        # Write the DBS Signal to .mat file
+        # DBS Amplitude
+        DBS_Block = neo.Block(name="DBS_Signal")
+        DBS_Signal_seg = neo.Segment(name="segment_0")
+        DBS_Block.segments.append(DBS_Signal_seg)
+        DBS_signal = neo.AnalogSignal(
+            DBS_Signal_neuron,
+            units="mA",
+            t_start=0 * pq.ms,
+            sampling_rate=pq.Quantity(1.0 / simulator.state.dt, "1/ms"),
+        )
+        DBS_Signal_seg.analogsignals.append(DBS_signal)
+        DBS_times = neo.AnalogSignal(
+            DBS_times_neuron,
+            units="ms",
+            t_start=DBS_times_neuron * pq.ms,
+            sampling_rate=pq.Quantity(1.0 / simulator.state.dt, "1/ms"),
+        )
+        DBS_Signal_seg.analogsignals.append(DBS_times)
 
-    w = neo.io.NeoMatlabIO(filename=str(simulation_output_dir / "DBS_Signal.mat"))
-    w.write_block(DBS_Block)
+        w = neo.io.NeoMatlabIO(filename=str(simulation_output_dir / "DBS_Signal.mat"))
+        w.write_block(DBS_Block)
+
+    if ctx_stimulation:
+        # Write the Cortex Signal to .mat file
+        # Cortex Amplitude
+        ctx_Block = neo.Block(name="ctx_Signal")
+        ctx_Signal_seg = neo.Segment(name="segment_0")
+        ctx_Block.segments.append(ctx_Signal_seg)
+        ctx_signal = neo.AnalogSignal(
+            ctx_Signal_neuron,
+            units="mA",
+            t_start=0 * pq.ms,
+            sampling_rate=pq.Quantity(1.0 / simulator.state.dt, "1/ms"),
+        )
+        ctx_Signal_seg.analogsignals.append(ctx_signal)
+        ctx_times = neo.AnalogSignal(
+            ctx_times_neuron,
+            units="ms",
+            t_start=ctx_times_neuron * pq.ms,
+            sampling_rate=pq.Quantity(1.0 / simulator.state.dt, "1/ms"),
+        )
+        ctx_Signal_seg.analogsignals.append(ctx_times)
+
+        w = neo.io.NeoMatlabIO(filename=str(simulation_output_dir / "ctx_Signal.mat"))
+        w.write_block(ctx_Block)
 
     if rank == 0:
         print("Simulation Done!")

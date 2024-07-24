@@ -23,6 +23,7 @@ from Cortical_Basal_Ganglia_Cell_Classes import (
 from Electrode_Distances import (
     distances_to_electrode,
     collateral_distances_to_electrode,
+    axon_distances_to_electrode,
 )
 import utils as u
 from pathlib import Path
@@ -41,6 +42,7 @@ def create_network(
     ctx_dc_offset = config.ctx_dc_offset
     ctx_slow_modulation_amplitude = config.ctx_slow_modulation_amplitude
     ctx_slow_modulation_step_count = config.ctx_slow_modulation_step_count
+
 
     np.random.seed(rng_seed)
     structure_save_dir = Path("network_structure")
@@ -722,6 +724,14 @@ def electrode_distance(
     STN_Pop,
     stimulating_electrode_position,
     Cortical_Pop,
+    soma_L,
+    ais_L,
+    myelin_L,
+    node_L,
+    myelin_L_0,
+    ais_nseg,
+    soma_nseg,
+    num_axon_compartments
 ):
     # Calculate STN cell distances to each recording electrode
     # using only xy coordinates for distance calculations
@@ -735,17 +745,36 @@ def electrode_distance(
     # Calculate Cortical Collateral distances from the stimulating electrode -
     # using xyz coordinates for distance
     # calculation - these distances need to be in um for xtra mechanism
-    Cortical_Collateral_stimulating_electrode_distances = (
-        collateral_distances_to_electrode(
-            stimulating_electrode_position, Cortical_Pop, L=500, nseg=11
-        )
+    Cortical_Collateral_stimulating_electrode_distances = collateral_distances_to_electrode(
+        stimulating_electrode_position, Cortical_Pop, L=500, nseg=11
+    )
+
+    (
+        segment_electrode_distances_nodes,
+        segment_electrode_distances_ais,
+        segment_electrode_distances_soma
+    ) = axon_distances_to_electrode(
+        stimulating_electrode_position,
+        Cortical_Pop,
+        node_L,
+        myelin_L,
+        ais_L,
+        soma_L,
+        myelin_L_0,
+        num_axon_compartments,
+        ais_nseg,
+        soma_nseg
     )
 
     return (
         STN_recording_electrode_1_distances,
         STN_recording_electrode_2_distances,
         Cortical_Collateral_stimulating_electrode_distances,
+        segment_electrode_distances_nodes,
+        segment_electrode_distances_ais,
+        segment_electrode_distances_soma
     )
+
 
 
 def add_slow_modulation(Population, amplitude, step_count, steady_state_duration, sim_total_time):

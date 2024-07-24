@@ -108,7 +108,10 @@ class Config(object):
         },
         stage_two_mean={"type": "boolean", "coerce": bool, "default": False},
         debug={"type": "boolean", "coerce": bool, "default": False},
-        normalise_error={"type": "boolean", "coerce": bool, "default": True}
+        normalise_error={"type": "boolean", "coerce": bool, "default": True},
+        #control for cortical stimulation on or off
+        ctx_stimulation={"type": "boolean", "coerce": bool, "default": False},
+        DBS_stimulation = {"type": "boolean", "coerce": bool, "default": True}
     )
 
     def __init__(self, config_file):

@@ -69,8 +69,11 @@ import numpy as np
 
 # Import global variables for GPe DBS
 import Global_Variables as GV
-
+import config as c
 from functools import reduce
+
+ctx_stimulation = c.ctx_stimulation
+DBS_stimulation = c.DBS_stimulation
 
 
 def _new_property(obj_hierarchy, attr_name):
@@ -199,22 +202,62 @@ class Cortical_Neuron(object):
         self.middle_node = self.node[middle_index]
         self.middle_myelin = self.myelin[middle_index]
 
-        # Add extracellular and xtra mechanisms to collateral
-        self.collateral.insert("extracellular")
-        self.collateral.insert("xtra")
+        if DBS_stimulation:
+            #Add extracellular and xtra mechanisms to collateral
+            self.collateral.insert("extracellular")
+            self.collateral.insert("xtra")
 
-        # Assign default rx values to the segments rx_xtra
-        #  - these values are updated in the main run file
-        # 	 where rx is calculated as the transfer resistance
-        #    for each collateral segments to the stimulation
-        #    electrode in the homogenous extracellular medium
-        for seg in self.collateral:
-            seg.xtra.rx = seg.x * 3e-1
+            # Assign default rx values to the segments rx_xtra
+            #  - these values are updated in the main run file
+            # 	 where rx is calculated as the transfer resistance
+            #    for each collateral segments to the stimulation
+            #    electrode in the homogenous extracellular medium
+            for seg in self.collateral:
+                seg.xtra.rx = seg.x * 3e-1
 
-        # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
-        for seg in self.collateral:
-            h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
-            h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+            # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
+            for seg in self.collateral:
+                h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
+                h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+
+        if ctx_stimulation:
+            # Add extracellular and xtra mechanism to soma
+            self.soma.insert("extracellular")
+            self.soma.insert("xtra")
+
+            # Add extracellular and xtra mechanism to AIS
+            self.ais.insert("extracellular")
+            self.ais.insert("xtra")
+
+            #Add extracellular and xtra mechanism to main axon nodes
+            for n in self.node:
+                n.insert("extracellular")
+                n.insert("xtra")
+
+                # Assign default rx values to soma, ais and main axon nodes
+                for seg in self.soma:
+                    seg.xtra.rx = seg.x * 3e-1
+
+                # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
+                for seg in self.soma:
+                    h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
+                    h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+
+                for n in self.node:
+                    n(0.5).xtra.rx = seg.x * 3e-1
+
+                for n in self.node:
+                    h.setpointer(n(0.5)._ref_e_extracellular, "ex", seg.xtra)
+                    h.setpointer(n(0.5)._ref_i_membrane, "im", seg.xtra)
+
+                for seg in self.ais:
+                    seg.xtra.rx = seg.x * 3e-1
+
+                for seg in self.ais:
+                    h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
+                    h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+
+
 
         # Add bias current to neuron model - current amplitude is in terms of original model paper, nA
         self.stim = h.IClamp(0.5, sec=self.soma)
@@ -235,15 +278,19 @@ class Cortical_Neuron(object):
         self.source = {
             "soma": self.soma(0.5)._ref_v,
             "middle_axon_node": self.middle_node(0.5)._ref_v,
-            "collateral": self.collateral(0.5)._ref_v,
+            "ais": self.ais(0.5)._ref_v,
         }
         self.source_section = {
             "soma": self.soma,
             "middle_axon_node": self.middle_node,
-            "collateral": self.collateral,
+            "ais": self.ais,
         }
         self.rec = h.NetCon(
             self.source["collateral"], None, sec=self.source_section["collateral"]
+        )  # Needed to clear the simulator
+
+        self.rec = h.NetCon(
+            self.source["ais"], None, sec=self.source_section["ais"]
         )  # Needed to clear the simulator
         self.spike_times = h.Vector(0)
         self.traces = {}
@@ -270,7 +317,56 @@ class Cortical_Neuron(object):
             rx_values[0, i] = seg.xtra.rx
         print(Sequence(rx_values.flatten()))
 
-    collateral_rx = property(fget=_get_collateral_rx, fset=_set_collateral_rx)
+    if DBS_stimulation:
+        collateral_rx = property(fget=_get_collateral_rx, fset=_set_collateral_rx)
+
+    # Setter and Getter for AIS
+    def _set_ais_rx(self, sequence_values):
+        rx_values = sequence_values.value
+        for ii, seg in enumerate(self.ais):
+            seg.xtra.rx = rx_values[ii]
+
+    def _get_ais_rx(self):
+        print("Getter Working!")
+        rx_values = np.zeros((1, self.ais.nseg))
+        for i, seg in enumerate(self.ais):
+            rx_values[0, i] = seg.xtra.rx
+        print(Sequence(rx_values.flatten()))
+
+    if ctx_stimulation:
+        ais_rx = property(fget=_get_ais_rx, fset=_set_ais_rx)
+
+    # Setter and Getter for Soma
+    def _set_soma_rx(self, sequence_values):
+        rx_values = sequence_values.value
+        for ii, seg in enumerate(self.soma):
+            seg.xtra.rx = rx_values[ii]
+
+    def _get_soma_rx(self):
+        print("Getter Working!")
+        rx_values = np.zeros((1, self.soma.nseg))
+        for i, seg in enumerate(self.soma):
+            rx_values[0, i] = seg.xtra.rx
+        print(Sequence(rx_values.flatten()))
+
+    if ctx_stimulation:
+        soma_rx = property(fget=_get_soma_rx, fset=_set_soma_rx)
+
+    # Setter and Getter for Nodes
+    def _set_nodes_rx(self, sequence_values):
+        rx_values = sequence_values.value
+        for ii, n in enumerate(self.nodes):
+            n(0.5).xtra.rx = rx_values[ii]
+
+    def _get_nodes_rx(self):
+        print("Getter Working!")
+        rx_values = np.zeros((1, self.nodes.nseg))
+        for i, n in enumerate(self.nodes):
+            rx_values[0, i] = n(0.5).xtra.rx
+        print(Sequence(rx_values.flatten()))
+
+    if ctx_stimulation:
+        nodes_rx = property(fget=_get_nodes_rx, fset=_set_nodes_rx)
 
 
 class Cortical_Neuron_Type(NativeCellType):
@@ -305,12 +401,29 @@ class Cortical_Neuron_Type(NativeCellType):
         "num_axon_compartments": 10,
     }
 
-    # Define initial vector of transfer resistances for the collateral segments
-    initial_collateral_rx = np.zeros(
-        (1, default_parameters["collateral_nseg"])
-    ).flatten()
-    initial_collateral_rx_Sequence = Sequence(initial_collateral_rx)
-    default_parameters["collateral_rx"] = initial_collateral_rx_Sequence
+    if DBS_stimulation:
+        # Define initial vector of transfer resistances for the collateral segments
+        initial_collateral_rx = np.zeros(
+            (1, default_parameters["collateral_nseg"])
+        ).flatten()
+        initial_collateral_rx_Sequence = Sequence(initial_collateral_rx)
+        default_parameters["collateral_rx"] = initial_collateral_rx_Sequence
+
+    if ctx_stimulation:
+        # Define initial vector of transfer resistances for the ais segments
+        initial_ais_rx = np.zeros((1, default_parameters["ais_nseg"])).flatten()
+        initial_ais_rx_Sequence = Sequence(initial_ais_rx)
+        default_parameters["ais_rx"] = initial_ais_rx_Sequence
+
+        # Define initial vector of transfer resistances for the soma segments
+        initial_soma_rx = np.zeros((1, default_parameters["soma_nseg"])).flatten()
+        initial_soma_rx_Sequence = Sequence(initial_soma_rx)
+        default_parameters["soma_rx"] = initial_soma_rx_Sequence
+
+        # Define initial vector of transfer resistances for the nodes segments
+        initial_nodes_rx = np.zeros((1, default_parameters["nodes_nseg"])).flatten()
+        initial_nodes_rx_Sequence = Sequence(initial_nodes_rx)
+        default_parameters["nodes_rx"] = initial_nodes_rx_Sequence
 
     default_initial_values = {"v": -68.0}
     recordable = [
@@ -354,6 +467,19 @@ class Interneuron(object):
             ),
         )
 
+        # Add extracellular and xtra mechanism to soma
+        self.soma.insert("extracellular")
+        self.soma.insert("xtra")
+
+        # Assign default rx values to soma and main axon nodes
+        for seg in self.soma:
+            seg.xtra.rx = seg.x * 3e-1
+
+        # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
+        for seg in self.soma:
+            h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
+            h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+
         # Add bias current to neuron model - current amplitude is in terms of original model paper, nA
         self.stim = h.IClamp(0.5, sec=self.soma)
         self.stim.delay = 0
@@ -395,6 +521,20 @@ class Interneuron(object):
         for seg in self.soma:
             seg.v = self.v_init
 
+    def _set_inter_rx(self, sequence_values):
+        rx_values = sequence_values.value
+        for ii, seg in enumerate(self.soma):
+            seg.xtra.rx = rx_values[ii]
+
+    def _get_inter_rx(self):
+        print("Getter Working!")
+        rx_values = np.zeros((1, self.soma.nseg))
+        for i, seg in enumerate(self.soma):
+            rx_values[0, i] = seg.xtra.rx
+        print(Sequence(rx_values.flatten()))
+
+    inter_rx = property(fget=_get_inter_rx, fset=_set_inter_rx)
+
 
 class Interneuron_Type(NativeCellType):
     default_parameters = {
@@ -405,6 +545,10 @@ class Interneuron_Type(NativeCellType):
         "cm": 1,
         "bias_current_amp": 0.25,
     }
+    # Define initial vector of transfer resistances for the soma segments
+    initial_inter_rx = np.zeros((1, default_parameters["soma_nseg"])).flatten()
+    initial_inter_rx_Sequence = Sequence(initial_inter_rx)
+    default_parameters["inter_rx"] = initial_inter_rx_Sequence
     default_initial_values = {"v": -68.0}
     recordable = [
         "soma(0.5).v",
@@ -546,14 +690,14 @@ class GP_Neuron(object):
         self.stim.dur = 1e12
         self.stim.amp = parameters["bias_current"]
 
-        # Add DBS stimulation current to neuron model
-        self.DBS_stim = h.IClamp(0.5, sec=self.soma)
-        self.DBS_stim.delay = 0
-        self.DBS_stim.dur = 1e9
-        self.DBS_stim.amp = 0
-
-        # Append the DBS stimulation iclamps to global list
-        GV.GPe_stimulation_iclamps.append(self.DBS_stim)
+        # # Add DBS stimulation current to neuron model
+        # self.DBS_stim = h.IClamp(0.5, sec=self.soma)
+        # self.DBS_stim.delay = 0
+        # self.DBS_stim.dur = 1e9
+        # self.DBS_stim.amp = 0
+        #
+        # # Append the DBS stimulation iclamps to global list
+        # GV.GPe_stimulation_iclamps.append(self.DBS_stim)
 
         # Add AMPA and GABAa synapses to the cell, i.e. add to the soma section
         self.AMPA = h.AMPA_S(0.5, sec=self.soma)
