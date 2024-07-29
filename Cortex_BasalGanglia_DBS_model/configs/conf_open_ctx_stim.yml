@@ -2,8 +2,8 @@
 # Simulation
 Controller: OPEN
 RunTime: 32000.0
-ctx_stimulation: True
-DBS_stimulation: False
+ctx_stimulation: true
+DBS_stimulation: false
 
 # Controller
 setpoint: 0
