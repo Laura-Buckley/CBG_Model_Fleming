@@ -133,6 +133,7 @@ class Config(object):
         print(f"Validation errors: {v.errors}")  # Debugging statement
 
         if not is_valid:
+            print(f"Validation errors: {v.errors}")
             raise RuntimeError(f"Invalid configuration file:\n{v.errors}")
 
 
