@@ -69,7 +69,7 @@ import numpy as np
 
 # Import global variables for GPe DBS
 import Global_Variables as GV
-from config import Config
+from config import Config, get_controller_kwargs
 from functools import reduce
 
 config_file = Path(args.config_file).resolve()
