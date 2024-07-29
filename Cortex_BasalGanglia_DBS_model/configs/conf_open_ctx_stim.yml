@@ -1,6 +1,6 @@
 ---
 # Simulation
-Controller: OPEN
+Controller: "OPEN"
 RunTime: 32000.0
 ctx_stimulation: true
 DBS_stimulation: false
