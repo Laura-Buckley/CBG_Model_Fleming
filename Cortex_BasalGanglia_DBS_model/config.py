@@ -132,9 +132,8 @@ class Config(object):
 
         if not is_valid:
             raise RuntimeError(f"Invalid configuration file:\n{v.errors}")
-            print("this is the new code iteration")
-        # if not v.validate(conf, self.schema):
-        #     raise RuntimeError(f"Invalid configuration file:\n{v.errors}")
+
+
 
         for key, value in v.document.items():
             self.__setattr__(key, value)
