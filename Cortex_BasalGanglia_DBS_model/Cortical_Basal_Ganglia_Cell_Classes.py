@@ -66,20 +66,36 @@ from nrnutils import Mechanism, Section
 from pyNN.neuron import NativeCellType
 from pyNN.parameters import Sequence
 import numpy as np
+from pathlib import Path
 
 # Import global variables for GPe DBS
 import Global_Variables as GV
 from config import Config, get_controller_kwargs
 from functools import reduce
 
-config_file = Path(args.config_file).resolve()
-output_dir = Path(args.output_dir).resolve()
-c = Config(args.config_file)
+# Initialize paths safely with checks
+config_path = Path(args.config_file)
+output_dir = Path(args.output_dir)
+
+if config_path.exists():
+    resolved_path = config_path.resolve()
+    print(f"Resolved Configuration Path: {resolved_path}")
+    c = Config(str(resolved_path))  # Make sure to convert Path object to string if necessary
+else:
+    print(f"Error: Configuration file does not exist at {config_path}")
+    # Here you can handle the error, e.g., raise an exception, log an error, or set default configurations
+    raise FileNotFoundError(f"Configuration file not found at {config_path}")
+
+if not output_dir.exists():
+    print(f"Creating output directory at {output_dir}")
+    os.makedirs(output_dir)  # Create the directory if it does not exist
+
+# Now that paths are resolved and checked, you can change directory
 os.chdir(newpwd)
 
+# Configuration variables
 ctx_stimulation = c.ctx_stimulation
 DBS_stimulation = c.DBS_stimulation
-
 
 def _new_property(obj_hierarchy, attr_name):
     """
