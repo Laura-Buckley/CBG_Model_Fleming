@@ -41,6 +41,8 @@ constant_schema = dict(
     setpoint={"type": "float", "coerce": float},
     stimulation_amplitude={"type": "float", "coerce": float},
     ts={"type": "float", "coerce": float},
+    ctx_stimulation={"type": "boolean", "coerce": bool, "default": False},  # Added
+    DBS_stimulation={"type": "boolean", "coerce": bool, "default": True}    # Added
 )
 
 
