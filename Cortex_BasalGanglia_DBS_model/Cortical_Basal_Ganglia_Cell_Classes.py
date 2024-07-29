@@ -69,8 +69,13 @@ import numpy as np
 
 # Import global variables for GPe DBS
 import Global_Variables as GV
-import config as c
+from config import Config
 from functools import reduce
+
+config_file = Path(args.config_file).resolve()
+output_dir = Path(args.output_dir).resolve()
+c = Config(args.config_file)
+os.chdir(newpwd)
 
 ctx_stimulation = c.ctx_stimulation
 DBS_stimulation = c.DBS_stimulation
