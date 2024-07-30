@@ -60,40 +60,45 @@
     Created on Tues Jan 15 12:51:26 2019
 
 """
-
+import argparse
+import os
+from pathlib import Path
 from neuron import h
 from nrnutils import Mechanism, Section
 from pyNN.neuron import NativeCellType
 from pyNN.parameters import Sequence
 import numpy as np
-from pathlib import Path
-
-# Import global variables for GPe DBS
-import Global_Variables as GV
-from config import Config, get_controller_kwargs
 from functools import reduce
 
-# Initialize paths safely with checks
-config_path = Path(args.config_file)
-output_dir = Path(args.output_dir)
+# Import global variables and configuration management
+import Global_Variables as GV
+from config import Config, get_controller_kwargs
 
-if config_path.exists():
-    resolved_path = config_path.resolve()
-    print(f"Resolved Configuration Path: {resolved_path}")
-    c = Config(str(resolved_path))  # Make sure to convert Path object to string if necessary
-else:
-    print(f"Error: Configuration file does not exist at {config_path}")
-    # Here you can handle the error, e.g., raise an exception, log an error, or set default configurations
-    raise FileNotFoundError(f"Configuration file not found at {config_path}")
+# Function to set up the environment based on command line arguments
+def setup_environment():
+    args = parse_arguments()
 
-if not output_dir.exists():
-    print(f"Creating output directory at {output_dir}")
-    os.makedirs(output_dir)  # Create the directory if it does not exist
+    # Resolve paths
+    config_path = Path(args.config_file).resolve(strict=True)  # strict=True will raise FileNotFoundError if path does not exist
+    output_dir = Path(args.output_dir).resolve()
 
-# Now that paths are resolved and checked, you can change directory
-os.chdir(newpwd)
+    # Create output directory if it does not exist
+    if not output_dir.exists():
+        print(f"Creating output directory at {output_dir}")
+        output_dir.mkdir(parents=True)
 
-# Configuration variables
+    # Change to the output directory
+    os.chdir(output_dir)
+
+    # Load configuration
+    c = Config(str(config_path))  # Config needs a string path
+
+    return c
+
+# Use the setup_environment function to configure the environment and load settings
+c = setup_environment()
+
+# Accessing configuration variables
 ctx_stimulation = c.ctx_stimulation
 DBS_stimulation = c.DBS_stimulation
 
