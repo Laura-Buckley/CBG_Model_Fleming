@@ -227,6 +227,18 @@ class Cortical_Neuron(object):
         self.middle_node = self.node[middle_index]
         self.middle_myelin = self.myelin[middle_index]
 
+        def _set_collateral_rx(self, sequence_values):
+            rx_values = sequence_values.value
+            for ii, seg in enumerate(self.collateral):
+                seg.xtra.rx = rx_values[ii]
+
+        def _get_collateral_rx(self):
+            print("Getter Working!")
+            rx_values = np.zeros((1, self.collateral.nseg))
+            for i, seg in enumerate(self.collateral):
+                rx_values[0, i] = seg.xtra.rx
+            print(Sequence(rx_values.flatten()))
+
         if DBS_stimulation:
             #Add extracellular and xtra mechanisms to collateral
             self.collateral.insert("extracellular")
@@ -245,6 +257,47 @@ class Cortical_Neuron(object):
                 h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
                 h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
 
+            collateral_rx = property(fget=_get_collateral_rx, fset=_set_collateral_rx)
+
+        # Setter and Getter for AIS
+        def _set_ais_rx(self, sequence_values):
+            rx_values = sequence_values.value
+            for ii, seg in enumerate(self.ais):
+                seg.xtra.rx = rx_values[ii]
+
+        def _get_ais_rx(self):
+            print("Getter Working!")
+            rx_values = np.zeros((1, self.ais.nseg))
+            for i, seg in enumerate(self.ais):
+                rx_values[0, i] = seg.xtra.rx
+            print(Sequence(rx_values.flatten()))
+
+        # Setter and Getter for Soma
+        def _set_soma_rx(self, sequence_values):
+            rx_values = sequence_values.value
+            for ii, seg in enumerate(self.soma):
+                seg.xtra.rx = rx_values[ii]
+
+        def _get_soma_rx(self):
+            print("Getter Working!")
+            rx_values = np.zeros((1, self.soma.nseg))
+            for i, seg in enumerate(self.soma):
+                rx_values[0, i] = seg.xtra.rx
+            print(Sequence(rx_values.flatten()))
+
+        # Setter and Getter for Nodes
+        def _set_nodes_rx(self, sequence_values):
+            rx_values = sequence_values.value
+            for ii, n in enumerate(self.nodes):
+                n(0.5).xtra.rx = rx_values[ii]
+
+        def _get_nodes_rx(self):
+            print("Getter Working!")
+            rx_values = np.zeros((1, self.nodes.nseg))
+            for i, n in enumerate(self.nodes):
+                rx_values[0, i] = n(0.5).xtra.rx
+            print(Sequence(rx_values.flatten()))
+
         if ctx_stimulation:
             # Add extracellular and xtra mechanism to soma
             self.soma.insert("extracellular")
@@ -259,30 +312,32 @@ class Cortical_Neuron(object):
                 n.insert("extracellular")
                 n.insert("xtra")
 
-                # Assign default rx values to soma, ais and main axon nodes
-                for seg in self.soma:
-                    seg.xtra.rx = seg.x * 3e-1
+            # Assign default rx values to soma, ais and main axon nodes
+            for seg in self.soma:
+                seg.xtra.rx = seg.x * 3e-1
 
-                # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
-                for seg in self.soma:
-                    h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
-                    h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+            # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
+            for seg in self.soma:
+                h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
+                h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
 
-                for n in self.node:
-                    n(0.5).xtra.rx = seg.x * 3e-1
+            for n in self.node:
+                n(0.5).xtra.rx = seg.x * 3e-1
 
-                for n in self.node:
-                    h.setpointer(n(0.5)._ref_e_extracellular, "ex", seg.xtra)
-                    h.setpointer(n(0.5)._ref_i_membrane, "im", seg.xtra)
+            for n in self.node:
+                h.setpointer(n(0.5)._ref_e_extracellular, "ex", seg.xtra)
+                h.setpointer(n(0.5)._ref_i_membrane, "im", seg.xtra)
 
-                for seg in self.ais:
-                    seg.xtra.rx = seg.x * 3e-1
+            for seg in self.ais:
+                seg.xtra.rx = seg.x * 3e-1
 
-                for seg in self.ais:
-                    h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
-                    h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+            for seg in self.ais:
+                h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
+                h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
 
-
+            ais_rx = property(fget=_get_ais_rx, fset=_set_ais_rx)
+            soma_rx = property(fget=_get_soma_rx, fset=_set_soma_rx)
+            nodes_rx = property(fget=_get_nodes_rx, fset=_set_nodes_rx)
 
         # Add bias current to neuron model - current amplitude is in terms of original model paper, nA
         self.stim = h.IClamp(0.5, sec=self.soma)
@@ -330,68 +385,6 @@ class Cortical_Neuron(object):
         for seg in self.soma:
             seg.v = self.v_init
 
-    def _set_collateral_rx(self, sequence_values):
-        rx_values = sequence_values.value
-        for ii, seg in enumerate(self.collateral):
-            seg.xtra.rx = rx_values[ii]
-
-    def _get_collateral_rx(self):
-        print("Getter Working!")
-        rx_values = np.zeros((1, self.collateral.nseg))
-        for i, seg in enumerate(self.collateral):
-            rx_values[0, i] = seg.xtra.rx
-        print(Sequence(rx_values.flatten()))
-
-    if DBS_stimulation:
-        collateral_rx = property(fget=_get_collateral_rx, fset=_set_collateral_rx)
-
-    # Setter and Getter for AIS
-    def _set_ais_rx(self, sequence_values):
-        rx_values = sequence_values.value
-        for ii, seg in enumerate(self.ais):
-            seg.xtra.rx = rx_values[ii]
-
-    def _get_ais_rx(self):
-        print("Getter Working!")
-        rx_values = np.zeros((1, self.ais.nseg))
-        for i, seg in enumerate(self.ais):
-            rx_values[0, i] = seg.xtra.rx
-        print(Sequence(rx_values.flatten()))
-
-    if ctx_stimulation:
-        ais_rx = property(fget=_get_ais_rx, fset=_set_ais_rx)
-
-    # Setter and Getter for Soma
-    def _set_soma_rx(self, sequence_values):
-        rx_values = sequence_values.value
-        for ii, seg in enumerate(self.soma):
-            seg.xtra.rx = rx_values[ii]
-
-    def _get_soma_rx(self):
-        print("Getter Working!")
-        rx_values = np.zeros((1, self.soma.nseg))
-        for i, seg in enumerate(self.soma):
-            rx_values[0, i] = seg.xtra.rx
-        print(Sequence(rx_values.flatten()))
-
-    if ctx_stimulation:
-        soma_rx = property(fget=_get_soma_rx, fset=_set_soma_rx)
-
-    # Setter and Getter for Nodes
-    def _set_nodes_rx(self, sequence_values):
-        rx_values = sequence_values.value
-        for ii, n in enumerate(self.nodes):
-            n(0.5).xtra.rx = rx_values[ii]
-
-    def _get_nodes_rx(self):
-        print("Getter Working!")
-        rx_values = np.zeros((1, self.nodes.nseg))
-        for i, n in enumerate(self.nodes):
-            rx_values[0, i] = n(0.5).xtra.rx
-        print(Sequence(rx_values.flatten()))
-
-    if ctx_stimulation:
-        nodes_rx = property(fget=_get_nodes_rx, fset=_set_nodes_rx)
 
 
 class Cortical_Neuron_Type(NativeCellType):
