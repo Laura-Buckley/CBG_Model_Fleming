@@ -95,12 +95,11 @@ def setup_environment():
 
     return c
 
-# Use the setup_environment function to configure the environment and load settings
-c = setup_environment()
-
-# Accessing configuration variables
-ctx_stimulation = c.ctx_stimulation
-DBS_stimulation = c.DBS_stimulation
+## This should be under 'if __name__ == "__main__":' to avoid execution on import
+if __name__ == "__main__":
+    c = setup_environment()
+    ctx_stimulation = c.ctx_stimulation
+    DBS_stimulation = c.DBS_stimulation
 
 def _new_property(obj_hierarchy, attr_name):
     """
