@@ -2,6 +2,10 @@ import yaml
 from cerberus import Validator
 from pathlib import Path
 
+# Define global variables
+global_ctx_stimulation = None
+global_DBS_stimulation = None
+
 zero_schema = dict(
     setpoint={"type": "float", "coerce": float},
     ts={"type": "float", "coerce": float},
@@ -41,8 +45,6 @@ constant_schema = dict(
     setpoint={"type": "float", "coerce": float},
     stimulation_amplitude={"type": "float", "coerce": float},
     ts={"type": "float", "coerce": float},
-    ctx_stimulation={"type": "boolean", "coerce": bool, "default": False},  # Added
-    DBS_stimulation={"type": "boolean", "coerce": bool, "default": True}    # Added
 )
 
 
@@ -136,10 +138,15 @@ class Config(object):
             print(f"Validation errors: {v.errors}")
             raise RuntimeError(f"Invalid configuration file:\n{v.errors}")
 
-
-
         for key, value in v.document.items():
-            self.__setattr__(key, value)
+            setattr(self, key, value)
+            # Update global variables if they are present in the configuration
+            if key == "ctx_stimulation":
+                global global_ctx_stimulation
+                global_ctx_stimulation = value
+            elif key == "DBS_stimulation":
+                global global_DBS_stimulation
+                global_DBS_stimulation = value
 
     def __str__(self):
         return str(vars(self)).strip("{}").replace(", ", ",\n")

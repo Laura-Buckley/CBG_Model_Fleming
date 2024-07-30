@@ -72,34 +72,8 @@ from functools import reduce
 
 # Import global variables and configuration management
 import Global_Variables as GV
-from config import Config, get_controller_kwargs
+from config import Config, global_ctx_stimulation, global_DBS_stimulation
 
-# Function to set up the environment based on command line arguments
-def setup_environment():
-    args = parse_arguments()
-
-    # Resolve paths
-    config_path = Path(args.config_file).resolve(strict=True)  # strict=True will raise FileNotFoundError if path does not exist
-    output_dir = Path(args.output_dir).resolve()
-
-    # Create output directory if it does not exist
-    if not output_dir.exists():
-        print(f"Creating output directory at {output_dir}")
-        output_dir.mkdir(parents=True)
-
-    # Change to the output directory
-    os.chdir(output_dir)
-
-    # Load configuration
-    c = Config(str(config_path))  # Config needs a string path
-
-    return c
-
-## This should be under 'if __name__ == "__main__":' to avoid execution on import
-if __name__ == "__main__":
-    c = setup_environment()
-    ctx_stimulation = c.ctx_stimulation
-    DBS_stimulation = c.DBS_stimulation
 
 def _new_property(obj_hierarchy, attr_name):
     """
@@ -239,7 +213,7 @@ class Cortical_Neuron(object):
                 rx_values[0, i] = seg.xtra.rx
             print(Sequence(rx_values.flatten()))
 
-        if DBS_stimulation:
+        if global_DBS_stimulation:
             #Add extracellular and xtra mechanisms to collateral
             self.collateral.insert("extracellular")
             self.collateral.insert("xtra")
@@ -298,7 +272,7 @@ class Cortical_Neuron(object):
                 rx_values[0, i] = n(0.5).xtra.rx
             print(Sequence(rx_values.flatten()))
 
-        if ctx_stimulation:
+        if global_ctx_stimulation:
             # Add extracellular and xtra mechanism to soma
             self.soma.insert("extracellular")
             self.soma.insert("xtra")
@@ -419,7 +393,7 @@ class Cortical_Neuron_Type(NativeCellType):
         "num_axon_compartments": 10,
     }
 
-    if DBS_stimulation:
+    if global_DBS_stimulation:
         # Define initial vector of transfer resistances for the collateral segments
         initial_collateral_rx = np.zeros(
             (1, default_parameters["collateral_nseg"])
@@ -427,7 +401,7 @@ class Cortical_Neuron_Type(NativeCellType):
         initial_collateral_rx_Sequence = Sequence(initial_collateral_rx)
         default_parameters["collateral_rx"] = initial_collateral_rx_Sequence
 
-    if ctx_stimulation:
+    if global_ctx_stimulation:
         # Define initial vector of transfer resistances for the ais segments
         initial_ais_rx = np.zeros((1, default_parameters["ais_nseg"])).flatten()
         initial_ais_rx_Sequence = Sequence(initial_ais_rx)
@@ -485,18 +459,34 @@ class Interneuron(object):
             ),
         )
 
-        # Add extracellular and xtra mechanism to soma
-        self.soma.insert("extracellular")
-        self.soma.insert("xtra")
+        def _set_inter_rx(self, sequence_values):
+            rx_values = sequence_values.value
+            for ii, seg in enumerate(self.soma):
+                seg.xtra.rx = rx_values[ii]
 
-        # Assign default rx values to soma and main axon nodes
-        for seg in self.soma:
-            seg.xtra.rx = seg.x * 3e-1
+        def _get_inter_rx(self):
+            print("Getter Working!")
+            rx_values = np.zeros((1, self.soma.nseg))
+            for i, seg in enumerate(self.soma):
+                rx_values[0, i] = seg.xtra.rx
+            print(Sequence(rx_values.flatten()))
 
-        # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
-        for seg in self.soma:
-            h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
-            h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+        if global_ctx_stimulation:
+
+            # Add extracellular and xtra mechanism to soma
+            self.soma.insert("extracellular")
+            self.soma.insert("xtra")
+
+            # Assign default rx values to soma and main axon nodes
+            for seg in self.soma:
+                seg.xtra.rx = seg.x * 3e-1
+
+            # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
+            for seg in self.soma:
+                h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
+                h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+
+            inter_rx = property(fget=_get_inter_rx, fset=_set_inter_rx)
 
         # Add bias current to neuron model - current amplitude is in terms of original model paper, nA
         self.stim = h.IClamp(0.5, sec=self.soma)
@@ -538,20 +528,6 @@ class Interneuron(object):
     def memb_init(self):
         for seg in self.soma:
             seg.v = self.v_init
-
-    def _set_inter_rx(self, sequence_values):
-        rx_values = sequence_values.value
-        for ii, seg in enumerate(self.soma):
-            seg.xtra.rx = rx_values[ii]
-
-    def _get_inter_rx(self):
-        print("Getter Working!")
-        rx_values = np.zeros((1, self.soma.nseg))
-        for i, seg in enumerate(self.soma):
-            rx_values[0, i] = seg.xtra.rx
-        print(Sequence(rx_values.flatten()))
-
-    inter_rx = property(fget=_get_inter_rx, fset=_set_inter_rx)
 
 
 class Interneuron_Type(NativeCellType):
