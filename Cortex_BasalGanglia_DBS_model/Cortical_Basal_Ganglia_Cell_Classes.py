@@ -540,7 +540,7 @@ class Interneuron_Type(NativeCellType):
         "bias_current_amp": 0.25,
     }
     # Define initial vector of transfer resistances for the soma segments
-    initial_inter_rx = np.zeros((1, default_parameters["soma_nseg"])).flatten()
+    initial_inter_rx = np.zeros((1, default_parameters["nseg"])).flatten()
     initial_inter_rx_Sequence = Sequence(initial_inter_rx)
     default_parameters["inter_rx"] = initial_inter_rx_Sequence
     default_initial_values = {"v": -68.0}
