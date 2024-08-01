@@ -333,11 +333,13 @@ class Cortical_Neuron(object):
             "soma": self.soma(0.5)._ref_v,
             "middle_axon_node": self.middle_node(0.5)._ref_v,
             "ais": self.ais(0.5)._ref_v,
+            "collateral": self.collateral(0.5)._ref_v,
         }
         self.source_section = {
             "soma": self.soma,
             "middle_axon_node": self.middle_node,
             "ais": self.ais,
+            "collateral": self.collateral,
         }
         self.rec = h.NetCon(
             self.source["collateral"], None, sec=self.source_section["collateral"]
