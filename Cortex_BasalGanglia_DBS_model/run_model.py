@@ -43,11 +43,14 @@ import math
 import argparse
 from utils import make_beta_cheby1_filter, calculate_avg_beta_power
 from model import create_network, load_network, electrode_distance
-from config import Config, get_controller_kwargs
+from config import Config, get_controller_kwargs, global_ctx_stimulation, global_DBS_stimulation
 from Cortical_Basal_Ganglia_Cell_Classes import Cortical_Neuron_Type
 
 # Import global variables for GPe DBS
 import Global_Variables as GV
+
+ctx_stimulation = global_ctx_stimulation
+DBS_stimulation = global_DBS_stimulation
 
 h = neuron.h
 comm = MPI.COMM_WORLD
