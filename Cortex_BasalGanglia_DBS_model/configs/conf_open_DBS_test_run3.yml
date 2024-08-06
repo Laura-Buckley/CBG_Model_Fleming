@@ -1,7 +1,7 @@
 ---
 # Simulation
 Controller: OPEN
-RunTime: 4000.0
+RunTime: 2000.0
 SteadyStateDuration: 500
 ctx_stimulation: False
 DBS_stimulation: True

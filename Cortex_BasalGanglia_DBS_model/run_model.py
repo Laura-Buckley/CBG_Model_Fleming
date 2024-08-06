@@ -374,7 +374,7 @@ if __name__ == "__main__":
 
     # Include check that DBS stimulation is switched on
     if DBS_stimulation:
-
+        print('DBS stimulation passed check point')
         # Generate a square wave which represents the DBS signal
         # Needs to be initialized to zero when unused to prevent
         # open-circuit of cortical collateral extracellular mechanism
