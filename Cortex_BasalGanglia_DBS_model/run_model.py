@@ -874,7 +874,8 @@ if __name__ == "__main__":
     # w = neo.io.NeoMatlabIO(filename=str(simulation_output_dir / "STN_LFP_GABAa.mat"))
     # w.write_block(STN_LFP_GABAa_Block)
 
-    if DBS_stimulation:
+    # Check if DBS_Signal_neuron exists and isn't void
+    if 'DBS_Signal_neuron' in globals() and DBS_Signal_neuron is not None and len(DBS_Signal_neuron) > 0:
         # Write the DBS Signal to .mat file
         print('Saving the DBS_Signal...')
         # DBS Amplitude
@@ -898,9 +899,13 @@ if __name__ == "__main__":
 
         w = neo.io.NeoMatlabIO(filename=str(simulation_output_dir / "DBS_Signal.mat"))
         w.write_block(DBS_Block)
+    else:
+        print('DBS_Signal_neuron does not exist or is void. Skipping save.')
 
-    if ctx_stimulation:
+    # Check if ctx_Signal_neuron exists and isn't void
+    if 'ctx_Signal_neuron' in globals() and ctx_Signal_neuron is not None and len(ctx_Signal_neuron) > 0:
         # Write the Cortex Signal to .mat file
+        print('Saving the ctx_Signal...')
         # Cortex Amplitude
         ctx_Block = neo.Block(name="ctx_Signal")
         ctx_Signal_seg = neo.Segment(name="segment_0")
@@ -922,6 +927,8 @@ if __name__ == "__main__":
 
         w = neo.io.NeoMatlabIO(filename=str(simulation_output_dir / "ctx_Signal.mat"))
         w.write_block(ctx_Block)
+    else:
+        print('ctx_Signal_neuron does not exist or is void. Skipping save.')
 
     if rank == 0:
         print("Simulation Done!")
