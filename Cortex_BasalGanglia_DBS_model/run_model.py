@@ -876,6 +876,7 @@ if __name__ == "__main__":
 
     if DBS_stimulation:
         # Write the DBS Signal to .mat file
+        print('Saving the DBS_Signal...')
         # DBS Amplitude
         DBS_Block = neo.Block(name="DBS_Signal")
         DBS_Signal_seg = neo.Segment(name="segment_0")
