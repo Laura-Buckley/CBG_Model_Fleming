@@ -477,6 +477,8 @@ if __name__ == "__main__":
             GPe_DBS_Signal_neuron.append(h.Vector(GPe_DBS_Signal))
             GPe_DBS_times_neuron.append(h.Vector(GPe_DBS_times))
 
+            num_iclamps = len(GV.GPe_stimulation_iclamps)
+            print(f'GP Neuron iClamps = {num_iclamps}')
             # Play the stimulation into each GPe neuron
             GPe_DBS_Signal_neuron[i].play(
                 GV.GPe_stimulation_iclamps[i]._ref_amp, GPe_DBS_times_neuron[i], 1
