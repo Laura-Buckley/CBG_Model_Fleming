@@ -254,8 +254,10 @@ if __name__ == "__main__":
     # rho needs units of ohm cm for xtra mechanism (S/m -> S/cm)
     rho = 1 / (sigma * 1e-2)
 
+
     # Only calculate and apply extracellular mechanism if DBS Stimulation case
     if DBS_stimulation:
+        print(f"The value of DBS stim is: {DBS_stimulation}")
         # Calculate transfer resistances for each collateral segment for xtra
         # units are Mohms
         collateral_rx = (
@@ -370,6 +372,7 @@ if __name__ == "__main__":
     simulation_output_dir = output_dir
     if rank == 0:
         print(f"Output directory: {simulation_output_dir}")
+        print(f"The value of DBS stim at this point is: {DBS_stimulation}")
         simulation_output_dir.mkdir(parents=True, exist_ok=True)
 
     # Include check that DBS stimulation is switched on
