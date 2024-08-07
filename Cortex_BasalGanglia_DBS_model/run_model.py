@@ -69,7 +69,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CBG Model")
     parser.add_argument("config_file", nargs="?", help="yaml configuration file")
     parser.add_argument(
-        "-o", "--output-dir", default="ROESULTS", help="output directory name"
+        "-o", "--output-dir", default="RESULTS", help="output directory name"
     )
     args, unknown = parser.parse_known_args()
 
@@ -78,6 +78,9 @@ if __name__ == "__main__":
     c = Config(args.config_file)
     os.chdir(newpwd)
 
+    # Debugging statement to check if global variables are set
+    print(f"global_ctx_stim_insert after config init: {global_ctx_stim_insert}")
+    print(f"global_DBS_stim_insert after config init: {global_DBS_stim_insert}")
     simulation_runtime = c.RunTime
     controller_type = c.Controller
     rng_seed = c.RandomSeed
