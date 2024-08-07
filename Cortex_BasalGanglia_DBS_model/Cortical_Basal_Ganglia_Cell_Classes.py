@@ -72,7 +72,7 @@ from functools import reduce
 
 # Import global variables and configuration management
 import Global_Variables as GV
-from config import Config, global_DBS_stim_insert, global_ctx_stim_insert
+from config import global_DBS_stim_insert, global_ctx_stim_insert
 
 
 def _new_property(obj_hierarchy, attr_name):
