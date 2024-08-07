@@ -43,7 +43,7 @@ import math
 import argparse
 from utils import make_beta_cheby1_filter, calculate_avg_beta_power
 from model import create_network, load_network, electrode_distance
-from config import Config, get_controller_kwargs, global_ctx_stimulation, global_DBS_stimulation
+from config import Config, get_controller_kwargs
 from Cortical_Basal_Ganglia_Cell_Classes import Cortical_Neuron_Type
 
 # Import global variables for GPe DBS
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CBG Model")
     parser.add_argument("config_file", nargs="?", help="yaml configuration file")
     parser.add_argument(
-        "-o", "--output-dir", default="RESULTS", help="output directory name"
+        "-o", "--output-dir", default="ROESULTS", help="output directory name"
     )
     args, unknown = parser.parse_known_args()
 
@@ -91,8 +91,8 @@ if __name__ == "__main__":
     controller_sampling_time = 1000 * c.ts
     ctx_slow_modulation_amplitude = c.ctx_slow_modulation_amplitude
     ctx_slow_modulation_step_count = c.ctx_slow_modulation_step_count
-    ctx_stimulation = global_ctx_stimulation
-    DBS_stimulation = global_DBS_stimulation
+    ctx_stimulation = c.ctx_stimulation
+    DBS_stimulation = c.DBS_stimulation
 
     sim_total_time = (
         steady_state_duration + simulation_runtime + timestep
@@ -193,8 +193,6 @@ if __name__ == "__main__":
         if rank == 0:
             print("Network created")
 
-    # ctx_stimulation = c.ctx_stimulation
-    # DBS_stimulation = c.DBS_stimulation
 
     # Define state variables to record from each population
     if c.save_ctx_voltage:

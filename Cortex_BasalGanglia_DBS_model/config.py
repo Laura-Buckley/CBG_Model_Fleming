@@ -2,9 +2,9 @@ import yaml
 from cerberus import Validator
 from pathlib import Path
 
-# # Define global variables
-# global_ctx_stimulation = None
-# global_DBS_stimulation = None
+#  Define global variables for inserting mechanisms into cell classes
+global_ctx_stim_insert = None
+global_DBS_stim_insert = None
 
 zero_schema = dict(
     setpoint={"type": "float", "coerce": float},
@@ -115,7 +115,8 @@ class Config(object):
         normalise_error={"type": "boolean", "coerce": bool, "default": True},
         #control for cortical stimulation on or off
         ctx_stimulation={"type": "boolean", "coerce": bool, "default": False},
-        DBS_stimulation = {"type": "boolean", "coerce": bool, "default": True}
+        DBS_stimulation = {"type": "boolean", "coerce": bool, "default": True},
+
     )
 
     def __init__(self, config_file):
@@ -142,11 +143,13 @@ class Config(object):
             setattr(self, key, value)
             # Update global variables if they are present in the configuration
             if key == "ctx_stimulation":
-                global global_ctx_stimulation
-                global_ctx_stimulation = value
+                global global_ctx_stim_insert
+                global_ctx_stim_insert = value
+
+
             elif key == "DBS_stimulation":
-                global global_DBS_stimulation
-                global_DBS_stimulation = value
+                global global_DBS_stim_insert
+                global_DBS_stim_insert = value
 
     def __str__(self):
         return str(vars(self)).strip("{}").replace(", ", ",\n")

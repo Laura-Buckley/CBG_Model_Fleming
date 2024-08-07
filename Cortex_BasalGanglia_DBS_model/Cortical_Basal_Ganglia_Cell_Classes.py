@@ -72,7 +72,7 @@ from functools import reduce
 
 # Import global variables and configuration management
 import Global_Variables as GV
-from config import Config, global_ctx_stimulation, global_DBS_stimulation
+from config import Config, global_DBS_stim_insert, global_ctx_stim_insert
 
 
 def _new_property(obj_hierarchy, attr_name):
@@ -213,7 +213,7 @@ class Cortical_Neuron(object):
                 rx_values[0, i] = seg.xtra.rx
             print(Sequence(rx_values.flatten()))
 
-        if global_DBS_stimulation:
+        if global_DBS_stim_insert:
             #Add extracellular and xtra mechanisms to collateral
             self.collateral.insert("extracellular")
             self.collateral.insert("xtra")
@@ -232,6 +232,9 @@ class Cortical_Neuron(object):
                 h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
 
             collateral_rx = property(fget=_get_collateral_rx, fset=_set_collateral_rx)
+
+        else:
+            print("Extracellular not applied to collaterals")
 
         # Setter and Getter for AIS
         def _set_ais_rx(self, sequence_values):
@@ -272,7 +275,7 @@ class Cortical_Neuron(object):
                 rx_values[0, i] = n(0.5).xtra.rx
             print(Sequence(rx_values.flatten()))
 
-        if global_ctx_stimulation:
+        if global_ctx_stim_insert:
             # Add extracellular and xtra mechanism to soma
             self.soma.insert("extracellular")
             self.soma.insert("xtra")
@@ -312,6 +315,9 @@ class Cortical_Neuron(object):
             ais_rx = property(fget=_get_ais_rx, fset=_set_ais_rx)
             soma_rx = property(fget=_get_soma_rx, fset=_set_soma_rx)
             nodes_rx = property(fget=_get_nodes_rx, fset=_set_nodes_rx)
+
+        else:
+            print("Extracellular not applied to cortical neurons' main axon")
 
         # Add bias current to neuron model - current amplitude is in terms of original model paper, nA
         self.stim = h.IClamp(0.5, sec=self.soma)
@@ -395,7 +401,7 @@ class Cortical_Neuron_Type(NativeCellType):
         "num_axon_compartments": 10,
     }
 
-    if global_DBS_stimulation:
+    if global_DBS_stim_insert:
         # Define initial vector of transfer resistances for the collateral segments
         initial_collateral_rx = np.zeros(
             (1, default_parameters["collateral_nseg"])
@@ -403,7 +409,7 @@ class Cortical_Neuron_Type(NativeCellType):
         initial_collateral_rx_Sequence = Sequence(initial_collateral_rx)
         default_parameters["collateral_rx"] = initial_collateral_rx_Sequence
 
-    if global_ctx_stimulation:
+    if global_ctx_stim_insert:
         # Define initial vector of transfer resistances for the ais segments
         initial_ais_rx = np.zeros((1, default_parameters["ais_nseg"])).flatten()
         initial_ais_rx_Sequence = Sequence(initial_ais_rx)
@@ -473,7 +479,7 @@ class Interneuron(object):
                 rx_values[0, i] = seg.xtra.rx
             print(Sequence(rx_values.flatten()))
 
-        if global_ctx_stimulation:
+        if global_ctx_stim_insert:
 
             # Add extracellular and xtra mechanism to soma
             self.soma.insert("extracellular")
@@ -686,7 +692,7 @@ class GP_Neuron(object):
         self.stim.dur = 1e12
         self.stim.amp = parameters["bias_current"]
 
-        if global_DBS_stimulation:
+        if global_DBS_stim_insert:
             # Add DBS stimulation current to neuron model
             self.DBS_stim = h.IClamp(0.5, sec=self.soma)
             self.DBS_stim.delay = 0
