@@ -94,8 +94,6 @@ if __name__ == "__main__":
     ctx_slow_modulation_step_count = c.ctx_slow_modulation_step_count
     ctx_stimulation = c.ctx_stimulation
     DBS_stimulation = c.DBS_stimulation
-    global_ctx_stim_insert = ctx_stimulation
-    global_DBS_stim_insert = DBS_stimulation
 
     # Debugging statement to check if global variables are set
     print(f"global_ctx_stim_insert after config init: {global_ctx_stim_insert}")

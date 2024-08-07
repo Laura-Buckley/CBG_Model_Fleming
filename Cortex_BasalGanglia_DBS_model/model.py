@@ -376,6 +376,10 @@ def load_network(
     ctx_slow_modulation_amplitude = config.ctx_slow_modulation_amplitude
     ctx_slow_modulation_step_count = config.ctx_slow_modulation_step_count
 
+    #load the cells with the ctx/DBS parameter set from config
+    global_ctx_stim_insert = config.ctx_stimulation
+    global_DBS_stim_insert = config.DBS_stimulation
+
     structure_save_dir = Path("network_structure")
 
     if config.cortical_beta_mechanism == "spikes":
