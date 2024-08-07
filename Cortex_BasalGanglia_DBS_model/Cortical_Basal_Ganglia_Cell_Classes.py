@@ -213,6 +213,10 @@ class Cortical_Neuron(object):
                 rx_values[0, i] = seg.xtra.rx
             print(Sequence(rx_values.flatten()))
 
+        # Debugging statement to check global variables
+        print(f"global_ctx_stim_insert: {global_ctx_stim_insert}")
+        print(f"global_DBS_stim_insert: {global_DBS_stim_insert}")
+
         if global_DBS_stim_insert:
             #Add extracellular and xtra mechanisms to collateral
             self.collateral.insert("extracellular")

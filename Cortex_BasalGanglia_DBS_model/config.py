@@ -120,7 +120,7 @@ class Config(object):
     )
 
     def __init__(self, config_file):
-
+        global global_ctx_stim_insert, global_DBS_stim_insert
         if config_file:
             self.config_file = Path(config_file).resolve()
             with self.config_file.open("r") as f:
@@ -143,12 +143,9 @@ class Config(object):
             setattr(self, key, value)
             # Update global variables if they are present in the configuration
             if key == "ctx_stimulation":
-                global global_ctx_stim_insert
                 global_ctx_stim_insert = value
 
-
             elif key == "DBS_stimulation":
-                global global_DBS_stim_insert
                 global_DBS_stim_insert = value
 
     def __str__(self):
