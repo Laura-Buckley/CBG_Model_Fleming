@@ -235,6 +235,7 @@ class Cortical_Neuron(object):
 
         else:
             print("Extracellular not applied to collaterals")
+            print(f'value of DBS_insert is: {global_DBS_stim_insert}')
 
         # Setter and Getter for AIS
         def _set_ais_rx(self, sequence_values):
@@ -318,6 +319,7 @@ class Cortical_Neuron(object):
 
         else:
             print("Extracellular not applied to cortical neurons' main axon")
+            print(f'value of ctx_insert is: {global_ctx_stim_insert}')
 
         # Add bias current to neuron model - current amplitude is in terms of original model paper, nA
         self.stim = h.IClamp(0.5, sec=self.soma)
