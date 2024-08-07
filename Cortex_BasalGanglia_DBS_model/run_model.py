@@ -95,9 +95,6 @@ if __name__ == "__main__":
     ctx_stimulation = c.ctx_stimulation
     DBS_stimulation = c.DBS_stimulation
 
-    # Debugging statement to check if global variables are set
-    print(f"global_ctx_stim_insert after config init: {global_ctx_stim_insert}")
-    print(f"global_DBS_stim_insert after config init: {global_DBS_stim_insert}")
 
     sim_total_time = (
         steady_state_duration + simulation_runtime + timestep
