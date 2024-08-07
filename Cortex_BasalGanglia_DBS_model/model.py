@@ -42,7 +42,8 @@ def create_network(
     ctx_dc_offset = config.ctx_dc_offset
     ctx_slow_modulation_amplitude = config.ctx_slow_modulation_amplitude
     ctx_slow_modulation_step_count = config.ctx_slow_modulation_step_count
-
+    # global_ctx_stim_insert = config.ctx_stimulation
+    # global_DBS_stim_insert = config.DBS_stimulation
 
     np.random.seed(rng_seed)
     structure_save_dir = Path("network_structure")
@@ -69,12 +70,16 @@ def create_network(
     Cortical_Pop = Population(
         Pop_size,
         Cortical_Neuron_Type(soma_bias_current_amp=0.245),
+        global_ctx_stim_insert=config.ctx_stimulation,
+        global_DBS_stim_insert=config.DBS_stimulation,
         structure=STN_space,
         label="Cortical Neurons",
     )
     Interneuron_Pop = Population(
         Pop_size,
         Interneuron_Type(bias_current_amp=0.070),
+        global_ctx_stim_insert=config.ctx_stimulation,
+        global_DBS_stim_insert=config.DBS_stimulation,
         initial_values={"v": v_init},
         label="Interneurons",
     )
@@ -89,6 +94,8 @@ def create_network(
     GPe_Pop = Population(
         Pop_size,
         GP_Neuron_Type(bias_current=-0.009),
+        global_ctx_stim_insert=config.ctx_stimulation,
+        global_DBS_stim_insert=config.DBS_stimulation,
         initial_values={"v": v_init},
         label="GPe Neurons",
     )

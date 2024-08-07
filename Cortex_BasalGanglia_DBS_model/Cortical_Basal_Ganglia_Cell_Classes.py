@@ -408,8 +408,8 @@ class Cortical_Neuron_Type(NativeCellType):
         "collateral_Ra": 150,
         "collateral_cm": 0.8,
         "num_axon_compartments": 10,
-        "global_ctx_stim_insert": False,  # Default to False
-        "global_DBS_stim_insert": True,  # Default to False
+        # "global_ctx_stim_insert": False,  # Default to False
+        # "global_DBS_stim_insert": True,  # Default to False
     }
 
     # if parameters["global_DBS_stim_insert"]:
