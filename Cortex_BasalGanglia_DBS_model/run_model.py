@@ -49,8 +49,8 @@ from Cortical_Basal_Ganglia_Cell_Classes import Cortical_Neuron_Type
 # Import global variables for GPe DBS
 import Global_Variables as GV
 
-# ctx_stimulation = global_ctx_stimulation
-# DBS_stimulation = global_DBS_stimulation
+ctx_stimulation = global_ctx_stimulation
+DBS_stimulation = global_DBS_stimulation
 
 h = neuron.h
 comm = MPI.COMM_WORLD
@@ -93,8 +93,8 @@ if __name__ == "__main__":
     controller_sampling_time = 1000 * c.ts
     ctx_slow_modulation_amplitude = c.ctx_slow_modulation_amplitude
     ctx_slow_modulation_step_count = c.ctx_slow_modulation_step_count
-    ctx_stimulation = c.ctx_stimulation
-    DBS_stimulation = c.DBS_stimulation
+    # ctx_stimulation = c.ctx_stimulation
+    # DBS_stimulation = c.DBS_stimulation
 
 
     sim_total_time = (
