@@ -412,29 +412,29 @@ class Cortical_Neuron_Type(NativeCellType):
         "global_DBS_stim_insert": True,  # Default to False
     }
 
-    if parameters["global_DBS_stim_insert"]:
-        # Define initial vector of transfer resistances for the collateral segments
-        initial_collateral_rx = np.zeros(
-            (1, default_parameters["collateral_nseg"])
-        ).flatten()
-        initial_collateral_rx_Sequence = Sequence(initial_collateral_rx)
-        default_parameters["collateral_rx"] = initial_collateral_rx_Sequence
+    # if parameters["global_DBS_stim_insert"]:
+    # Define initial vector of transfer resistances for the collateral segments
+    initial_collateral_rx = np.zeros(
+        (1, default_parameters["collateral_nseg"])
+    ).flatten()
+    initial_collateral_rx_Sequence = Sequence(initial_collateral_rx)
+    default_parameters["collateral_rx"] = initial_collateral_rx_Sequence
 
-    if parameters["global_ctx_stim_insert"]:
-        # Define initial vector of transfer resistances for the ais segments
-        initial_ais_rx = np.zeros((1, default_parameters["ais_nseg"])).flatten()
-        initial_ais_rx_Sequence = Sequence(initial_ais_rx)
-        default_parameters["ais_rx"] = initial_ais_rx_Sequence
+    # if parameters["global_ctx_stim_insert"]:
+    # Define initial vector of transfer resistances for the ais segments
+    initial_ais_rx = np.zeros((1, default_parameters["ais_nseg"])).flatten()
+    initial_ais_rx_Sequence = Sequence(initial_ais_rx)
+    default_parameters["ais_rx"] = initial_ais_rx_Sequence
 
-        # Define initial vector of transfer resistances for the soma segments
-        initial_soma_rx = np.zeros((1, default_parameters["soma_nseg"])).flatten()
-        initial_soma_rx_Sequence = Sequence(initial_soma_rx)
-        default_parameters["soma_rx"] = initial_soma_rx_Sequence
+    # Define initial vector of transfer resistances for the soma segments
+    initial_soma_rx = np.zeros((1, default_parameters["soma_nseg"])).flatten()
+    initial_soma_rx_Sequence = Sequence(initial_soma_rx)
+    default_parameters["soma_rx"] = initial_soma_rx_Sequence
 
-        # Define initial vector of transfer resistances for the nodes segments
-        initial_nodes_rx = np.zeros((1, default_parameters["nodes_nseg"])).flatten()
-        initial_nodes_rx_Sequence = Sequence(initial_nodes_rx)
-        default_parameters["nodes_rx"] = initial_nodes_rx_Sequence
+    # Define initial vector of transfer resistances for the nodes segments
+    initial_nodes_rx = np.zeros((1, default_parameters["nodes_nseg"])).flatten()
+    initial_nodes_rx_Sequence = Sequence(initial_nodes_rx)
+    default_parameters["nodes_rx"] = initial_nodes_rx_Sequence
 
     default_initial_values = {"v": -68.0}
     recordable = [
