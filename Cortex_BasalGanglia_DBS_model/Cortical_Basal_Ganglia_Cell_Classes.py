@@ -72,7 +72,7 @@ from functools import reduce
 
 # Import global variables and configuration management
 import Global_Variables as GV
-from config import global_DBS_stim_insert, global_ctx_stim_insert
+
 
 
 def _new_property(obj_hierarchy, attr_name):
@@ -200,6 +200,9 @@ class Cortical_Neuron(object):
         middle_index = int((parameters["num_axon_compartments"] / 2.0))
         self.middle_node = self.node[middle_index]
         self.middle_myelin = self.myelin[middle_index]
+        self.global_ctx_stim_insert = parameters["global_ctx_stim_insert"]
+        self.global_DBS_stim_insert = parameters["global_DBS_stim_insert"]
+
 
         def _set_collateral_rx(self, sequence_values):
             rx_values = sequence_values.value
@@ -217,7 +220,7 @@ class Cortical_Neuron(object):
         print(f"global_ctx_stim_insert: {global_ctx_stim_insert}")
         print(f"global_DBS_stim_insert: {global_DBS_stim_insert}")
 
-        if global_DBS_stim_insert:
+        if self.global_DBS_stim_insert:
             #Add extracellular and xtra mechanisms to collateral
             self.collateral.insert("extracellular")
             self.collateral.insert("xtra")
@@ -280,7 +283,7 @@ class Cortical_Neuron(object):
                 rx_values[0, i] = n(0.5).xtra.rx
             print(Sequence(rx_values.flatten()))
 
-        if global_ctx_stim_insert:
+        if self.global_ctx_stim_insert:
             # Add extracellular and xtra mechanism to soma
             self.soma.insert("extracellular")
             self.soma.insert("xtra")
@@ -405,9 +408,11 @@ class Cortical_Neuron_Type(NativeCellType):
         "collateral_Ra": 150,
         "collateral_cm": 0.8,
         "num_axon_compartments": 10,
+        "global_ctx_stim_insert": False,  # Default to False
+        "global_DBS_stim_insert": True,  # Default to False
     }
 
-    if global_DBS_stim_insert:
+    if parameters["global_DBS_stim_insert"]:
         # Define initial vector of transfer resistances for the collateral segments
         initial_collateral_rx = np.zeros(
             (1, default_parameters["collateral_nseg"])
@@ -415,7 +420,7 @@ class Cortical_Neuron_Type(NativeCellType):
         initial_collateral_rx_Sequence = Sequence(initial_collateral_rx)
         default_parameters["collateral_rx"] = initial_collateral_rx_Sequence
 
-    if global_ctx_stim_insert:
+    if parameters["global_ctx_stim_insert"]:
         # Define initial vector of transfer resistances for the ais segments
         initial_ais_rx = np.zeros((1, default_parameters["ais_nseg"])).flatten()
         initial_ais_rx_Sequence = Sequence(initial_ais_rx)
@@ -472,6 +477,8 @@ class Interneuron(object):
                 Mechanism("interneuron_i_k"),
             ),
         )
+        self.global_ctx_stim_insert = parameters["global_ctx_stim_insert"]
+        self.global_DBS_stim_insert = parameters["global_DBS_stim_insert"]
 
         def _set_inter_rx(self, sequence_values):
             rx_values = sequence_values.value
@@ -683,6 +690,8 @@ class GP_Neuron(object):
                 ),
             ],
         )
+        self.global_ctx_stim_insert = parameters["global_ctx_stim_insert"]
+        self.global_DBS_stim_insert = parameters["global_DBS_stim_insert"]
 
         # Initialize ion concentrations
         h("cai0_ca_ion = 5e-6 ")

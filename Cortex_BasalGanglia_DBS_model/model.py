@@ -409,13 +409,13 @@ def load_network(
     # Generate the cortico-basal ganglia neuron populations
     Cortical_Pop = Population(
         Pop_size,
-        Cortical_Neuron_Type(soma_bias_current_amp=0.245),
+        Cortical_Neuron_Type(soma_bias_current_amp=0.245, global_ctx_stim_insert = global_ctx_stim_insert, global_DBS_stim_insert = global_DBS_stim_insert),
         structure=STN_space,
         label="Cortical Neurons",
     )
     Interneuron_Pop = Population(
         Pop_size,
-        Interneuron_Type(bias_current_amp=0.070),
+        Interneuron_Type(bias_current_amp=0.070, global_ctx_stim_insert = global_ctx_stim_insert, global_DBS_stim_insert = global_DBS_stim_insert),
         initial_values={"v": v_init},
         label="Interneurons",
     )
@@ -429,7 +429,7 @@ def load_network(
     # GPe/i have the same parameters, but different bias currents
     GPe_Pop = Population(
         Pop_size,
-        GP_Neuron_Type(bias_current=-0.009),
+        GP_Neuron_Type(bias_current=-0.009, global_ctx_stim_insert = global_ctx_stim_insert, global_DBS_stim_insert = global_DBS_stim_insert),
         initial_values={"v": v_init},
         label="GPe Neurons",
     )
