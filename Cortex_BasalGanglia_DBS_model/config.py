@@ -144,9 +144,11 @@ class Config(object):
             # Update global variables if they are present in the configuration
             if key == "ctx_stimulation":
                 global_ctx_stim_insert = value
+                print(f"Set global_ctx_stim_insert to {global_ctx_stim_insert}")
 
             elif key == "DBS_stimulation":
                 global_DBS_stim_insert = value
+                print(f"Set global_DBS_stim_insert to {global_DBS_stim_insert}")
 
     def __str__(self):
         return str(vars(self)).strip("{}").replace(", ", ",\n")
