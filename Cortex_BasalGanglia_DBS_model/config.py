@@ -2,9 +2,9 @@ import yaml
 from cerberus import Validator
 from pathlib import Path
 
-#  Define global variables for inserting mechanisms into cell classes
-global_ctx_stim_insert = None
-global_DBS_stim_insert = None
+# #  Define global variables for inserting mechanisms into cell classes
+# global_ctx_stim_insert = None
+# global_DBS_stim_insert = None
 
 zero_schema = dict(
     setpoint={"type": "float", "coerce": float},
@@ -120,7 +120,7 @@ class Config(object):
     )
 
     def __init__(self, config_file):
-        global global_ctx_stim_insert, global_DBS_stim_insert
+        # global global_ctx_stim_insert, global_DBS_stim_insert
         if config_file:
             self.config_file = Path(config_file).resolve()
             with self.config_file.open("r") as f:
@@ -139,16 +139,16 @@ class Config(object):
             print(f"Validation errors: {v.errors}")
             raise RuntimeError(f"Invalid configuration file:\n{v.errors}")
 
-        for key, value in v.document.items():
-            setattr(self, key, value)
-            # Update global variables if they are present in the configuration
-            if key == "ctx_stimulation":
-                global_ctx_stim_insert = value
-                print(f"Set global_ctx_stim_insert to {global_ctx_stim_insert}")
-
-            elif key == "DBS_stimulation":
-                global_DBS_stim_insert = value
-                print(f"Set global_DBS_stim_insert to {global_DBS_stim_insert}")
+        # for key, value in v.document.items():
+        #     setattr(self, key, value)
+        #     # Update global variables if they are present in the configuration
+        #     if key == "ctx_stimulation":
+        #         global_ctx_stim_insert = value
+        #         print(f"Set global_ctx_stim_insert to {global_ctx_stim_insert}")
+        #
+        #     elif key == "DBS_stimulation":
+        #         global_DBS_stim_insert = value
+        #         print(f"Set global_DBS_stim_insert to {global_DBS_stim_insert}")
 
     def __str__(self):
         return str(vars(self)).strip("{}").replace(", ", ",\n")

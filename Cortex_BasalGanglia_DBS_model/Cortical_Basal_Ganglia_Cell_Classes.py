@@ -200,8 +200,8 @@ class Cortical_Neuron(object):
         middle_index = int((parameters["num_axon_compartments"] / 2.0))
         self.middle_node = self.node[middle_index]
         self.middle_myelin = self.myelin[middle_index]
-        self.global_ctx_stim_insert = parameters["global_ctx_stim_insert"]
-        self.global_DBS_stim_insert = parameters["global_DBS_stim_insert"]
+        self.global_ctx_stim_insert = parameters["ctx_stimulation"]
+        self.global_DBS_stim_insert = parameters["DBS_stimulation"]
 
 
         def _set_collateral_rx(self, sequence_values):
@@ -477,8 +477,8 @@ class Interneuron(object):
                 Mechanism("interneuron_i_k"),
             ),
         )
-        self.global_ctx_stim_insert = parameters["global_ctx_stim_insert"]
-        self.global_DBS_stim_insert = parameters["global_DBS_stim_insert"]
+        self.global_ctx_stim_insert = parameters["ctx_stimulation"]
+        self.global_DBS_stim_insert = parameters["DBS_stimulation"]
 
         def _set_inter_rx(self, sequence_values):
             rx_values = sequence_values.value
@@ -690,8 +690,8 @@ class GP_Neuron(object):
                 ),
             ],
         )
-        self.global_ctx_stim_insert = parameters["global_ctx_stim_insert"]
-        self.global_DBS_stim_insert = parameters["global_DBS_stim_insert"]
+        self.global_ctx_stim_insert = parameters["ctx_stimulation"]
+        self.global_DBS_stim_insert = parameters["DBS_stimulation"]
 
         # Initialize ion concentrations
         h("cai0_ca_ion = 5e-6 ")
