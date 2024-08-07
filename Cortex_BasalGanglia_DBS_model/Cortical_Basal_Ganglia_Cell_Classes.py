@@ -432,7 +432,7 @@ class Cortical_Neuron_Type(NativeCellType):
     default_parameters["soma_rx"] = initial_soma_rx_Sequence
 
     # Define initial vector of transfer resistances for the nodes segments
-    initial_nodes_rx = np.zeros((1, default_parameters["nodes_nseg"])).flatten()
+    initial_nodes_rx = np.zeros((1, default_parameters["node_nseg"])).flatten()
     initial_nodes_rx_Sequence = Sequence(initial_nodes_rx)
     default_parameters["nodes_rx"] = initial_nodes_rx_Sequence
 
