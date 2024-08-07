@@ -93,8 +93,6 @@ if __name__ == "__main__":
     controller_sampling_time = 1000 * c.ts
     ctx_slow_modulation_amplitude = c.ctx_slow_modulation_amplitude
     ctx_slow_modulation_step_count = c.ctx_slow_modulation_step_count
-    # ctx_stimulation = c.ctx_stimulation
-    # DBS_stimulation = c.DBS_stimulation
 
 
     sim_total_time = (
@@ -195,6 +193,9 @@ if __name__ == "__main__":
         )
         if rank == 0:
             print("Network created")
+
+    ctx_stimulation = c.ctx_stimulation
+    DBS_stimulation = c.DBS_stimulation
 
     # Define state variables to record from each population
     if c.save_ctx_voltage:
