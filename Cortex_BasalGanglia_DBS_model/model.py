@@ -70,16 +70,16 @@ def create_network(
     Cortical_Pop = Population(
         Pop_size,
         Cortical_Neuron_Type(soma_bias_current_amp=0.245),
-        ctx_stimulation=config.ctx_stimulation,
-        DBS_stimulation=config.DBS_stimulation,
+        # ctx_stimulation=config.ctx_stimulation,
+        # DBS_stimulation=config.DBS_stimulation,
         structure=STN_space,
         label="Cortical Neurons",
     )
     Interneuron_Pop = Population(
         Pop_size,
         Interneuron_Type(bias_current_amp=0.070),
-        ctx_stimulation=config.ctx_stimulation,
-        DBS_stimulation=config.DBS_stimulation,
+        # ctx_stimulation=config.ctx_stimulation,
+        # DBS_stimulation=config.DBS_stimulation,
         initial_values={"v": v_init},
         label="Interneurons",
     )
@@ -94,8 +94,8 @@ def create_network(
     GPe_Pop = Population(
         Pop_size,
         GP_Neuron_Type(bias_current=-0.009),
-        ctx_stimulation=config.ctx_stimulation,
-        DBS_stimulation=config.DBS_stimulation,
+        # ctx_stimulation=config.ctx_stimulation,
+        # DBS_stimulation=config.DBS_stimulation,
         initial_values={"v": v_init},
         label="GPe Neurons",
     )

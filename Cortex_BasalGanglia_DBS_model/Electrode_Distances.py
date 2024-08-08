@@ -126,7 +126,7 @@ def axon_distances_to_electrode(src_electrode, tgt_pop, node_L, myelin_L, ais_L,
 
     Y_coords_nodes = np.zeros(num_axon_compartments)
     for n in np.arange(num_axon_compartments):
-        Y_coords_nodes[n] = (num_axon_compartments-1-n)*(node_L*myelin_L) + (node_L*0.5)
+        Y_coords_nodes[n] = (num_axon_compartments-1-n)*(node_L + myelin_L) + (node_L*0.5)
 
     for ii, tgt_cell in enumerate(tgt_pop):
         for n in np.arange(num_axon_compartments):
