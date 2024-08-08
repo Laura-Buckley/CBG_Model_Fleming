@@ -213,6 +213,8 @@ class Cortical_Neuron(object):
                 rx_values[0, i] = seg.xtra.rx
             print(Sequence(rx_values.flatten()))
 
+        print(f'The value of DBS stim before colltateral extra is: {global_DBS_stimulation}')
+
         if global_DBS_stimulation:
             #Add extracellular and xtra mechanisms to collateral
             self.collateral.insert("extracellular")
@@ -394,7 +396,7 @@ class Cortical_Neuron_Type(NativeCellType):
         "collateral_cm": 0.8,
         "num_axon_compartments": 10,
     }
-
+    print(f'The value of DBS stim before initialising collatteral seq is: {global_DBS_stimulation}')
     if global_DBS_stimulation:
         # Define initial vector of transfer resistances for the collateral segments
         initial_collateral_rx = np.zeros(
@@ -686,14 +688,17 @@ class GP_Neuron(object):
         self.stim.dur = 1e12
         self.stim.amp = parameters["bias_current"]
 
-        # # Add DBS stimulation current to neuron model
-        # self.DBS_stim = h.IClamp(0.5, sec=self.soma)
-        # self.DBS_stim.delay = 0
-        # self.DBS_stim.dur = 1e9
-        # self.DBS_stim.amp = 0
-        #
-        # # Append the DBS stimulation iclamps to global list
-        # GV.GPe_stimulation_iclamps.append(self.DBS_stim)
+        print(f'The value of DBS stim before GP extra is: {global_DBS_stimulation}')
+
+        if global_DBS_stimulation:
+            # Add DBS stimulation current to neuron model
+            self.DBS_stim = h.IClamp(0.5, sec=self.soma)
+            self.DBS_stim.delay = 0
+            self.DBS_stim.dur = 1e9
+            self.DBS_stim.amp = 0
+
+            # Append the DBS stimulation iclamps to global list
+            GV.GPe_stimulation_iclamps.append(self.DBS_stim)
 
         # Add AMPA and GABAa synapses to the cell, i.e. add to the soma section
         self.AMPA = h.AMPA_S(0.5, sec=self.soma)
