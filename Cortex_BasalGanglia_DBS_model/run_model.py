@@ -79,8 +79,9 @@ if __name__ == "__main__":
     os.chdir(newpwd)
 
 
-    simulation_runtime = c.RunTime
+
     controller_type = c.Controller
+    simulation_runtime = c.RunTime
     rng_seed = c.RandomSeed
     timestep = c.TimeStep
     steady_state_duration = c.SteadyStateDuration
