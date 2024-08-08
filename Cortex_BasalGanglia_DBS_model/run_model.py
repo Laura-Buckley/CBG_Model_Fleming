@@ -106,6 +106,7 @@ if __name__ == "__main__":
     if rank == 0:
         print("\n------ Configuration ------")
         print(c, "\n")
+        print("this is the main branch")
 
     # Make beta band filter centred on 25Hz (cutoff frequencies are 21-29 Hz)
     # for biomarker estimation
