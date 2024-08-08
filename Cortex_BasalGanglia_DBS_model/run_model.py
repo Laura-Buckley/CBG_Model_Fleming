@@ -432,7 +432,7 @@ if __name__ == "__main__":
 
         DBS_Signal = np.hstack((np.array([0, 0]), DBS_Signal))
         DBS_times = np.hstack((np.array([0, steady_state_duration + 10]), DBS_times))
-        print(f'The first DBS pulse signal amplitude value is {DBS_Signal[2]} ')
+        #print(f'The first DBS pulse signal amplitude value is {DBS_Signal[2]} ')
         # Get DBS time indexes which corresponds to controller call times
         controller_DBS_indices = []
         for call_time in controller_call_times:
@@ -508,7 +508,7 @@ if __name__ == "__main__":
             GPe_DBS_times_neuron.append(h.Vector(GPe_DBS_times))
 
             num_iclamps = len(GV.GPe_stimulation_iclamps)
-            print(f'GP Neuron iClamps = {num_iclamps}')
+            #print(f'GP Neuron iClamps = {num_iclamps}')
             # Play the stimulation into each GPe neuron
             GPe_DBS_Signal_neuron[i].play(
                 GV.GPe_stimulation_iclamps[i]._ref_amp, GPe_DBS_times_neuron[i], 1
