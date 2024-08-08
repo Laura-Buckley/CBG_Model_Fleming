@@ -72,8 +72,10 @@ from functools import reduce
 
 # Import global variables and configuration management
 import Global_Variables as GV
-from config import Config, global_ctx_stimulation, global_DBS_stimulation
+from config import Config as c, global_ctx_stimulation, global_DBS_stimulation
 
+global_ctx_stimulation = c.ctx_stimulation
+global_DBS_stimulation =c.DBS_stimulation
 
 def _new_property(obj_hierarchy, attr_name):
     """
