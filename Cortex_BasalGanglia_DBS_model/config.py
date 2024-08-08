@@ -2,9 +2,9 @@ import yaml
 from cerberus import Validator
 from pathlib import Path
 
-# # Define global variables
-# global_ctx_stimulation = None
-# global_DBS_stimulation = None
+# Define global variables
+global global_ctx_stimulation
+global global_DBS_stimulation
 
 zero_schema = dict(
     setpoint={"type": "float", "coerce": float},
