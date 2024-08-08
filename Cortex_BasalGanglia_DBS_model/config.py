@@ -139,8 +139,8 @@ class Config(object):
             print(f"Validation errors: {v.errors}")
             raise RuntimeError(f"Invalid configuration file:\n{v.errors}")
 
-        # for key, value in v.document.items():
-        #     setattr(self, key, value)
+        for key, value in v.document.items():
+            setattr(self, key, value)
         #     # Update global variables if they are present in the configuration
         #     if key == "ctx_stimulation":
         #         global_ctx_stim_insert = value
