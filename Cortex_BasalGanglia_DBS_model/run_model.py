@@ -284,6 +284,15 @@ if __name__ == "__main__":
             * (rho / (4 * math.pi))
             * (1 / segment_electrode_distances_nodes)
         )
+        nodes_rx_seq = np.ndarray(
+            shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        ).flatten()
+        for ii in range(0, Cortical_Pop.local_size):
+            nodes_rx_seq[ii] = Sequence(nodes_rx[ii, :].flatten())
+
+        # Assign transfer resistances values to ais
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.nodes_rx = nodes_rx_seq[ii]
 
         # Calculate transfer resistances for each ais segment for xtra
         ais_rx = (
@@ -303,23 +312,23 @@ if __name__ == "__main__":
         for ii, cell in enumerate(Cortical_Pop):
             cell.ais_rx = ais_rx_seq[ii]
 
-            # Calculate transfer resistances for each soma segments for xtra
-            soma_rx = (
-                    0.01
-                    * (rho / (4 * math.pi))
-                    * (1 / segment_electrode_distances_soma)
-            )
-            # Convert ndarray to array of Sequence objects - needed to set cortical
-            # soma transfer resistances
-            soma_rx_seq = np.ndarray(
-                shape=(1, Cortical_Pop.local_size), dtype=Sequence
-            ).flatten()
-            for ii in range(0, Cortical_Pop.local_size):
-                soma_rx_seq[ii] = Sequence(soma_rx[ii, :].flatten())
+        # Calculate transfer resistances for each soma segments for xtra
+        soma_rx = (
+                0.01
+                * (rho / (4 * math.pi))
+                * (1 / segment_electrode_distances_soma)
+        )
+        # Convert ndarray to array of Sequence objects - needed to set cortical
+        # soma transfer resistances
+        soma_rx_seq = np.ndarray(
+            shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        ).flatten()
+        for ii in range(0, Cortical_Pop.local_size):
+            soma_rx_seq[ii] = Sequence(soma_rx[ii, :].flatten())
 
-            # Assign transfer resistances values to somas
-            for ii, cell in enumerate(Cortical_Pop):
-                cell.soma_rx = soma_rx_seq[ii]
+        # Assign transfer resistances values to somas
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.soma_rx = soma_rx_seq[ii]
 
     # Create times for when the DBS controller will be called
     # Window length for filtering biomarker
