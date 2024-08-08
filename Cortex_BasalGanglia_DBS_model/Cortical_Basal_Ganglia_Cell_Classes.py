@@ -200,8 +200,8 @@ class Cortical_Neuron(object):
         middle_index = int((parameters["num_axon_compartments"] / 2.0))
         self.middle_node = self.node[middle_index]
         self.middle_myelin = self.myelin[middle_index]
-        self.global_ctx_stim_insert = parameters["ctx_stimulation"]
-        self.global_DBS_stim_insert = parameters["DBS_stimulation"]
+        # self.global_ctx_stim_insert = parameters["ctx_stimulation"]
+        # self.global_DBS_stim_insert = parameters["DBS_stimulation"]
 
 
         def _set_collateral_rx(self, sequence_values):
