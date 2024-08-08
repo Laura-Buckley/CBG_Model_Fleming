@@ -99,7 +99,7 @@ if __name__ == "__main__":
         v_init,
         rng_seed=rng_seed,
     )
-
+    print("Network loaded - steady state")
     # Define state variables to record from each population
     Cortical_Pop.record("soma(0.5).v", sampling_interval=rec_sampling_interval)
     Cortical_Pop.record("collateral(0.5).v", sampling_interval=rec_sampling_interval)
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         stimulating_electrode_position,
         Cortical_Pop,
     )
-
+    print("Distance calculated - steady state")
     # Conductivity and resistivity values for homogenous, isotropic medium
     sigma = 0.27  # Latikka et al. 2001 - Conductivity of Brain tissue S/m
     # rho needs units of ohm cm for xtra mechanism (S/m -> S/cm)
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     STN_LFP = []
     STN_LFP_AMPA = []
     STN_LFP_GABAa = []
-
+    print("passed assigning of play vectors")
     # Run the model to the steady state
     if rank == 0:
         print("Running model to steady state...")
