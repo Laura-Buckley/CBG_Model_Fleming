@@ -143,7 +143,7 @@ def axon_distances_to_electrode(src_electrode, tgt_pop, node_L, myelin_L, ais_L,
     # initialise array for storage of electrode distances for each segment for every compartment
     segment_electrode_distances_ais = np.zeros((tgt_pop.local_size, ais_nseg))
 
-    segment_centres_ais = np.arange(0, ais_nseg + 3 - 1) * (1 / ais_nseg)
+    segment_centres_ais = np.arange(0, nseg + 3 - 1) * (1 / ais_nseg)
     segment_centres_ais = segment_centres_ais - (1 / (2 * ais_nseg))
     segment_centres_ais[0] = 0
     segment_centres_ais[-1] = 1
@@ -163,7 +163,7 @@ def axon_distances_to_electrode(src_electrode, tgt_pop, node_L, myelin_L, ais_L,
         # initialise array for storage of electrode distances for each segment for every compartment
         segment_electrode_distances_soma = np.zeros((tgt_pop.local_size, soma_nseg))
 
-        segment_centres_soma = np.arange(0, soma_nseg + 3 - 1) * (1 / soma_nseg)
+        segment_centres_soma = np.arange(0, nseg + 3 - 1) * (1 / soma_nseg)
         segment_centres_soma = segment_centres_soma - (1 / (2 * soma_nseg))
         segment_centres_soma[0] = 0
         segment_centres_soma[-1] = 1
