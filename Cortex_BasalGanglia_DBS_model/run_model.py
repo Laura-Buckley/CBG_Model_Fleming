@@ -279,6 +279,8 @@ if __name__ == "__main__":
         for ii, cell in enumerate(Cortical_Pop):
             cell.ais_rx = zero_ais_sequence
 
+        print("passed ais to 0 rx")
+
         # Use the _set_collateral_rx function to apply these zero resistances to AIS
         for cell in Cortical_Pop:
             cell._set_collateral_rx(zero_ais_sequence)
