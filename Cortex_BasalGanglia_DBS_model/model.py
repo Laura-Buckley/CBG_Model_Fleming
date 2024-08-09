@@ -724,14 +724,6 @@ def electrode_distance(
     STN_Pop,
     stimulating_electrode_position,
     Cortical_Pop,
-    soma_L,
-    ais_L,
-    myelin_L,
-    node_L,
-    myelin_L_0,
-    ais_nseg,
-    soma_nseg,
-    num_axon_compartments
 ):
     # Calculate STN cell distances to each recording electrode
     # using only xy coordinates for distance calculations
