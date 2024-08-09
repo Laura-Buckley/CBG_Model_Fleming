@@ -244,14 +244,6 @@ if __name__ == "__main__":
         STN_Pop,
         stimulating_electrode_position,
         Cortical_Pop,
-        soma_L,
-        ais_L,
-        myelin_L,
-        node_L,
-        myelin_L_0,
-        ais_nseg,
-        soma_nseg,
-        num_axon_compartments,
     )
 
     population_size = Cortical_Pop.local_size

@@ -756,14 +756,14 @@ def electrode_distance(
     ) = axon_distances_to_electrode(
         stimulating_electrode_position,
         Cortical_Pop,
-        node_L,
-        myelin_L,
-        ais_L,
-        soma_L,
-        myelin_L_0,
-        num_axon_compartments,
-        ais_nseg,
-        soma_nseg
+        node_L = 2,
+        myelin_L = 500,
+        ais_L = 20,
+        soma_L = 35,
+        myelin_L_0 = 80,
+        num_axon_compartments = 10,
+        ais_nseg = 5,
+        soma_nseg = 1
     )
 
     return (
