@@ -242,7 +242,7 @@ if __name__ == "__main__":
     )
 
     population_size = Cortical_Pop.local_size
-
+    print("Passed electrode distance function")
     # Conductivity and resistivity values for homogenous, isotropic medium
     sigma = 0.27  # Latikka et al. 2001 - Conductivity of Brain tissue S/m
     # rho needs units of ohm cm for xtra mechanism (S/m -> S/cm)
