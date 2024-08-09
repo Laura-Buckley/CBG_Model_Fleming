@@ -286,7 +286,7 @@ if __name__ == "__main__":
         # Apply zero extracellular potential to collaterals
 
         # Determine the size of the AIS (Axon Initial Segment)
-        ais_size = len(ais_rx[0])  # Assuming each AIS has the same number of segments
+        ais_size = len(np.array(ais_rx))  # Assuming each AIS has the same number of segments
 
         # Create a zero sequence for each cell's AIS
         zero_ais_sequence = Sequence(np.zeros(ais_size))
@@ -300,7 +300,7 @@ if __name__ == "__main__":
             cell._set_collateral_rx(zero_ais_sequence)
 
         # Determine the size of the soma
-        soma_size = len(soma_rx[0])  # Assuming each soma has the same number of segments
+        soma_size = len(np.array(soma_rx))  # Assuming each soma has the same number of segments
 
         # Create a zero sequence for each cell's soma
         zero_soma_sequence = Sequence(np.zeros(soma_size))
@@ -314,7 +314,7 @@ if __name__ == "__main__":
             cell._set_collateral_rx(zero_soma_sequence)
 
         # Determine the size of the nodes (e.g., nodes of Ranvier)
-        nodes_size = len(nodes_rx[0])  # Assuming each node has the same number of segments
+        nodes_size = len(np.array(nodes_rx))  # Assuming each node has the same number of segments
 
         # Create a zero sequence for each cell's nodes
         zero_nodes_sequence = Sequence(np.zeros(nodes_size))
@@ -383,7 +383,7 @@ if __name__ == "__main__":
 
         # Apply zero extracellular potential to collaterals
 
-        collateral_size = len(collateral_rx[0])  # Assuming each collateral has the same number of segments
+        collateral_size = len(np.array(collateral_rx))  # Assuming each collateral has the same number of segments
 
         # Create a zero sequence for each cell's collateral
         zero_sequence = Sequence(np.zeros(collateral_size))
