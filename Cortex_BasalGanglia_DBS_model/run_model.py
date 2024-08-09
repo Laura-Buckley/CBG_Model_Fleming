@@ -272,7 +272,8 @@ if __name__ == "__main__":
             cell.collateral_rx = collateral_rx_seq[ii]
 
         # Apply zero extracellular potential to collaterals
-        ais_rx = np.zeros(ais_nseg)
+        ais_rx = np.zeros((Cortical_Pop.local_size, ais_nseg))
+
         # AIS transfer resistances
         ais_rx_seq = np.ndarray(
             shape=(1, Cortical_Pop.local_size), dtype=Sequence
@@ -286,7 +287,7 @@ if __name__ == "__main__":
 
         print("passed ais to 0 rx")
 
-        soma_rx = np.zeros(soma_nseg)
+        soma_rx = np.zeros((Cortical_Pop.local_size, soma_nseg))
 
         # Soma transfer resistances
         soma_rx_seq = np.ndarray(
@@ -301,7 +302,8 @@ if __name__ == "__main__":
 
         print("passed soma to 0 rx")
 
-        nodes_rx = np.zeros(num_axon_compartments)
+        nodes_rx = np.zeros((Cortical_Pop.local_size, num_axon_compartments))
+
 
         # Nodes transfer resistances
         nodes_rx_seq = np.ndarray(
@@ -371,7 +373,8 @@ if __name__ == "__main__":
             cell.soma_rx = soma_rx_seq[ii]
 
         # Apply zero extracellular potential to collaterals
-        collateral_rx = np.zeros(collateral_nseg)
+        collateral_rx = np.zeros((Cortical_Pop.local_size, collateral_nseg))
+
         # Nodes transfer resistances
         collateral_rx_seq = np.ndarray(
             shape=(1, Cortical_Pop.local_size), dtype=Sequence
