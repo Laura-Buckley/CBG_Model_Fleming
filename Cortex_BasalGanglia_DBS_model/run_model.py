@@ -279,11 +279,12 @@ if __name__ == "__main__":
         for ii, cell in enumerate(Cortical_Pop):
             cell.ais_rx = zero_ais_sequence
 
-        print("passed ais to 0 rx")
 
         # Use the _set_collateral_rx function to apply these zero resistances to AIS
         for cell in Cortical_Pop:
-            cell._set_collateral_rx(zero_ais_sequence)
+            cell._set_ais_rx(zero_ais_sequence)
+
+        print("passed ais to 0 rx")
 
         # Create a zero sequence for each cell's soma
         zero_soma_sequence = Sequence(np.zeros(soma_nseg))
@@ -294,7 +295,9 @@ if __name__ == "__main__":
 
         # Use the _set_collateral_rx function to apply these zero resistances to soma
         for cell in Cortical_Pop:
-            cell._set_collateral_rx(zero_soma_sequence)
+            cell._set_soma_rx(zero_soma_sequence)
+
+        print("passed soma to 0 rx")
 
         # Create a zero sequence for each cell's nodes
         zero_nodes_sequence = Sequence(np.zeros(num_axon_compartments))
@@ -305,7 +308,9 @@ if __name__ == "__main__":
 
         # Use the _set_collateral_rx function to apply these zero resistances to nodes
         for cell in Cortical_Pop:
-            cell._set_collateral_rx(zero_nodes_sequence)
+            cell._set_nodes_rx(zero_nodes_sequence)
+
+        print("passed ais to 0 rx")
 
     if ctx_stimulation:
 
