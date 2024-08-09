@@ -54,11 +54,6 @@ h = neuron.h
 comm = MPI.COMM_WORLD
 
 # Accessing default parameters of Cortical_Neuron_Type
-soma_L = Cortical_Neuron_Type.default_parameters["soma_L"]
-ais_L = Cortical_Neuron_Type.default_parameters["ais_L"]
-myelin_L = Cortical_Neuron_Type.default_parameters["myelin_L"]
-node_L = Cortical_Neuron_Type.default_parameters["node_L"]
-myelin_L_0 = Cortical_Neuron_Type.default_parameters["myelin_L_0"]
 ais_nseg = Cortical_Neuron_Type.default_parameters["ais_nseg"]
 soma_nseg = Cortical_Neuron_Type.default_parameters["soma_nseg"]
 num_axon_compartments = Cortical_Neuron_Type.default_parameters["num_axon_compartments"]
