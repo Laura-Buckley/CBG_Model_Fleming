@@ -285,11 +285,8 @@ if __name__ == "__main__":
 
         # Apply zero extracellular potential to collaterals
 
-        # Determine the size of the AIS (Axon Initial Segment)
-        ais_size = len(np.array(ais_rx))  # Assuming each AIS has the same number of segments
-
         # Create a zero sequence for each cell's AIS
-        zero_ais_sequence = Sequence(np.zeros(ais_size))
+        zero_ais_sequence = Sequence(np.zeros(ais_nseg))
 
         # Assign this zero sequence to each cell's AIS
         for ii, cell in enumerate(Cortical_Pop):
@@ -299,11 +296,8 @@ if __name__ == "__main__":
         for cell in Cortical_Pop:
             cell._set_collateral_rx(zero_ais_sequence)
 
-        # Determine the size of the soma
-        soma_size = len(np.array(soma_rx))  # Assuming each soma has the same number of segments
-
         # Create a zero sequence for each cell's soma
-        zero_soma_sequence = Sequence(np.zeros(soma_size))
+        zero_soma_sequence = Sequence(np.zeros(soma_nseg))
 
         # Assign this zero sequence to each cell's soma
         for ii, cell in enumerate(Cortical_Pop):
@@ -313,11 +307,8 @@ if __name__ == "__main__":
         for cell in Cortical_Pop:
             cell._set_collateral_rx(zero_soma_sequence)
 
-        # Determine the size of the nodes (e.g., nodes of Ranvier)
-        nodes_size = len(np.array(nodes_rx))  # Assuming each node has the same number of segments
-
         # Create a zero sequence for each cell's nodes
-        zero_nodes_sequence = Sequence(np.zeros(nodes_size))
+        zero_nodes_sequence = Sequence(np.zeros(num_axon_compartments))
 
         # Assign this zero sequence to each cell's nodes
         for ii, cell in enumerate(Cortical_Pop):
@@ -383,10 +374,8 @@ if __name__ == "__main__":
 
         # Apply zero extracellular potential to collaterals
 
-        collateral_size = len(np.array(collateral_rx))  # Assuming each collateral has the same number of segments
-
         # Create a zero sequence for each cell's collateral
-        zero_sequence = Sequence(np.zeros(collateral_size))
+        zero_sequence = Sequence(np.zeros(num_axon_compartments))
 
         # Assign this zero sequence to each cell's collateral
         for ii, cell in enumerate(Cortical_Pop):
