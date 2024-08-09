@@ -249,6 +249,8 @@ if __name__ == "__main__":
         num_axon_compartments,
     )
 
+    population_size = Cortical_Pop.local_size
+
     # Conductivity and resistivity values for homogenous, isotropic medium
     sigma = 0.27  # Latikka et al. 2001 - Conductivity of Brain tissue S/m
     # rho needs units of ohm cm for xtra mechanism (S/m -> S/cm)
@@ -275,6 +277,50 @@ if __name__ == "__main__":
         # Assign transfer resistances values to collaterals
         for ii, cell in enumerate(Cortical_Pop):
             cell.collateral_rx = collateral_rx_seq[ii]
+
+        # Apply zero extracellular potential to collaterals
+
+        # Determine the size of the AIS (Axon Initial Segment)
+        ais_size = len(ais_rx[0])  # Assuming each AIS has the same number of segments
+
+        # Create a zero sequence for each cell's AIS
+        zero_ais_sequence = Sequence(np.zeros(ais_size))
+
+        # Assign this zero sequence to each cell's AIS
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.ais_rx = zero_ais_sequence
+
+        # Use the _set_collateral_rx function to apply these zero resistances to AIS
+        for cell in Cortical_Pop:
+            cell._set_collateral_rx(zero_ais_sequence)
+
+        # Determine the size of the soma
+        soma_size = len(soma_rx[0])  # Assuming each soma has the same number of segments
+
+        # Create a zero sequence for each cell's soma
+        zero_soma_sequence = Sequence(np.zeros(soma_size))
+
+        # Assign this zero sequence to each cell's soma
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.soma_rx = zero_soma_sequence
+
+        # Use the _set_collateral_rx function to apply these zero resistances to soma
+        for cell in Cortical_Pop:
+            cell._set_collateral_rx(zero_soma_sequence)
+
+        # Determine the size of the nodes (e.g., nodes of Ranvier)
+        nodes_size = len(nodes_rx[0])  # Assuming each node has the same number of segments
+
+        # Create a zero sequence for each cell's nodes
+        zero_nodes_sequence = Sequence(np.zeros(nodes_size))
+
+        # Assign this zero sequence to each cell's nodes
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.nodes_rx = zero_nodes_sequence
+
+        # Use the _set_collateral_rx function to apply these zero resistances to nodes
+        for cell in Cortical_Pop:
+            cell._set_collateral_rx(zero_nodes_sequence)
 
     if ctx_stimulation:
 
@@ -329,6 +375,21 @@ if __name__ == "__main__":
         # Assign transfer resistances values to somas
         for ii, cell in enumerate(Cortical_Pop):
             cell.soma_rx = soma_rx_seq[ii]
+
+        # Apply zero extracellular potential to collaterals
+
+        collateral_size = len(collateral_rx[0])  # Assuming each collateral has the same number of segments
+
+        # Create a zero sequence for each cell's collateral
+        zero_sequence = Sequence(np.zeros(collateral_size))
+
+        # Assign this zero sequence to each cell's collateral
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.collateral_rx = zero_sequence
+
+        # Use the _set_collateral_rx function to apply these zero resistances
+        for cell in Cortical_Pop:
+            cell._set_collateral_rx(zero_sequence)
 
     # Create times for when the DBS controller will be called
     # Window length for filtering biomarker

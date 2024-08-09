@@ -140,13 +140,13 @@ class Config(object):
 
         for key, value in v.document.items():
             setattr(self, key, value)
-            # Update global variables if they are present in the configuration
-            if key == "ctx_stimulation":
-                global global_ctx_stimulation
-                global_ctx_stimulation = value
-            elif key == "DBS_stimulation":
-                global global_DBS_stimulation
-                global_DBS_stimulation = value
+            # # Update global variables if they are present in the configuration
+            # if key == "ctx_stimulation":
+            #     global global_ctx_stimulation
+            #     global_ctx_stimulation = value
+            # elif key == "DBS_stimulation":
+            #     global global_DBS_stimulation
+            #     global_DBS_stimulation = value
 
     def __str__(self):
         return str(vars(self)).strip("{}").replace(", ", ",\n")
