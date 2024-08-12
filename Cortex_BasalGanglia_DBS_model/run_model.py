@@ -124,6 +124,36 @@ if __name__ == "__main__":
     # Set initial values for cell membrane voltages
     v_init = -68
 
+    def check_for_invalid_values(array, array_name):
+        if np.any(np.isnan(array)):
+            print(f"Error: {array_name} contains NaN values.")
+        if np.any(array == 0):
+            print(f"Warning: {array_name} contains zero values, which may lead to division by zero.")
+        if np.any(array < 0):
+            print(f"Warning: {array_name} contains negative values.")
+        if np.any(np.isinf(array)):
+            print(f"Error: {array_name} contains infinity values.")
+
+        # Optionally print out indices and values of problematic elements
+        nan_indices = np.where(np.isnan(array))
+        if nan_indices[0].size > 0:
+            print(f"NaN values found in {array_name} at indices: {nan_indices}")
+            print(f"NaN values: {array[nan_indices]}")
+
+        zero_indices = np.where(array == 0)
+        if zero_indices[0].size > 0:
+            print(f"Zero values found in {array_name} at indices: {zero_indices}")
+            print(f"Zero values: {array[zero_indices]}")
+
+        negative_indices = np.where(array < 0)
+        if negative_indices[0].size > 0:
+            print(f"Negative values found in {array_name} at indices: {negative_indices}")
+            print(f"Negative values: {array[negative_indices]}")
+
+        inf_indices = np.where(np.isinf(array))
+        if inf_indices[0].size > 0:
+            print(f"Infinite values found in {array_name} at indices: {inf_indices}")
+            print(f"Infinite values: {array[inf_indices]}")
     print(f"values of DBS stim : {DBS_stimulation}")
 
     if not create_new_network:
@@ -368,7 +398,7 @@ if __name__ == "__main__":
                 * (1 / segment_electrode_distances_soma)
         )
         check_for_invalid_values(soma_rx, "soma_rx")
-        
+
         # Convert ndarray to array of Sequence objects - needed to set cortical
         # soma transfer resistances
         soma_rx_seq = np.ndarray(
@@ -946,36 +976,7 @@ if __name__ == "__main__":
     # w = neo.io.NeoMatlabIO(filename=str(simulation_output_dir / "STN_LFP_GABAa.mat"))
     # w.write_block(STN_LFP_GABAa_Block)
     # Debugging function to check for invalid values
-    def check_for_invalid_values(array, array_name):
-        if np.any(np.isnan(array)):
-            print(f"Error: {array_name} contains NaN values.")
-        if np.any(array == 0):
-            print(f"Warning: {array_name} contains zero values, which may lead to division by zero.")
-        if np.any(array < 0):
-            print(f"Warning: {array_name} contains negative values.")
-        if np.any(np.isinf(array)):
-            print(f"Error: {array_name} contains infinity values.")
 
-        # Optionally print out indices and values of problematic elements
-        nan_indices = np.where(np.isnan(array))
-        if nan_indices[0].size > 0:
-            print(f"NaN values found in {array_name} at indices: {nan_indices}")
-            print(f"NaN values: {array[nan_indices]}")
-
-        zero_indices = np.where(array == 0)
-        if zero_indices[0].size > 0:
-            print(f"Zero values found in {array_name} at indices: {zero_indices}")
-            print(f"Zero values: {array[zero_indices]}")
-
-        negative_indices = np.where(array < 0)
-        if negative_indices[0].size > 0:
-            print(f"Negative values found in {array_name} at indices: {negative_indices}")
-            print(f"Negative values: {array[negative_indices]}")
-
-        inf_indices = np.where(np.isinf(array))
-        if inf_indices[0].size > 0:
-            print(f"Infinite values found in {array_name} at indices: {inf_indices}")
-            print(f"Infinite values: {array[inf_indices]}")
 
 
     if DBS_stimulation:
