@@ -598,6 +598,12 @@ if __name__ == "__main__":
             last_pulse_time_prior = steady_state_duration
         else:
             last_pulse_time_prior = 0
+
+            # Debug: Print modulation type and last pulse time prior
+        if rank == 0:
+            print(f"Ctx Stimulation Modulation: {c.Modulation}")
+            print(f"Last Pulse Time Prior: {last_pulse_time_prior}")
+
         (
             ctx_Signal,
             ctx_times,
@@ -614,11 +620,38 @@ if __name__ == "__main__":
             offset=0,
         )
         print("initialising ctx signal...")
+        if rank == 0:
+            print("Initial ctx_Signal and ctx_times generated.")
+            print(f"ctx_Signal shape: {ctx_Signal.shape}, ctx_times shape: {ctx_times.shape}")
+            print(f"First 5 ctx_Signal values: {ctx_Signal[:5]}")
+            print(f"First 5 ctx_times values: {ctx_times[:5]}")
+            print(f"next_ctx_pulse_time: {next_ctx_pulse_time}, last_ctx_pulse_time: {last_ctx_pulse_time}")
+
         ctx_Signal = np.hstack((np.array([0, 0]), ctx_Signal))
         ctx_times = np.hstack((np.array([0, steady_state_duration + 10]), ctx_times))
 
+        if rank == 0:
+            print("After hstack, updated ctx_Signal and ctx_times:")
+            print(f"ctx_Signal shape: {ctx_Signal.shape}, ctx_times shape: {ctx_times.shape}")
+            print(f"First 5 ctx_Signal values: {ctx_Signal[:5]}")
+            print(f"First 5 ctx_times values: {ctx_times[:5]}")
+
         ctx_Signal_neuron = h.Vector(ctx_Signal)
         ctx_times_neuron = h.Vector(ctx_times)
+
+        if rank == 0:
+            print("Converted ctx_Signal and ctx_times to NEURON Vectors.")
+            print(f"ctx_Signal_neuron size: {ctx_Signal_neuron.size()}")
+            print(f"ctx_times_neuron size: {ctx_times_neuron.size()}")
+
+            # Debug: Verify contents of NEURON Vectors
+        if rank == 0 and ctx_Signal_neuron.size() >= 5 and ctx_times_neuron.size() >= 5:
+            print("First 5 elements of ctx_Signal_neuron:")
+            for i in range(5):
+                print(f"  ctx_Signal_neuron[{i}] = {ctx_Signal_neuron.x[i]}")
+            print("First 5 elements of ctx_times_neuron:")
+            for i in range(5):
+                print(f"  ctx_times_neuron[{i}] = {ctx_times_neuron.x[i]}")
 
         # Play ctx signal to global variable is_xtra
         ctx_Signal_neuron.play(h._ref_is_xtra, ctx_times_neuron, 1)
