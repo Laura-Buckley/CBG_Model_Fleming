@@ -673,6 +673,7 @@ if __name__ == "__main__":
 
     try:
         # Load the steady state
+        print(f"Steady state duration is {steady_state_duration}, sim state is {simulator.state.dt}")
         run_until(steady_state_duration + simulator.state.dt, run_from_steady_state=False)
 
         if rank == 0:
