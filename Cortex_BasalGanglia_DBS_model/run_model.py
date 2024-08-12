@@ -44,7 +44,7 @@ import argparse
 from utils import make_beta_cheby1_filter, calculate_avg_beta_power
 from model import create_network, load_network, electrode_distance
 from config import Config, get_controller_kwargs, global_DBS_stimulation, global_ctx_stimulation
-from Cortical_Basal_Ganglia_Cell_Classes import Cortical_Neuron_Type
+from Cortical_Basal_Ganglia_Cell_Classes import Cortical_Neuron_Type, initialize_cell_classes
 
 
 # Import global variables for GPe DBS
@@ -72,6 +72,10 @@ if __name__ == "__main__":
     config_file = Path(args.config_file).resolve()
     output_dir = Path(args.output_dir).resolve()
     c = Config(args.config_file)
+
+    # Initialize global variables with config settings
+    initialize_cell_classes(c)
+
     os.chdir(newpwd)
 
     simulation_runtime = c.RunTime
@@ -89,8 +93,6 @@ if __name__ == "__main__":
     ctx_slow_modulation_step_count = c.ctx_slow_modulation_step_count
     ctx_stimulation = c.ctx_stimulation
     DBS_stimulation = c.DBS_stimulation
-    global_DBS_stimulation = DBS_stimulation
-    global_ctx_stimulation = ctx_stimulation
 
 
     sim_total_time = (

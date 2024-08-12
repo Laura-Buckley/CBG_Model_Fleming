@@ -98,6 +98,14 @@ def _new_property(obj_hierarchy, attr_name):
     return property(fset=set, fget=get)
 
 
+def initialize_cell_classes(config):
+    global global_ctx_stimulation
+    global global_DBS_stimulation
+
+    global_ctx_stimulation = config.ctx_stimulation
+    global_DBS_stimulation = config.DBS_stimulation
+
+
 class Cortical_Neuron(object):
     def __init__(self, **parameters):
 
