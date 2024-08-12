@@ -354,6 +354,7 @@ if __name__ == "__main__":
 
     if ctx_stimulation:
 
+        print("Starting ctx_stimulation block...")
         # Calculate transfer resistances for each node segment for xtra
         nodes_rx = (
             0.01
@@ -410,6 +411,8 @@ if __name__ == "__main__":
         # Assign transfer resistances values to somas
         for ii, cell in enumerate(Cortical_Pop):
             cell.soma_rx = soma_rx_seq[ii]
+
+        print("Finishing ctx_stimulation block...")
 
         # # Apply zero extracellular potential to collaterals
         # collateral_rx = np.zeros((Cortical_Pop.local_size, collateral_nseg))
@@ -610,7 +613,7 @@ if __name__ == "__main__":
             pulse_width=0.06,
             offset=0,
         )
-
+        print("initialising ctx signal...")
         ctx_Signal = np.hstack((np.array([0, 0]), ctx_Signal))
         ctx_times = np.hstack((np.array([0, steady_state_duration + 10]), ctx_times))
 
@@ -619,7 +622,7 @@ if __name__ == "__main__":
 
         # Play ctx signal to global variable is_xtra
         ctx_Signal_neuron.play(h._ref_is_xtra, ctx_times_neuron, 1)
-
+        print("ctx signal played in...")
     # Initialise STN LFP list
     STN_LFP = []
     STN_LFP_AMPA = []
