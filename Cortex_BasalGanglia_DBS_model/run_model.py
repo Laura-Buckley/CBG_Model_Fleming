@@ -43,7 +43,7 @@ import math
 import argparse
 from utils import make_beta_cheby1_filter, calculate_avg_beta_power
 from model import create_network, load_network, electrode_distance
-from config import Config, get_controller_kwargs
+from config import Config, get_controller_kwargs, global_DBS_stimulation, global_ctx_stimulation
 from Cortical_Basal_Ganglia_Cell_Classes import Cortical_Neuron_Type
 
 
@@ -93,6 +93,8 @@ if __name__ == "__main__":
     ctx_slow_modulation_step_count = c.ctx_slow_modulation_step_count
     ctx_stimulation = c.ctx_stimulation
     DBS_stimulation = c.DBS_stimulation
+    global_DBS_stimulation = DBS_stimulation
+    global_ctx_stimulation = ctx_stimulation
 
 
     sim_total_time = (
@@ -271,50 +273,50 @@ if __name__ == "__main__":
         for ii, cell in enumerate(Cortical_Pop):
             cell.collateral_rx = collateral_rx_seq[ii]
 
-        # Apply zero extracellular potential to collaterals
-        ais_rx = np.zeros((Cortical_Pop.local_size, ais_nseg))
-
-        # AIS transfer resistances
-        ais_rx_seq = np.ndarray(
-            shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        ).flatten()
-        for ii in range(0, Cortical_Pop.local_size):
-            ais_rx_seq[ii] = Sequence(ais_rx[ii, :].flatten())
-
-        # Assign transfer resistances values to AIS
-        for ii, cell in enumerate(Cortical_Pop):
-            cell.ais_rx = ais_rx_seq[ii]
-
-        print("passed ais to 0 rx")
-
-        soma_rx = np.zeros((Cortical_Pop.local_size, soma_nseg))
-
-        # Soma transfer resistances
-        soma_rx_seq = np.ndarray(
-            shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        ).flatten()
-        for ii in range(0, Cortical_Pop.local_size):
-            soma_rx_seq[ii] = Sequence(soma_rx[ii, :].flatten())
-
-        # Assign transfer resistances values to soma
-        for ii, cell in enumerate(Cortical_Pop):
-            cell.soma_rx = soma_rx_seq[ii]
-
-        print("passed soma to 0 rx")
-
-        nodes_rx = np.zeros((Cortical_Pop.local_size, num_axon_compartments))
-
-
-        # Nodes transfer resistances
-        nodes_rx_seq = np.ndarray(
-            shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        ).flatten()
-        for ii in range(0, Cortical_Pop.local_size):
-            nodes_rx_seq[ii] = Sequence(nodes_rx[ii, :].flatten())
-
-        # Assign transfer resistances values to nodes
-        for ii, cell in enumerate(Cortical_Pop):
-            cell.nodes_rx = nodes_rx_seq[ii]
+        # # Apply zero extracellular potential to collaterals
+        # ais_rx = np.zeros((Cortical_Pop.local_size, ais_nseg))
+        #
+        # # AIS transfer resistances
+        # ais_rx_seq = np.ndarray(
+        #     shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        # ).flatten()
+        # for ii in range(0, Cortical_Pop.local_size):
+        #     ais_rx_seq[ii] = Sequence(ais_rx[ii, :].flatten())
+        #
+        # # Assign transfer resistances values to AIS
+        # for ii, cell in enumerate(Cortical_Pop):
+        #     cell.ais_rx = ais_rx_seq[ii]
+        #
+        # print("passed ais to 0 rx")
+        #
+        # soma_rx = np.zeros((Cortical_Pop.local_size, soma_nseg))
+        #
+        # # Soma transfer resistances
+        # soma_rx_seq = np.ndarray(
+        #     shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        # ).flatten()
+        # for ii in range(0, Cortical_Pop.local_size):
+        #     soma_rx_seq[ii] = Sequence(soma_rx[ii, :].flatten())
+        #
+        # # Assign transfer resistances values to soma
+        # for ii, cell in enumerate(Cortical_Pop):
+        #     cell.soma_rx = soma_rx_seq[ii]
+        #
+        # print("passed soma to 0 rx")
+        #
+        # nodes_rx = np.zeros((Cortical_Pop.local_size, num_axon_compartments))
+        #
+        #
+        # # Nodes transfer resistances
+        # nodes_rx_seq = np.ndarray(
+        #     shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        # ).flatten()
+        # for ii in range(0, Cortical_Pop.local_size):
+        #     nodes_rx_seq[ii] = Sequence(nodes_rx[ii, :].flatten())
+        #
+        # # Assign transfer resistances values to nodes
+        # for ii, cell in enumerate(Cortical_Pop):
+        #     cell.nodes_rx = nodes_rx_seq[ii]
 
         print("passed ais to 0 rx")
 
@@ -372,19 +374,19 @@ if __name__ == "__main__":
         for ii, cell in enumerate(Cortical_Pop):
             cell.soma_rx = soma_rx_seq[ii]
 
-        # Apply zero extracellular potential to collaterals
-        collateral_rx = np.zeros((Cortical_Pop.local_size, collateral_nseg))
-
-        # Nodes transfer resistances
-        collateral_rx_seq = np.ndarray(
-            shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        ).flatten()
-        for ii in range(0, Cortical_Pop.local_size):
-            collateral_rx_seq[ii] = Sequence(collateral_rx[ii, :].flatten())
-
-        # Assign transfer resistances values to nodes
-        for ii, cell in enumerate(Cortical_Pop):
-            cell.collateral_rx = collateral_rx_seq[ii]
+        # # Apply zero extracellular potential to collaterals
+        # collateral_rx = np.zeros((Cortical_Pop.local_size, collateral_nseg))
+        #
+        # # Nodes transfer resistances
+        # collateral_rx_seq = np.ndarray(
+        #     shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        # ).flatten()
+        # for ii in range(0, Cortical_Pop.local_size):
+        #     collateral_rx_seq[ii] = Sequence(collateral_rx[ii, :].flatten())
+        #
+        # # Assign transfer resistances values to nodes
+        # for ii, cell in enumerate(Cortical_Pop):
+        #     cell.collateral_rx = collateral_rx_seq[ii]
 
     # Create times for when the DBS controller will be called
     # Window length for filtering biomarker
