@@ -58,10 +58,10 @@ ais_nseg = Cortical_Neuron_Type.default_parameters["ais_nseg"]
 soma_nseg = Cortical_Neuron_Type.default_parameters["soma_nseg"]
 collateral_nseg = Cortical_Neuron_Type.default_parameters["collateral_nseg"]
 num_axon_compartments = Cortical_Neuron_Type.default_parameters["num_axon_compartments"]
-ais_rx = Cortical_Neuron_Type.default_parameters["ais_rx"]
-nodes_rx = Cortical_Neuron_Type.default_parameters["nodes_rx"]
-soma_rx = Cortical_Neuron_Type.default_parameters["soma_rx"]
-collateral_rx = Cortical_Neuron_Type.default_parameters["collateral_rx"]
+# ais_rx = Cortical_Neuron_Type.default_parameters["ais_rx"]
+# nodes_rx = Cortical_Neuron_Type.default_parameters["nodes_rx"]
+# soma_rx = Cortical_Neuron_Type.default_parameters["soma_rx"]
+# collateral_rx = Cortical_Neuron_Type.default_parameters["collateral_rx"]
 
 
 if __name__ == "__main__":
