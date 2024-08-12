@@ -58,10 +58,6 @@ ais_nseg = Cortical_Neuron_Type.default_parameters["ais_nseg"]
 soma_nseg = Cortical_Neuron_Type.default_parameters["soma_nseg"]
 collateral_nseg = Cortical_Neuron_Type.default_parameters["collateral_nseg"]
 num_axon_compartments = Cortical_Neuron_Type.default_parameters["num_axon_compartments"]
-# ais_rx = Cortical_Neuron_Type.default_parameters["ais_rx"]
-# nodes_rx = Cortical_Neuron_Type.default_parameters["nodes_rx"]
-# soma_rx = Cortical_Neuron_Type.default_parameters["soma_rx"]
-# collateral_rx = Cortical_Neuron_Type.default_parameters["collateral_rx"]
 
 
 if __name__ == "__main__":
@@ -125,6 +121,8 @@ if __name__ == "__main__":
 
     # Set initial values for cell membrane voltages
     v_init = -68
+
+    print(f"values of DBS stim : {DBS_stimulation}")
 
     if not create_new_network:
         if rank == 0:
@@ -196,6 +194,8 @@ if __name__ == "__main__":
         )
         if rank == 0:
             print("Network created")
+
+    print(f"values of DBS stim : {DBS_stimulation}")
 
     # Define state variables to record from each population
     if c.save_ctx_voltage:

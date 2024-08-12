@@ -215,27 +215,27 @@ class Cortical_Neuron(object):
                 rx_values[0, i] = seg.xtra.rx
             print(Sequence(rx_values.flatten()))
 
-        # print(f'The value of DBS stim before colltateral extra is: {global_DBS_stimulation}')
+        print(f'The value of DBS stim before colltateral extra is: {global_DBS_stimulation}')
 
-        # if global_DBS_stimulation:
-            #Add extracellular and xtra mechanisms to collateral
-        self.collateral.insert("extracellular")
-        self.collateral.insert("xtra")
+        if global_DBS_stimulation:
+                #Add extracellular and xtra mechanisms to collateral
+            self.collateral.insert("extracellular")
+            self.collateral.insert("xtra")
 
-        # Assign default rx values to the segments rx_xtra
-        #  - these values are updated in the main run file
-        # 	 where rx is calculated as the transfer resistance
-        #    for each collateral segments to the stimulation
-        #    electrode in the homogenous extracellular medium
-        for seg in self.collateral:
-            seg.xtra.rx = seg.x * 3e-1
+            # Assign default rx values to the segments rx_xtra
+            #  - these values are updated in the main run file
+            # 	 where rx is calculated as the transfer resistance
+            #    for each collateral segments to the stimulation
+            #    electrode in the homogenous extracellular medium
+            for seg in self.collateral:
+                seg.xtra.rx = seg.x * 3e-1
 
-        # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
-        for seg in self.collateral:
-            h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
-            h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+            # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
+            for seg in self.collateral:
+                h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
+                h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
 
-        collateral_rx = property(fget=_get_collateral_rx, fset=_set_collateral_rx)
+            collateral_rx = property(fget=_get_collateral_rx, fset=_set_collateral_rx)
 
         # Setter and Getter for AIS
         def _set_ais_rx(self, sequence_values):
@@ -398,7 +398,7 @@ class Cortical_Neuron_Type(NativeCellType):
         "collateral_cm": 0.8,
         "num_axon_compartments": 10,
     }
-    # print(f'The value of DBS stim before initialising collatteral seq is: {global_DBS_stimulation}')
+    print(f'The value of DBS stim before initialising collateral seq is: {global_DBS_stimulation}')
     if global_DBS_stimulation:
         # Define initial vector of transfer resistances for the collateral segments
         initial_collateral_rx = np.zeros(
@@ -690,7 +690,7 @@ class GP_Neuron(object):
         self.stim.dur = 1e12
         self.stim.amp = parameters["bias_current"]
 
-        # print(f'The value of DBS stim before GP extra is: {global_DBS_stimulation}')
+        print(f'The value of DBS stim before GP extra is: {global_DBS_stimulation}')
 
         if global_DBS_stimulation:
             # Add DBS stimulation current to neuron model
