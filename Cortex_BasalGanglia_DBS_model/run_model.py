@@ -665,19 +665,27 @@ if __name__ == "__main__":
     last_write_time = steady_state_duration
 
     if rank == 0:
-        print(
-            f"\n---> Running simulation to steady state ({steady_state_duration} ms) ..."
-        )
-    # Load the steady state
-    run_until(steady_state_duration + simulator.state.dt, run_from_steady_state=False)
-    if rank == 0:
-        print("Steady state finished.")
-        print(
-            f"\n---> Running simulation for {simulation_runtime:.0f}"
-            f"ms after steady state ({steady_state_duration:.0f} ms)"
-            f"with {controller_type} control"
-        )
+        print(f"\n---> Running simulation to steady state ({steady_state_duration} ms) ...")
 
+    # Debugging print statements before running the steady state
+    if rank == 0:
+        print("Preparing to run_until steady state...")
+
+    try:
+        # Load the steady state
+        run_until(steady_state_duration + simulator.state.dt, run_from_steady_state=False)
+
+        if rank == 0:
+            print("Steady state finished.")
+            print(
+                f"\n---> Running simulation for {simulation_runtime:.0f}"
+                f"ms after steady state ({steady_state_duration:.0f} ms)"
+                f"with {controller_type} control"
+            )
+
+    except Exception as e:
+        if rank == 0:
+            print(f"Error during run_until: {e}")
     # Reload striatal spike times after loading the steady state
     Striatal_Pop.set(spike_times=striatal_spike_times[:, 0])
 
