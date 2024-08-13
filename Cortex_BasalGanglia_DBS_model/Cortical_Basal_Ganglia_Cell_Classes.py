@@ -223,7 +223,7 @@ class Cortical_Neuron(object):
                 rx_values[0, i] = seg.xtra.rx
             print(Sequence(rx_values.flatten()))
 
-        print(f'The value of DBS stim before colltateral extra is: {global_DBS_stimulation}')
+        print(f'The value of ctx stim before colltateral extra is: {global_ctx_stimulation}')
 
         if global_DBS_stimulation:
                 #Add extracellular and xtra mechanisms to collateral
@@ -308,11 +308,11 @@ class Cortical_Neuron(object):
                 h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
 
             for n in self.node:
-                n(0.5).xtra.rx = seg.x * 3e-1
+                n(0.5).xtra.rx = n(0.5).x * 3e-1
 
             for n in self.node:
-                h.setpointer(n(0.5)._ref_e_extracellular, "ex", seg.xtra)
-                h.setpointer(n(0.5)._ref_i_membrane, "im", seg.xtra)
+                h.setpointer(n(0.5)._ref_e_extracellular, "ex", n(0.5).xtra)
+                h.setpointer(n(0.5)._ref_i_membrane, "im", n(0.5).xtra)
 
             for seg in self.ais:
                 seg.xtra.rx = seg.x * 3e-1
