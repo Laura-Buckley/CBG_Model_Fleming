@@ -276,7 +276,7 @@ if __name__ == "__main__":
         Cortical_Pop,
     )
 
-    population_size = Cortical_Pop.local_size
+
     print("Passed electrode distance function")
     # Conductivity and resistivity values for homogenous, isotropic medium
     sigma = 0.27  # Latikka et al. 2001 - Conductivity of Brain tissue S/m
@@ -305,52 +305,7 @@ if __name__ == "__main__":
         for ii, cell in enumerate(Cortical_Pop):
             cell.collateral_rx = collateral_rx_seq[ii]
 
-        # # Apply zero extracellular potential to collaterals
-        # ais_rx = np.zeros((Cortical_Pop.local_size, ais_nseg))
-        #
-        # # AIS transfer resistances
-        # ais_rx_seq = np.ndarray(
-        #     shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        # ).flatten()
-        # for ii in range(0, Cortical_Pop.local_size):
-        #     ais_rx_seq[ii] = Sequence(ais_rx[ii, :].flatten())
-        #
-        # # Assign transfer resistances values to AIS
-        # for ii, cell in enumerate(Cortical_Pop):
-        #     cell.ais_rx = ais_rx_seq[ii]
-        #
-        # print("passed ais to 0 rx")
-        #
-        # soma_rx = np.zeros((Cortical_Pop.local_size, soma_nseg))
-        #
-        # # Soma transfer resistances
-        # soma_rx_seq = np.ndarray(
-        #     shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        # ).flatten()
-        # for ii in range(0, Cortical_Pop.local_size):
-        #     soma_rx_seq[ii] = Sequence(soma_rx[ii, :].flatten())
-        #
-        # # Assign transfer resistances values to soma
-        # for ii, cell in enumerate(Cortical_Pop):
-        #     cell.soma_rx = soma_rx_seq[ii]
-        #
-        # print("passed soma to 0 rx")
-        #
-        # nodes_rx = np.zeros((Cortical_Pop.local_size, num_axon_compartments))
-        #
-        #
-        # # Nodes transfer resistances
-        # nodes_rx_seq = np.ndarray(
-        #     shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        # ).flatten()
-        # for ii in range(0, Cortical_Pop.local_size):
-        #     nodes_rx_seq[ii] = Sequence(nodes_rx[ii, :].flatten())
-        #
-        # # Assign transfer resistances values to nodes
-        # for ii, cell in enumerate(Cortical_Pop):
-        #     cell.nodes_rx = nodes_rx_seq[ii]
 
-        print("passed ais to 0 rx")
 
     if ctx_stimulation:
 
@@ -414,19 +369,7 @@ if __name__ == "__main__":
 
         print("Finishing ctx_stimulation block...")
 
-        # # Apply zero extracellular potential to collaterals
-        # collateral_rx = np.zeros((Cortical_Pop.local_size, collateral_nseg))
-        #
-        # # Nodes transfer resistances
-        # collateral_rx_seq = np.ndarray(
-        #     shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        # ).flatten()
-        # for ii in range(0, Cortical_Pop.local_size):
-        #     collateral_rx_seq[ii] = Sequence(collateral_rx[ii, :].flatten())
-        #
-        # # Assign transfer resistances values to nodes
-        # for ii, cell in enumerate(Cortical_Pop):
-        #     cell.collateral_rx = collateral_rx_seq[ii]
+
 
     # Create times for when the DBS controller will be called
     # Window length for filtering biomarker
@@ -656,6 +599,15 @@ if __name__ == "__main__":
         # Play ctx signal to global variable is_xtra
         ctx_Signal_neuron.play(h._ref_is_xtra, ctx_times_neuron, 1)
         print("ctx signal played in...")
+
+        # Get DBS_Signal_neuron as a numpy array for easy updating
+        updated_ctx_signal = ctx_Signal_neuron.as_numpy()
+
+        # Initialize tracking the frequencies calculated by the controller
+        last_freq_calculated = 0
+        last_ctx_pulse_time = steady_state_duration
+
+
     # Initialise STN LFP list
     STN_LFP = []
     STN_LFP_AMPA = []
@@ -885,6 +837,83 @@ if __name__ == "__main__":
 
                 else:
                     pass
+
+        if ctx_stimulation:
+
+
+            if c.Modulation == "frequency":
+                # Calculate the updated DBS Frequency
+                ctx_amp = 1.5
+                ctx_freq = controller.update(
+                    state_value=lfp_beta_average_value, current_time=simulator.state.t
+                )
+            else:
+                # Calculate the updated DBS amplitude
+                ctx_amp = controller.update(
+                    state_value=lfp_beta_average_value, current_time=simulator.state.t
+                )
+                ctx_freq = 130.0
+
+            # Update the DBS Signal
+            if call_index + 1 < len(controller_call_times):
+
+                if c.Modulation == "frequency":
+                    last_pulse_time_prior = last_ctx_pulse_time
+                    # Check if the frequency needs to change before the last time that was calculated
+                    if ctx_freq != last_freq_calculated:
+                        if ctx_freq == 0.0:  # Check if DBS wants to turn off
+                            next_ctx_pulse_time = 1e9
+                        else:  # Calculate new next pulse time if DBS is on
+                            T = (1.0 / ctx_freq) * 1e3
+                            next_ctx_pulse_time = last_ctx_pulse_time + T - 0.06
+
+                            # Need to check for situation when new DBS time is less than the current time
+                            if next_ctx_pulse_time <= simulator.state.t:
+                                next_ctx_pulse_time = simulator.state.t
+                else:
+                    last_pulse_time_prior = 0
+
+                # Calculate new DBS segment from the next DBS pulse time
+                if next_ctx_pulse_time < controller_call_times[call_index + 1]:
+
+
+
+                    # DBS Cortical Collateral Stimulation
+                    (
+                        new_ctx_Signal_Segment,
+                        new_ctx_times_Segment,
+                        next_ctx_pulse_time,
+                        last_ctx_pulse_time,
+                    ) = controller.generate_dbs_signal(
+                        start_time=next_ctx_pulse_time,
+                        stop_time=controller_call_times[call_index + 1],
+                        last_pulse_time_prior=last_ctx_time_prior,
+                        dt=simulator.state.dt,
+                        amplitude=-ctx_amp,
+                        frequency=ctx_freq,
+                        pulse_width=0.06,
+                        offset=0,
+                    )
+
+                    # Update DBS segment - replace original DBS array values with
+                    # updated ones
+                    indices = np.where(DBS_times == new_ctx_times_Segment[0])[0]
+                    if len(indices) > 0:
+                        window_start_index = indices[0]
+                    else:
+                        window_start_index = 0
+                    new_window_sample_length = len(new_ctx_Signal_Segment)
+                    window_end_index = window_start_index + new_window_sample_length
+                    updated_ctx_signal[
+                    window_start_index:window_end_index
+                    ] = new_ctx_Signal_Segment
+
+                    # Remember the last frequency that was calculated
+                    last_freq_calculated = ctx_freq
+
+                else:
+                    pass
+
 
         # Write population data to file
         if save_stn_voltage:
