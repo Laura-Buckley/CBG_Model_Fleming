@@ -258,7 +258,12 @@ if __name__ == "__main__":
     # Assign Positions for recording and stimulating electrode point sources
     recording_electrode_1_position = np.array([0, -1500, 250])
     recording_electrode_2_position = np.array([0, 1500, 250])
-    stimulating_electrode_position = np.array([0, 0, 250])
+    if DBS_stimulation:
+        stimulating_electrode_position = np.array([0, 0, 250])
+
+    if ctx_stimulation:
+        stimulating_electrode_position = np.array([0, 6000, 250])
+
 
     # Call the electrode_distance function with the required parameters
     (
