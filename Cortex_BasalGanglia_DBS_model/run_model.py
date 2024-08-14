@@ -857,7 +857,7 @@ if __name__ == "__main__":
                 ctx_amp = controller.update(
                     state_value=lfp_beta_average_value, current_time=simulator.state.t
                 )
-                ctx_freq = 130.0
+                ctx_freq = 60.0
 
             # Update the DBS Signal
             if call_index + 1 < len(controller_call_times):
