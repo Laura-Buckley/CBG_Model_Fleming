@@ -562,8 +562,8 @@ if __name__ == "__main__":
             stop_time=sim_total_time,
             last_pulse_time_prior=last_pulse_time_prior,
             dt=simulator.state.dt,
-            amplitude=-2.0, #apply relevant values for cortical stimulation
-            frequency=130.0,
+            amplitude=-1.0, #apply relevant values for cortical stimulation
+            frequency=60.0,
             pulse_width=0.06,
             offset=0,
         )
