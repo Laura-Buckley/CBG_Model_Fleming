@@ -63,6 +63,28 @@ def distances_to_electrode(src_electrode, tgt_pop, coordinate_mask=None):
 
     return cell_electrode_distances
 
+def Interneuron_distances_to_electrode(src_electrode, tgt_pop, coordinate_mask=None):
+    """
+    Return an array of the Euclidian distances from a point source
+    electrode to a population of cells.
+    `coordinate_mask` allows only certain dimensions to be considered, e.g.::
+            * to ignore the z-dimension, use `coordinate_mask=array([0,1])`
+            * to ignore y, `coordinate_mask=array([0,2])`
+            * to just consider z-distance, `coordinate_mask=array([2])`
+    'src_electrode' is the electrode positon in xyz co-ordinates.
+    'tgt_pop' is the target population of cells.
+    """
+
+    cell_electrode_distances = np.zeros((tgt_pop.local_size, 1))
+    cell_electrode_distances.flatten()
+
+    for ii, tgt_cell in enumerate(tgt_pop):
+        cell_electrode_distances[ii] = distance_to_electrode(
+            src_electrode, tgt_cell,
+        )
+
+    return cell_electrode_distances
+
 
 def collateral_distances_to_electrode(src_electrode, tgt_pop, L, nseg):
     """

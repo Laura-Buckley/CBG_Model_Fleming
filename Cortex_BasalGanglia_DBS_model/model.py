@@ -52,6 +52,11 @@ def create_network(
         boundary=space.Sphere(2000), rng=NumpyRNG(seed=rng_seed)
     )
 
+    #Sphere with radius 1500 um for interneuron distribution
+    cortical_layers_space =  space.RandomStructure(
+        boundary=space.Sphere(1500), origin = (0, 5500, 0) , rng=NumpyRNG(seed=rng_seed)
+    )
+
     # Generate Poisson-distributed Striatal Spike trains
     striatal_spike_times = u.generate_poisson_spike_times(
         Pop_size, steady_state_duration, simulation_runtime, 20, 1.0, rng_seed
@@ -75,6 +80,7 @@ def create_network(
     Interneuron_Pop = Population(
         Pop_size,
         Interneuron_Type(bias_current_amp=0.070),
+        structures = cortical_layers_space,
         initial_values={"v": v_init},
         label="Interneurons",
     )
@@ -191,6 +197,23 @@ def create_network(
 
     # Save the generated STN xy positions to a textfile
     np.savetxt(structure_save_dir / "STN_xy_pos.txt", STN_Pop.positions, delimiter=",")
+
+    # ensure inside -1500<x<1500, 4000<y<7000, and not inside electrode positions -0.5mm<x<0.5mm
+    for Interneuron_cell in Interneuron_Pop:
+        while (
+            (Interneuron_cell.position[1] > 7000 )
+            or (Interneuron_cell.position[1] < 4000)
+            or  (np.abs(Interneuron_cell.position[0]) > 1500)
+        ) or (
+            (np.abs(Interneuron_cell.position[0]) < 500)
+            and (-1500 < Interneuron_cell.position[1] < 2000)
+        ):
+            Interneuron_cell.position = cortical_layers_space.generate_positions(1).flatten()
+        Interneuron_cell.position[2] = 500
+
+    # Save the generated STN xy positions to a textfile
+    np.savetxt(structure_save_dir / "Interneuron_xy_pos.txt", Interneuron_Pop.positions, delimiter=",")
+
 
     # Synaptic Connections
     # Add variability to Cortical connections - cortical interneuron
@@ -412,6 +435,7 @@ def load_network(
     Interneuron_Pop = Population(
         Pop_size,
         Interneuron_Type(bias_current_amp=0.070),
+        structure = cortical_layer_space,
         initial_values={"v": v_init},
         label="Interneurons",
     )
@@ -563,6 +587,18 @@ def load_network(
         cell.position[0] = STN_Neuron_x_Positions[ii]
         cell.position[1] = STN_Neuron_y_Positions[ii]
         cell.position[2] = 500
+
+
+    # Load Interneuron positions - Comment/Remove to generate new positions
+    Interneuron_xy_Positions = np.loadtxt(structure_save_dir / "Interneuron_xy_pos.txt", delimiter=",")
+    interneuron_local_indices = [cell in Interneuron_Pop for cell in Interneuron_Pop.all_cells]
+    Interneuron_x_Positions = Interneuron_xy_Positions[0, interneuron_local_indices]
+    Interneuron_y_Positions = Interneuron_xy_Positions[1, interneuron_local_indices]
+
+    # Set Interneuron xy positions to those loaded in
+    for ii, cell in enumerate(Interneuron_Pop):
+        cell.position[0] = Interneuron_x_Positions[ii]
+        cell.position[1] = Interneuron_y_Positions[ii]
 
     # Synaptic Connections
     # Add variability to Cortical connections - cortical interneuron
@@ -724,6 +760,7 @@ def electrode_distance(
     STN_Pop,
     stimulating_electrode_position,
     Cortical_Pop,
+    Interneuron_Pop,
 ):
     # Calculate STN cell distances to each recording electrode
     # using only xy coordinates for distance calculations
@@ -732,6 +769,11 @@ def electrode_distance(
     )
     STN_recording_electrode_2_distances = distances_to_electrode(
         recording_electrode_2_position, STN_Pop
+    )
+
+    #Calculate Interneuron cell distances to electrode
+    Interneuron_electrode_distances = Interneuron_distances_to_electrode(
+        stimulating_electrode_position, Interneuron_Pop
     )
 
     # Calculate Cortical Collateral distances from the stimulating electrode -
@@ -764,7 +806,8 @@ def electrode_distance(
         Cortical_Collateral_stimulating_electrode_distances,
         segment_electrode_distances_nodes,
         segment_electrode_distances_ais,
-        segment_electrode_distances_soma
+        segment_electrode_distances_soma,
+        Interneuron_electrode_distances
     )
 
 

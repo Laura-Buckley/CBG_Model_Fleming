@@ -272,7 +272,8 @@ if __name__ == "__main__":
         Cortical_Collateral_stimulating_electrode_distances,
         segment_electrode_distances_nodes,
         segment_electrode_distances_ais,
-        segment_electrode_distances_soma
+        segment_electrode_distances_soma,
+        Interneuron_electrode_distances
     ) = electrode_distance(
         recording_electrode_1_position,
         recording_electrode_2_position,
@@ -369,8 +370,28 @@ if __name__ == "__main__":
             soma_rx_seq[ii] = Sequence(soma_rx[ii, :].flatten())
 
         # Assign transfer resistances values to somas
-        for ii, cell in enumerate(Cortical_Pop):
+        for ii, cell in enumerate(Interneuron_Pop):
             cell.soma_rx = soma_rx_seq[ii]
+
+        # Calculate transfer resistances for each segment in the Interneurons for xtra
+        inter_rx = (
+                0.01
+                * (rho / (4 * math.pi))
+                * (1 / Interneuron_electrode_distances)
+        )
+        check_for_invalid_values(inter_rx, "inter_rx")
+
+        # Convert ndarray to array of Sequence objects - needed to set
+        # interneurons transfer resistances
+        inter_rx_seq = np.ndarray(
+            shape=(1, Interneuron_Pop.local_size), dtype=Sequence
+        ).flatten()
+        for ii in range(0, Interneuron_Pop.local_size):
+            inter_rx_seq[ii] = Sequence(inter_rx[ii, :].flatten())
+
+        # Assign transfer resistances values to interneurons
+        for ii, cell in enumerate(Interneuron_Pop):
+            cell.inter_rx = inter_rx_seq[ii]
 
         print("Finishing ctx_stimulation block...")
 
