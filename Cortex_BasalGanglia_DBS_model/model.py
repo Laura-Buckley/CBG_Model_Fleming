@@ -81,7 +81,7 @@ def create_network(
     Interneuron_Pop = Population(
         Pop_size,
         Interneuron_Type(bias_current_amp=0.070),
-        structures = cortical_layers_space,
+        structure = cortical_layers_space,
         initial_values={"v": v_init},
         label="Interneurons",
     )
