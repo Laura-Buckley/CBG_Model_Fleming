@@ -24,6 +24,7 @@ from Electrode_Distances import (
     distances_to_electrode,
     collateral_distances_to_electrode,
     axon_distances_to_electrode,
+    Interneuron_distances_to_electrode
 )
 import utils as u
 from pathlib import Path
@@ -416,6 +417,10 @@ def load_network(
     STN_space = space.RandomStructure(
         boundary=space.Sphere(2000), rng=NumpyRNG(seed=rng_seed)
     )
+    # Sphere with radius 1500 um for interneuron distribution
+    cortical_layers_space = space.RandomStructure(
+        boundary=space.Sphere(1500), origin=(0, 5500, 0), rng=NumpyRNG(seed=rng_seed)
+    )
 
     # Load striatal spike times from file
     striatal_spike_times = np.load(structure_save_dir / "Striatal_Spike_Times.npy", allow_pickle=True)
@@ -435,7 +440,7 @@ def load_network(
     Interneuron_Pop = Population(
         Pop_size,
         Interneuron_Type(bias_current_amp=0.070),
-        structure = cortical_layer_space,
+        structure = cortical_layers_space,
         initial_values={"v": v_init},
         label="Interneurons",
     )
@@ -599,6 +604,7 @@ def load_network(
     for ii, cell in enumerate(Interneuron_Pop):
         cell.position[0] = Interneuron_x_Positions[ii]
         cell.position[1] = Interneuron_y_Positions[ii]
+        cell.position[2] = 500
 
     # Synaptic Connections
     # Add variability to Cortical connections - cortical interneuron

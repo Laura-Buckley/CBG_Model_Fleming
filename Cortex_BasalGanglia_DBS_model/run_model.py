@@ -584,7 +584,7 @@ if __name__ == "__main__":
             last_pulse_time_prior=last_pulse_time_prior,
             dt=simulator.state.dt,
             amplitude=-1.0, #apply relevant values for cortical stimulation
-            frequency=60.0,
+            frequency=130.0,
             pulse_width=0.06,
             offset=0,
         )
@@ -878,7 +878,7 @@ if __name__ == "__main__":
                 ctx_amp = controller.update(
                     state_value=lfp_beta_average_value, current_time=simulator.state.t
                 )
-                ctx_freq = 60.0
+                ctx_freq = 130.0
 
             # Update the DBS Signal
             if call_index + 1 < len(controller_call_times):
