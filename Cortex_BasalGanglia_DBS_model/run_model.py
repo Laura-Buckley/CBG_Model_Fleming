@@ -373,14 +373,14 @@ if __name__ == "__main__":
         for ii, cell in enumerate(Interneuron_Pop):
             cell.soma_rx = soma_rx_seq[ii]
 
-        # Calculate transfer resistances for each segment in the Interneurons for xtra
-        inter_rx = (
-                0.01
-                * (rho / (4 * math.pi))
-                * (1 / Interneuron_electrode_distances)
-        )
-        check_for_invalid_values(inter_rx, "inter_rx")
-        #
+        # # Calculate transfer resistances for each segment in the Interneurons for xtra
+        # inter_rx = (
+        #         0.01
+        #         * (rho / (4 * math.pi))
+        #         * (1 / Interneuron_electrode_distances)
+        # )
+        # check_for_invalid_values(inter_rx, "inter_rx")
+        # #
         # # Convert ndarray to array of Sequence objects - needed to set
         # # interneurons transfer resistances
         # inter_rx_seq = np.ndarray(
