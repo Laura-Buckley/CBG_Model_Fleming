@@ -273,7 +273,7 @@ if __name__ == "__main__":
         segment_electrode_distances_nodes,
         segment_electrode_distances_ais,
         segment_electrode_distances_soma,
-        Interneuron_electrode_distances
+        #Interneuron_electrode_distances
     ) = electrode_distance(
         recording_electrode_1_position,
         recording_electrode_2_position,
@@ -380,18 +380,18 @@ if __name__ == "__main__":
                 * (1 / Interneuron_electrode_distances)
         )
         check_for_invalid_values(inter_rx, "inter_rx")
-
-        # Convert ndarray to array of Sequence objects - needed to set
-        # interneurons transfer resistances
-        inter_rx_seq = np.ndarray(
-            shape=(1, Interneuron_Pop.local_size), dtype=Sequence
-        ).flatten()
-        for ii in range(0, Interneuron_Pop.local_size):
-            inter_rx_seq[ii] = Sequence(inter_rx[ii, :].flatten())
-
-        # Assign transfer resistances values to interneurons
-        for ii, cell in enumerate(Interneuron_Pop):
-            cell.inter_rx = inter_rx_seq[ii]
+        #
+        # # Convert ndarray to array of Sequence objects - needed to set
+        # # interneurons transfer resistances
+        # inter_rx_seq = np.ndarray(
+        #     shape=(1, Interneuron_Pop.local_size), dtype=Sequence
+        # ).flatten()
+        # for ii in range(0, Interneuron_Pop.local_size):
+        #     inter_rx_seq[ii] = Sequence(inter_rx[ii, :].flatten())
+        #
+        # # Assign transfer resistances values to interneurons
+        # for ii, cell in enumerate(Interneuron_Pop):
+        #     cell.inter_rx = inter_rx_seq[ii]
 
         print("Finishing ctx_stimulation block...")
 
