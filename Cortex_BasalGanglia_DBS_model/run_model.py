@@ -262,7 +262,7 @@ if __name__ == "__main__":
         stimulating_electrode_position = np.array([0, 0, 250])
 
     if ctx_stimulation:
-        stimulating_electrode_position = np.array([0, 7000, 850])
+        stimulating_electrode_position = np.array([0, 6000, 250])
 
 
     # Call the electrode_distance function with the required parameters
@@ -583,8 +583,8 @@ if __name__ == "__main__":
             stop_time=sim_total_time,
             last_pulse_time_prior=last_pulse_time_prior,
             dt=simulator.state.dt,
-            amplitude=-3.0, #apply relevant values for cortical stimulation
-            frequency=60.0,
+            amplitude=-1.0, #apply relevant values for cortical stimulation
+            frequency=130.0,
             pulse_width=0.06,
             offset=0,
         )
