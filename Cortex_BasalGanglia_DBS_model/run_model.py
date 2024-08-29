@@ -248,11 +248,10 @@ if __name__ == "__main__":
     Thalamic_Pop.record("soma(0.5).v", sampling_interval=rec_sampling_interval)
 
     # need new way of measuring the e-extracellular applied
-    # if ctx_stimulation:
-    #     Cortical_Pop.record("soma(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
-    #     Cortical_Pop.record("ais(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
-    #     for n in num_axon_compartments:
-    #         Cortical_Pop.record("node[n](0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
+    if ctx_stimulation:
+        Cortical_Pop.record("soma(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
+        Cortical_Pop.record("ais(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
+        Cortical_Pop.record("middle_node(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
 
 
     # Assign Positions for recording and stimulating electrode point sources
@@ -975,6 +974,13 @@ if __name__ == "__main__":
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_AMPA_i.mat"), "AMPA.i", clear=False)
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_GABAa_i.mat"), "GABAa.i", clear=False)
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_AMPA_i.mat"), "AMPA.i", clear=False)
+
+    if ctx_stimulation:
+        if rank == 0:
+            print("Saving CTX Extracellular potential...")
+        Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_soma_ex.mat"), "soma(0.5).ref_e_extracellular", clear=False)
+        Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_AIS_ex.mat"), "ais(0.5).ref_e_extracellular", clear=False)
+        Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_node_ex.mat"), "middle_node(0.5).ref_e_extracellular", clear=False)
 
     # Write controller values to csv files
     controller_measured_beta_values = np.asarray(controller.state_history)
