@@ -434,6 +434,7 @@ class Cortical_Neuron_Type(NativeCellType):
     default_initial_values = {"v": -68.0}
     recordable = [
         "soma(0.5).v",
+        "soma(0.5).i_membrane_",
         "collateral(0.5).v",
         "collateral(0.5).i_membrane_",
         "ais(0.5).v",
@@ -441,12 +442,11 @@ class Cortical_Neuron_Type(NativeCellType):
         "middle_myelin(0.5).v",
         "AMPA.i",
         "GABAa.i",
-        "soma(0.5).ref_e_extracellular",
-        "ais(0.5).ref_e_extracellular",
-        "middle_node(0.5).ref_e_extracellular",
+
     ]
     units = {
         "soma(0.5).v": "mV",
+        "soma(0.5).i_membrane_": "nA",
         "collateral(0.5).v": "mV",
         "collateral(0.5).i_membrane_": "nA",
         "ais(0.5).v": "mV",
@@ -454,9 +454,7 @@ class Cortical_Neuron_Type(NativeCellType):
         "middle_myelin(0.5).v": "mV",
         "AMPA.i": "nA",
         "GABAa.i": "nA",
-        "soma(0.5).ref_e_extracellular": "mV",
-        "ais(0.5).ref_e_extracellular": "mV",
-        "middle_node(0.5).ref_e_extracellular": "mV",
+
     }
     receptor_types = ["AMPA", "GABAa"]
     model = Cortical_Neuron

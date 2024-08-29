@@ -249,9 +249,10 @@ if __name__ == "__main__":
 
     # need new way of measuring the e-extracellular applied
     if ctx_stimulation:
-        Cortical_Pop.record("soma(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
-        Cortical_Pop.record("ais(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
-        Cortical_Pop.record("middle_node(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
+        Cortical_Pop.record("soma(0.5).i_membrane_", sampling_interval=rec_sampling_interval)
+        Cortical_Pop.record("collateral(0.5).i_membrane_", sampling_interval=rec_sampling_interval)
+        # Cortical_Pop.record("ais(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
+        # Cortical_Pop.record("middle_node(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
 
 
     # Assign Positions for recording and stimulating electrode point sources
@@ -977,10 +978,10 @@ if __name__ == "__main__":
 
     if ctx_stimulation:
         if rank == 0:
-            print("Saving CTX Extracellular potential...")
-        Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_soma_ex.mat"), "soma(0.5).ref_e_extracellular", clear=False)
-        Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_AIS_ex.mat"), "ais(0.5).ref_e_extracellular", clear=False)
-        Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_node_ex.mat"), "middle_node(0.5).ref_e_extracellular", clear=False)
+            print("Saving collateral and soma currents...")
+        Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_soma_im.mat"), "soma(0.5).i_membrane_", clear=False)
+        Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_collateral_im.mat"), "collateral(0.5).i_membrane_", clear=False)
+        # Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_node_ex.mat"), "middle_node(0.5).ref_e_extracellular", clear=False)
 
     # Write controller values to csv files
     controller_measured_beta_values = np.asarray(controller.state_history)
