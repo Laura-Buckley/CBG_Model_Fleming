@@ -474,7 +474,7 @@ if __name__ == "__main__":
             pulse_width=0.06,
             offset=0,
         )
-
+        print(f"First 5 DBS_Signal values: {DBS_Signal[:5]}")
         DBS_Signal = np.hstack((np.array([0, 0]), DBS_Signal))
         DBS_times = np.hstack((np.array([0, steady_state_duration + 10]), DBS_times))
 
