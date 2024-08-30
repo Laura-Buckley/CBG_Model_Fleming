@@ -977,7 +977,8 @@ if __name__ == "__main__":
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_GABAa_i.mat"), "GABAa.i", clear=False)
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_AMPA_i.mat"), "AMPA.i", clear=False)
 
-    if ctx_stimulation:
+    #if ctx_stimulation:
+    if DBS_stimulation:
         if rank == 0:
             print("Saving collateral and soma currents...")
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_soma_im.mat"), "soma(0.5).i_membrane_", clear=False)
