@@ -493,6 +493,15 @@ if __name__ == "__main__":
         DBS_Signal_neuron = h.Vector(DBS_Signal)
         DBS_times_neuron = h.Vector(DBS_times)
 
+        # Debug: Verify contents of NEURON Vectors
+        if rank == 0 and DBS_Signal_neuron.size() >= 5 and DBS_times_neuron.size() >= 5:
+            print("First 5 elements of DBS_Signal_neuron:")
+            for i in range(5):
+                print(f"  DBS_Signal_neuron[{i}] = {DBS_Signal_neuron.x[i]}")
+            print("First 5 elements of ctx_times_neuron:")
+            for i in range(5):
+                print(f"  DBS_times_neuron[{i}] = {DBS_times_neuron.x[i]}")
+
         # Play DBS signal to global variable is_xtra
         DBS_Signal_neuron.play(h._ref_is_xtra, DBS_times_neuron, 1)
 
