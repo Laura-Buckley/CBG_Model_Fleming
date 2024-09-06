@@ -490,6 +490,9 @@ if __name__ == "__main__":
         DBS_Signal[0:] = 0
         next_DBS_pulse_time = controller_call_times[0]
 
+        print(f"Last 5 DBS_Signal values (part2): {DBS_Signal[-5:]}")
+        print(f"First 5 DBS_Signal values (part2): {DBS_Signal[:5]}")
+
         DBS_Signal_neuron = h.Vector(DBS_Signal)
         DBS_times_neuron = h.Vector(DBS_times)
 
