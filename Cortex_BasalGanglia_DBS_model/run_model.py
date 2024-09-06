@@ -474,7 +474,8 @@ if __name__ == "__main__":
             pulse_width=0.06,
             offset=0,
         )
-        print(f"First 5 DBS_Signal values: {DBS_Signal[:5]}")
+        print(f"First 5 DBS_Signal values: {DBS_Signal[:10]}")
+        print(f"Last 5 DBS_Signal values: {DBS_Signal[-10:]}")
         DBS_Signal = np.hstack((np.array([0, 0]), DBS_Signal))
         DBS_times = np.hstack((np.array([0, steady_state_duration + 10]), DBS_times))
 
@@ -484,14 +485,16 @@ if __name__ == "__main__":
             indices = np.where(DBS_times == call_time)[0]
             if len(indices) > 0:
                 controller_DBS_indices.extend([indices[0]])
+        print(f"Last 5 DBS_Signal values (part2): {DBS_Signal[-10:]}")
+        print(f"First 5 DBS_Signal values (part2): {DBS_Signal[:10]}")
 
         # Set first portion of DBS signal (Up to first controller call after
         # steady state) to zero amplitude
         DBS_Signal[0:] = 0
         next_DBS_pulse_time = controller_call_times[0]
 
-        print(f"Last 5 DBS_Signal values (part2): {DBS_Signal[-5:]}")
-        print(f"First 5 DBS_Signal values (part2): {DBS_Signal[:5]}")
+        print(f"Last 5 DBS_Signal values (part3): {DBS_Signal[-10:]}")
+        print(f"First 5 DBS_Signal values (part3): {DBS_Signal[:10]}")
 
         DBS_Signal_neuron = h.Vector(DBS_Signal)
         DBS_times_neuron = h.Vector(DBS_times)
