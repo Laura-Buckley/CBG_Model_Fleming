@@ -477,9 +477,13 @@ if __name__ == "__main__":
         print(f"First 5 DBS_Signal values: {DBS_Signal[:10]}")
         print(f"Last 5 DBS_Signal values: {DBS_Signal[-10:]}")
 
-        # Calculate and print the midpoint of DBS_Signal before modifying
+        # Calculate the midpoint index and the middle 10 range
         midpoint_index_signal = len(DBS_Signal) // 2
-        print(f"Midpoint DBS_Signal value (before modification): {DBS_Signal[midpoint_index_signal]}")
+        start_index = max(0, midpoint_index_signal - 5)
+        end_index = min(len(DBS_Signal), midpoint_index_signal + 5)
+
+        # Print the middle 10 values
+        print(f"Middle 10 DBS_Signal values: {DBS_Signal[start_index:end_index]}")
 
         DBS_Signal = np.hstack((np.array([0, 0]), DBS_Signal))
         DBS_times = np.hstack((np.array([0, steady_state_duration + 10]), DBS_times))
@@ -492,7 +496,7 @@ if __name__ == "__main__":
                 controller_DBS_indices.extend([indices[0]])
         print(f"Last 5 DBS_Signal values (part2): {DBS_Signal[-10:]}")
         print(f"First 5 DBS_Signal values (part2): {DBS_Signal[:10]}")
-        print(f"Midpoint DBS_Signal value (part2): {DBS_Signal[midpoint_index_signal]}")
+        print(f"Middle 10 DBS_Signal values (part2): {DBS_Signal[start_index:end_index]}")
         # Set first portion of DBS signal (Up to first controller call after
         # steady state) to zero amplitude
         DBS_Signal[0:] = 0
@@ -500,7 +504,7 @@ if __name__ == "__main__":
 
         print(f"Last 5 DBS_Signal values (part3): {DBS_Signal[-10:]}")
         print(f"First 5 DBS_Signal values (part3): {DBS_Signal[:10]}")
-        print(f"Midpoint DBS_Signal value (part3): {DBS_Signal[midpoint_index_signal]}")
+        print(f"Middle 10 DBS_Signal values (part3): {DBS_Signal[start_index:end_index]}")
         DBS_Signal_neuron = h.Vector(DBS_Signal)
         DBS_times_neuron = h.Vector(DBS_times)
 
