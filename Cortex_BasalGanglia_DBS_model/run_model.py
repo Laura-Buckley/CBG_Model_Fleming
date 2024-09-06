@@ -479,8 +479,8 @@ if __name__ == "__main__":
 
         # Calculate the midpoint index and the middle 10 range
         midpoint_index_signal = len(DBS_Signal) // 2
-        start_index = max(0, midpoint_index_signal - 5)
-        end_index = min(len(DBS_Signal), midpoint_index_signal + 5)
+        start_index = max(0, midpoint_index_signal - 10)
+        end_index = min(len(DBS_Signal), midpoint_index_signal + 10)
 
         # Print the middle 10 values
         print(f"Middle 10 DBS_Signal values: {DBS_Signal[start_index:end_index]}")
@@ -1114,6 +1114,10 @@ if __name__ == "__main__":
 
 
     if DBS_stimulation:
+        print(f"Last 5 DBS_Signal values (part4): {DBS_Signal[-10:]}")
+        print(f"First 5 DBS_Signal values (part4): {DBS_Signal[:10]}")
+        print(f"Middle 10 DBS_Signal values (part4): {DBS_Signal[start_index:end_index]}")
+
         # Write the DBS Signal to .mat file
         # DBS Amplitude
         DBS_Block = neo.Block(name="DBS_Signal")
