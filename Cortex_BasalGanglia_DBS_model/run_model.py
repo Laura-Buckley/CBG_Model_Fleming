@@ -299,7 +299,7 @@ if __name__ == "__main__":
             * (rho / (4 * math.pi))
             * (1 / Cortical_Collateral_stimulating_electrode_distances)
         )
-
+        check_for_invalid_values(collateral_rx, "collateral_rx")
         # Convert ndarray to array of Sequence objects - needed to set cortical
         # collateral transfer resistances
         collateral_rx_seq = np.ndarray(
