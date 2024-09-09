@@ -1126,9 +1126,9 @@ if __name__ == "__main__":
 
 
     if DBS_stimulation:
-        print(f"Last 5 DBS_Signal values (part4): {DBS_Signal[-10:]}")
-        print(f"First 5 DBS_Signal values (part4): {DBS_Signal[:10]}")
-        print(f"Middle 10 DBS_Signal values (part4): {DBS_Signal[start_index:end_index]}")
+        print("Saving DBS signal")
+        check_non_zero_elements(DBS_Signal, "DBS_Signal")
+        check_non_zero_elements(DBS_times, "DBS_times")
 
         # Write the DBS Signal to .mat file
         # DBS Amplitude
