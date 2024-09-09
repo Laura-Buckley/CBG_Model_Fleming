@@ -11,4 +11,4 @@ save_ctx_lfp: True
 # Controller
 setpoint: 0
 ts: 0.02
-stimulation_amplitude: -2.0
+stimulation_amplitude: 2.0
