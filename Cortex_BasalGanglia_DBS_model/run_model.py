@@ -124,6 +124,14 @@ if __name__ == "__main__":
     # Set initial values for cell membrane voltages
     v_init = -68
 
+
+    def check_non_zero_elements(arr, arr_name="Variable"):
+        non_zero_count = np.count_nonzero(arr)
+        if non_zero_count > 0:
+            print(f"{arr_name} has {non_zero_count} non-zero elements.")
+        else:
+            print(f"{arr_name} has no non-zero elements.")
+
     def check_for_invalid_values(array, array_name):
         if np.any(np.isnan(array)):
             print(f"Error: {array_name} contains NaN values.")
@@ -474,19 +482,19 @@ if __name__ == "__main__":
             pulse_width=0.06,
             offset=0,
         )
-        print(f"First 5 DBS_Signal values: {DBS_Signal[:10]}")
-        print(f"Last 5 DBS_Signal values: {DBS_Signal[-10:]}")
 
-        # Calculate the midpoint index and the middle 10 range
-        midpoint_index_signal = len(DBS_Signal) // 2
-        start_index = max(0, midpoint_index_signal - 10)
-        end_index = min(len(DBS_Signal), midpoint_index_signal + 10)
 
-        # Print the middle 10 values
-        print(f"Middle 10 DBS_Signal values: {DBS_Signal[start_index:end_index]}")
+        print("DBS SIGNAL P1 ")
+        check_non_zero_elements(DBS_Signal, "DBS_Signal")
+        check_non_zero_elements(DBS_times, "DBS_times")
+
 
         DBS_Signal = np.hstack((np.array([0, 0]), DBS_Signal))
         DBS_times = np.hstack((np.array([0, steady_state_duration + 10]), DBS_times))
+
+        print("DBS SIGNAL P2 ")
+        check_non_zero_elements(DBS_Signal, "DBS_Signal")
+        check_non_zero_elements(DBS_times, "DBS_times")
 
         # Get DBS time indexes which corresponds to controller call times
         controller_DBS_indices = []
@@ -494,29 +502,33 @@ if __name__ == "__main__":
             indices = np.where(DBS_times == call_time)[0]
             if len(indices) > 0:
                 controller_DBS_indices.extend([indices[0]])
-        print(f"Last 5 DBS_Signal values (part2): {DBS_Signal[-10:]}")
-        print(f"First 5 DBS_Signal values (part2): {DBS_Signal[:10]}")
-        print(f"Middle 10 DBS_Signal values (part2): {DBS_Signal[start_index:end_index]}")
+
+        print("DBS SIGNAL P3 ")
+        check_non_zero_elements(DBS_Signal, "DBS_Signal")
+        check_non_zero_elements(DBS_times, "DBS_times")
         # Set first portion of DBS signal (Up to first controller call after
         # steady state) to zero amplitude
         DBS_Signal[0:] = 0
         next_DBS_pulse_time = controller_call_times[0]
 
-        print(f"Last 5 DBS_Signal values (part3): {DBS_Signal[-10:]}")
-        print(f"First 5 DBS_Signal values (part3): {DBS_Signal[:10]}")
-        print(f"Middle 10 DBS_Signal values (part3): {DBS_Signal[start_index:end_index]}")
+        print("DBS SIGNAL P4 ")
+        check_non_zero_elements(DBS_Signal, "DBS_Signal")
+        check_non_zero_elements(DBS_times, "DBS_times")
+
         DBS_Signal_neuron = h.Vector(DBS_Signal)
         DBS_times_neuron = h.Vector(DBS_times)
+        check_non_zero_elements(DBS_Signal_neuron, "DBS_Signal_neuron")
+        check_non_zero_elements(DBS_times_neuron, "DBS_times_neuron")
 
-        # Debug: Verify contents of NEURON Vectors
-        if rank == 0 and DBS_Signal_neuron.size() >= 5 and DBS_times_neuron.size() >= 5:
-            print("Last 5 elements of DBS_Signal_neuron:")
-            for i in range(-5, 0):  # Access the last 5 elements using negative indices
-                print(f"  DBS_Signal_neuron[{i}] = {DBS_Signal_neuron.x[i]}")
-
-            print("Last 5 elements of DBS_times_neuron:")
-            for i in range(-5, 0):
-                print(f"  DBS_times_neuron[{i}] = {DBS_times_neuron.x[i]}")
+        # # Debug: Verify contents of NEURON Vectors
+        # if rank == 0 and DBS_Signal_neuron.size() >= 5 and DBS_times_neuron.size() >= 5:
+        #     print("Last 5 elements of DBS_Signal_neuron:")
+        #     for i in range(-5, 0):  # Access the last 5 elements using negative indices
+        #         print(f"  DBS_Signal_neuron[{i}] = {DBS_Signal_neuron.x[i]}")
+        #
+        #     print("Last 5 elements of DBS_times_neuron:")
+        #     for i in range(-5, 0):
+        #         print(f"  DBS_times_neuron[{i}] = {DBS_times_neuron.x[i]}")
 
         # Play DBS signal to global variable is_xtra
         DBS_Signal_neuron.play(h._ref_is_xtra, DBS_times_neuron, 1)
