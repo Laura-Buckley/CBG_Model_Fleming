@@ -508,20 +508,20 @@ if __name__ == "__main__":
         check_non_zero_elements(DBS_Signal, "DBS_Signal")
         check_non_zero_elements(DBS_times, "DBS_times")
 
-        # # Set first portion of DBS signal (Up to first controller call after
-        # # steady state) to zero amplitude
-        # DBS_Signal[0:] = 0
-        # next_DBS_pulse_time = controller_call_times[0]
+        # Set first portion of DBS signal (Up to first controller call after
+        # steady state) to zero amplitude
+        DBS_Signal[0:] = 0
+        next_DBS_pulse_time = controller_call_times[0]
 
-        if controller_DBS_indices:
-            # Do something if controller_DBS_indices is not empty
-            first_call_index = controller_DBS_indices[0]
-            DBS_Signal[:first_call_index] = 0  # Set DBS_Signal to zero only up to the first controller call
+        # if controller_DBS_indices:
+        #     # Do something if controller_DBS_indices is not empty
+        #     first_call_index = controller_DBS_indices[0]
+        #     DBS_Signal[:first_call_index] = 0  # Set DBS_Signal to zero only up to the first controller call
 
-            print(f"Controller DBS indices is not empty, first call index: {first_call_index}")
-        else:
-            # Handle the case where controller_DBS_indices is empty
-            print("Controller DBS indices is empty, skipping the zeroing of DBS_Signal.")
+        #     print(f"Controller DBS indices is not empty, first call index: {first_call_index}")
+        # else:
+        #     # Handle the case where controller_DBS_indices is empty
+        #     print("Controller DBS indices is empty, skipping the zeroing of DBS_Signal.")
 
         next_DBS_pulse_time = controller_call_times[0]
 
