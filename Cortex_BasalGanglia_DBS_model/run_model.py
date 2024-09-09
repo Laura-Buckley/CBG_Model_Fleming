@@ -511,9 +511,9 @@ if __name__ == "__main__":
         # DBS_Signal[0:] = 0
         # next_DBS_pulse_time = controller_call_times[0]
 
-        # Set the portion of the DBS signal up to the first controller call to zero amplitude
-        first_call_index = controller_DBS_indices[0]  # Get the index of the first controller call
-        DBS_Signal[:first_call_index] = 0  # Set DBS_Signal to zero only up to the first controller call
+        # # Set the portion of the DBS signal up to the first controller call to zero amplitude
+        # first_call_index = controller_DBS_indices[0]  # Get the index of the first controller call
+        # DBS_Signal[:first_call_index] = 0  # Set DBS_Signal to zero only up to the first controller call
 
         print("DBS SIGNAL P4 ")
         check_non_zero_elements(DBS_Signal, "DBS_Signal")
