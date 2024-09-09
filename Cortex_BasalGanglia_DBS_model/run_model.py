@@ -434,6 +434,7 @@ if __name__ == "__main__":
     )
 
     if len(controller_call_times) == 0:
+        print("controller call times was empty")
         controller_call_times = np.array([controller_start])
 
     # Initialize the Controller being used:
@@ -506,14 +507,23 @@ if __name__ == "__main__":
         print("DBS SIGNAL P3 ")
         check_non_zero_elements(DBS_Signal, "DBS_Signal")
         check_non_zero_elements(DBS_times, "DBS_times")
-        # Set first portion of DBS signal (Up to first controller call after
-        # steady state) to zero amplitude
+
+        # # Set first portion of DBS signal (Up to first controller call after
+        # # steady state) to zero amplitude
         # DBS_Signal[0:] = 0
         # next_DBS_pulse_time = controller_call_times[0]
 
-        # # Set the portion of the DBS signal up to the first controller call to zero amplitude
-        # first_call_index = controller_DBS_indices[0]  # Get the index of the first controller call
-        # DBS_Signal[:first_call_index] = 0  # Set DBS_Signal to zero only up to the first controller call
+        if controller_DBS_indices:
+            # Do something if controller_DBS_indices is not empty
+            first_call_index = controller_DBS_indices[0]
+            DBS_Signal[:first_call_index] = 0  # Set DBS_Signal to zero only up to the first controller call
+
+            print(f"Controller DBS indices is not empty, first call index: {first_call_index}")
+        else:
+            # Handle the case where controller_DBS_indices is empty
+            print("Controller DBS indices is empty, skipping the zeroing of DBS_Signal.")
+
+        next_DBS_pulse_time = controller_call_times[0]
 
         print("DBS SIGNAL P4 ")
         check_non_zero_elements(DBS_Signal, "DBS_Signal")
