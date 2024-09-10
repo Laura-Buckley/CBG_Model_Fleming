@@ -523,7 +523,7 @@ if __name__ == "__main__":
         #     # Handle the case where controller_DBS_indices is empty
         #     print("Controller DBS indices is empty, skipping the zeroing of DBS_Signal.")
 
-       
+
 
         print("DBS SIGNAL P4 ")
         check_non_zero_elements(DBS_Signal, "DBS_Signal")
