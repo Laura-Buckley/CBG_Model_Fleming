@@ -947,7 +947,7 @@ if __name__ == "__main__":
 
                     # Update DBS segment - replace original DBS array values with
                     # updated ones
-                    indices = np.where(DBS_times == new_ctx_times_Segment[0])[0]
+                    indices = np.where(ctx_times == new_ctx_times_Segment[0])[0]
                     if len(indices) > 0:
                         window_start_index = indices[0]
                     else:
