@@ -513,16 +513,6 @@ if __name__ == "__main__":
         DBS_Signal[0:] = 0
         next_DBS_pulse_time = controller_call_times[0]
 
-        # if controller_DBS_indices:
-        #     # Do something if controller_DBS_indices is not empty
-        #     first_call_index = controller_DBS_indices[0]
-        #     DBS_Signal[:first_call_index] = 0  # Set DBS_Signal to zero only up to the first controller call
-
-        #     print(f"Controller DBS indices is not empty, first call index: {first_call_index}")
-        # else:
-        #     # Handle the case where controller_DBS_indices is empty
-        #     print("Controller DBS indices is empty, skipping the zeroing of DBS_Signal.")
-
 
 
         print("DBS SIGNAL P4 ")
@@ -534,15 +524,7 @@ if __name__ == "__main__":
         check_non_zero_elements(DBS_Signal_neuron, "DBS_Signal_neuron")
         check_non_zero_elements(DBS_times_neuron, "DBS_times_neuron")
 
-        # # Debug: Verify contents of NEURON Vectors
-        # if rank == 0 and DBS_Signal_neuron.size() >= 5 and DBS_times_neuron.size() >= 5:
-        #     print("Last 5 elements of DBS_Signal_neuron:")
-        #     for i in range(-5, 0):  # Access the last 5 elements using negative indices
-        #         print(f"  DBS_Signal_neuron[{i}] = {DBS_Signal_neuron.x[i]}")
-        #
-        #     print("Last 5 elements of DBS_times_neuron:")
-        #     for i in range(-5, 0):
-        #         print(f"  DBS_times_neuron[{i}] = {DBS_times_neuron.x[i]}")
+
 
         # Play DBS signal to global variable is_xtra
         DBS_Signal_neuron.play(h._ref_is_xtra, DBS_times_neuron, 1)
@@ -640,39 +622,29 @@ if __name__ == "__main__":
             pulse_width=0.06,
             offset=0,
         )
-        print("initialising ctx signal...")
-        if rank == 0:
-            print("Initial ctx_Signal and ctx_times generated.")
-            print(f"ctx_Signal shape: {ctx_Signal.shape}, ctx_times shape: {ctx_times.shape}")
-            print(f"First 5 ctx_Signal values: {ctx_Signal[:5]}")
-            print(f"First 5 ctx_times values: {ctx_times[:5]}")
-            print(f"next_ctx_pulse_time: {next_ctx_pulse_time}, last_ctx_pulse_time: {last_ctx_pulse_time}")
 
         ctx_Signal = np.hstack((np.array([0, 0]), ctx_Signal))
         ctx_times = np.hstack((np.array([0, steady_state_duration + 10]), ctx_times))
 
-        if rank == 0:
-            print("After hstack, updated ctx_Signal and ctx_times:")
-            print(f"ctx_Signal shape: {ctx_Signal.shape}, ctx_times shape: {ctx_times.shape}")
-            print(f"First 5 ctx_Signal values: {ctx_Signal[:5]}")
-            print(f"First 5 ctx_times values: {ctx_times[:5]}")
+        # Get DBS time indexes which corresponds to controller call times
+        controller_ctx_indices = []
+        for call_time in controller_call_times:
+            indices = np.where(ctx_times == call_time)[0]
+            if len(indices) > 0:
+                controller_ctx_indices.extend([indices[0]])
+
+
+
+        # Set first portion of DBS signal (Up to first controller call after
+        # steady state) to zero amplitude
+        ctx_Signal[0:] = 0
+        next_ctx_pulse_time = controller_call_times[0]
+
 
         ctx_Signal_neuron = h.Vector(ctx_Signal)
         ctx_times_neuron = h.Vector(ctx_times)
 
-        if rank == 0:
-            print("Converted ctx_Signal and ctx_times to NEURON Vectors.")
-            print(f"ctx_Signal_neuron size: {ctx_Signal_neuron.size()}")
-            print(f"ctx_times_neuron size: {ctx_times_neuron.size()}")
 
-            # Debug: Verify contents of NEURON Vectors
-        if rank == 0 and ctx_Signal_neuron.size() >= 5 and ctx_times_neuron.size() >= 5:
-            print("First 5 elements of ctx_Signal_neuron:")
-            for i in range(5):
-                print(f"  ctx_Signal_neuron[{i}] = {ctx_Signal_neuron.x[i]}")
-            print("First 5 elements of ctx_times_neuron:")
-            for i in range(5):
-                print(f"  ctx_times_neuron[{i}] = {ctx_times_neuron.x[i]}")
 
         # Play ctx signal to global variable is_xtra
         ctx_Signal_neuron.play(h._ref_is_xtra, ctx_times_neuron, 1)
@@ -1028,10 +1000,9 @@ if __name__ == "__main__":
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_GABAa_i.mat"), "GABAa.i", clear=False)
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_AMPA_i.mat"), "AMPA.i", clear=False)
 
-    #if ctx_stimulation:
-    if DBS_stimulation:
-        if rank == 0:
-            print("Saving collateral and soma currents...")
+
+    if rank == 0:
+        print("Saving collateral and soma currents...")
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_soma_im.mat"), "soma(0.5).i_membrane_", clear=False)
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_collateral_im.mat"), "collateral(0.5).i_membrane_", clear=False)
         # Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_node_ex.mat"), "middle_node(0.5).ref_e_extracellular", clear=False)
