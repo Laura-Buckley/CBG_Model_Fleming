@@ -937,7 +937,7 @@ if __name__ == "__main__":
                     ) = controller.generate_dbs_signal(
                         start_time=next_ctx_pulse_time,
                         stop_time=controller_call_times[call_index + 1],
-                        last_pulse_time_prior=last_ctx_time_prior,
+                        last_pulse_time_prior=last_pulse_time_prior,
                         dt=simulator.state.dt,
                         amplitude=-ctx_amp,
                         frequency=ctx_freq,
