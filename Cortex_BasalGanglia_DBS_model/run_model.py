@@ -254,14 +254,10 @@ if __name__ == "__main__":
     GPe_Pop.record("soma(0.5).v", sampling_interval=rec_sampling_interval)
     GPi_Pop.record("soma(0.5).v", sampling_interval=rec_sampling_interval)
     Thalamic_Pop.record("soma(0.5).v", sampling_interval=rec_sampling_interval)
-
-    # need new way of measuring the e-extracellular applied
-    #if ctx_stimulation:
-    if DBS_stimulation:
-        Cortical_Pop.record("soma(0.5).i_membrane_", sampling_interval=rec_sampling_interval)
-        Cortical_Pop.record("collateral(0.5).i_membrane_", sampling_interval=rec_sampling_interval)
-        # Cortical_Pop.record("ais(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
-        # Cortical_Pop.record("middle_node(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
+    Cortical_Pop.record("soma(0.5).i_membrane_", sampling_interval=rec_sampling_interval)
+    Cortical_Pop.record("collateral(0.5).i_membrane_", sampling_interval=rec_sampling_interval)
+    # Cortical_Pop.record("ais(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
+    # Cortical_Pop.record("middle_node(0.5).ref_e_extracellular", sampling_interval=rec_sampling_interval)
 
 
     # Assign Positions for recording and stimulating electrode point sources
