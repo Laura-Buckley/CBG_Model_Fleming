@@ -1028,7 +1028,7 @@ if __name__ == "__main__":
         controller_integral_term_history = np.asarray(controller.integral_term_history)
     except AttributeError:
         controller_integral_term_history = None
-
+    print("About to save controller values to csv files")
     if rank == 0:
         np.savetxt(
             simulation_output_dir / "controller_beta_values.csv",
@@ -1074,7 +1074,7 @@ if __name__ == "__main__":
                 controller_integral_term_history,
                 delimiter=",",
             )
-
+    print("Saved controller values to csv files")
     # Write the STN LFP to .mat file
     STN_LFP_Block = neo.Block(name="STN_LFP")
     STN_LFP_seg = neo.Segment(name="segment_0")
@@ -1139,6 +1139,7 @@ if __name__ == "__main__":
         w.write_block(DBS_Block)
 
     if ctx_stimulation:
+        print("Saving ctx signal")
         # Write the Cortex Signal to .mat file
         # Cortex Amplitude
         ctx_Block = neo.Block(name="ctx_Signal")
