@@ -2,7 +2,7 @@
 # Simulation
 Controller: Zero
 RunTime: 9000.0
-SteadyStateDuration: 500
+SteadyStateDuration: 2000
 
 # Controller
 setpoint: 0
