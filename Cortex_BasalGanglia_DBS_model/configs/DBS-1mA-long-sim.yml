@@ -2,7 +2,7 @@
 # Simulation
 Controller: OPEN
 RunTime: 9000.0
-SteadyStateDuration: 500
+SteadyStateDuration: 2000
 ctx_stimulation: False
 DBS_stimulation: True
 save_ctx_voltage: True
