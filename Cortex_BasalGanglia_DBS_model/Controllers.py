@@ -118,6 +118,7 @@ class ConstantController:
         min_value=0.0,
         max_value=1e9,
         stimulation_amplitude=0.0,
+        stimulation_frequency = 60.0,
         ctx_stimulation=False,  # Default value and initialize
         DBS_stimulation=True, # Default value and initialize
         ts=0.0,
@@ -128,6 +129,7 @@ class ConstantController:
         self.max_value = max_value
         self.min_value = min_value
         self.stimulation_amplitude = stimulation_amplitude
+        self.stimulation_frequency = stimulation_frequency
         self.ctx_stimulation = ctx_stimulation
         self.DBS_stimulation = DBS_stimulation
         self.ts = ts  # should be in sec as per above

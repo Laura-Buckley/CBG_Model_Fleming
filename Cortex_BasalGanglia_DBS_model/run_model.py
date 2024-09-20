@@ -94,6 +94,7 @@ if __name__ == "__main__":
     ctx_stimulation = c.ctx_stimulation
     DBS_stimulation = c.DBS_stimulation
     stimulation_amplitude =  c.stimulation_amplitude
+    stimulation_frequency = c.stimulation_frequency
 
 
     sim_total_time = (
@@ -615,7 +616,7 @@ if __name__ == "__main__":
             last_pulse_time_prior=last_pulse_time_prior,
             dt=simulator.state.dt,
             amplitude=stimulation_amplitude, #apply relevant values for cortical stimulation
-            frequency=100.0,
+            frequency= stimulation_frequency,
             pulse_width=0.06,
             offset=0,
         )

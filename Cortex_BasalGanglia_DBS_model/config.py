@@ -44,6 +44,7 @@ ift_schema = dict(
 constant_schema = dict(
     setpoint={"type": "float", "coerce": float},
     stimulation_amplitude={"type": "float", "coerce": float},
+    stimulation_frequency = {"type": "float", "coerce": float},
     ts={"type": "float", "coerce": float},
 )
 
@@ -90,6 +91,7 @@ class Config(object):
         fix_kp={"type": "boolean", "coerce": bool, "default": False},
         fix_ti={"type": "boolean", "coerce": bool, "default": False},
         stimulation_amplitude={"type": "float", "coerce": float, "default": 0},
+        stimulation_frequency= {"type": "float", "coerce": float, "default": 130},
         cortical_beta_mechanism={
             "type": "string",
             "coerce": (str, lambda x: x.lower()),
