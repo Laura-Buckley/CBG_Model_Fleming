@@ -592,6 +592,9 @@ if __name__ == "__main__":
             # of GPe stimulation signals
             updated_GPe_DBS_signal.append(GPe_DBS_Signal_neuron[i].as_numpy())
 
+    print(f"Ctx Stimulation amplitude: {stimulation_amplitude}")
+    print(f"Ctx Stimulation frequency: {stimulation_frequency}")
+
     if ctx_stimulation:
 
         # Generate an equivalent signal for the cortex
