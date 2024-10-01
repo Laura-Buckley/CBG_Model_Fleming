@@ -12,3 +12,4 @@ save_ctx_lfp: True
 setpoint: 0
 ts: 0.02
 stimulation_amplitude: 0.1
+stimulation_frequency: 60.0
