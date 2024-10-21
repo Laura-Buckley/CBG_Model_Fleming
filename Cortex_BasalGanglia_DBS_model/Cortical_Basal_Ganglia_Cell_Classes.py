@@ -221,7 +221,6 @@ class Cortical_Neuron(object):
                 rx_values[0, i] = seg.xtra.rx
             print(Sequence(rx_values.flatten()))
 
-        print(f'The value of ctx stim before colltateral extra is: {global_ctx_stimulation}')
 
         if global_DBS_stimulation:
                 #Add extracellular and xtra mechanisms to collateral
@@ -404,7 +403,7 @@ class Cortical_Neuron_Type(NativeCellType):
         "collateral_cm": 0.8,
         "num_axon_compartments": 10,
     }
-    print(f'The value of DBS stim before initialising collateral seq is: {global_DBS_stimulation}')
+
     if global_DBS_stimulation:
         # Define initial vector of transfer resistances for the collateral segments
         initial_collateral_rx = np.zeros(

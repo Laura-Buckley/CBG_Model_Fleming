@@ -109,7 +109,7 @@ if __name__ == "__main__":
     if rank == 0:
         print("\n------ Configuration ------")
         print(c, "\n")
-        print("this is the main branch")
+
 
     # Make beta band filter centred on 25Hz (cutoff frequencies are 21-29 Hz)
     # for biomarker estimation
@@ -127,44 +127,6 @@ if __name__ == "__main__":
     v_init = -68
 
 
-    def check_non_zero_elements(arr, arr_name="Variable"):
-        non_zero_count = np.count_nonzero(arr)
-        if non_zero_count > 0:
-            print(f"{arr_name} has {non_zero_count} non-zero elements.")
-        else:
-            print(f"{arr_name} has no non-zero elements.")
-
-    def check_for_invalid_values(array, array_name):
-        if np.any(np.isnan(array)):
-            print(f"Error: {array_name} contains NaN values.")
-        if np.any(array == 0):
-            print(f"Warning: {array_name} contains zero values, which may lead to division by zero.")
-        if np.any(array < 0):
-            print(f"Warning: {array_name} contains negative values.")
-        if np.any(np.isinf(array)):
-            print(f"Error: {array_name} contains infinity values.")
-
-        # Optionally print out indices and values of problematic elements
-        nan_indices = np.where(np.isnan(array))
-        if nan_indices[0].size > 0:
-            print(f"NaN values found in {array_name} at indices: {nan_indices}")
-            print(f"NaN values: {array[nan_indices]}")
-
-        zero_indices = np.where(array == 0)
-        if zero_indices[0].size > 0:
-            print(f"Zero values found in {array_name} at indices: {zero_indices}")
-            print(f"Zero values: {array[zero_indices]}")
-
-        negative_indices = np.where(array < 0)
-        if negative_indices[0].size > 0:
-            print(f"Negative values found in {array_name} at indices: {negative_indices}")
-            print(f"Negative values: {array[negative_indices]}")
-
-        inf_indices = np.where(np.isinf(array))
-        if inf_indices[0].size > 0:
-            print(f"Infinite values found in {array_name} at indices: {inf_indices}")
-            print(f"Infinite values: {array[inf_indices]}")
-    print(f"values of DBS stim : {DBS_stimulation}")
 
     if not create_new_network:
         if rank == 0:
@@ -237,7 +199,7 @@ if __name__ == "__main__":
         if rank == 0:
             print("Network created")
 
-    print(f"values of DBS stim : {DBS_stimulation}")
+
 
     # Define state variables to record from each population
     if c.save_ctx_voltage:
@@ -290,7 +252,6 @@ if __name__ == "__main__":
     )
 
 
-    print("Passed electrode distance function")
     # Conductivity and resistivity values for homogenous, isotropic medium
     sigma = 0.27  # Latikka et al. 2001 - Conductivity of Brain tissue S/m
     # rho needs units of ohm cm for xtra mechanism (S/m -> S/cm)
@@ -322,7 +283,6 @@ if __name__ == "__main__":
 
     if ctx_stimulation:
 
-        print("Starting ctx_stimulation block...")
         # Calculate transfer resistances for each node segment for xtra
         nodes_rx = (
             0.01
@@ -400,7 +360,7 @@ if __name__ == "__main__":
         # for ii, cell in enumerate(Interneuron_Pop):
         #     cell.inter_rx = inter_rx_seq[ii]
 
-        print("Finishing ctx_stimulation block...")
+
 
 
 
@@ -483,17 +443,10 @@ if __name__ == "__main__":
         )
 
 
-        print("DBS SIGNAL P1 ")
-        check_non_zero_elements(DBS_Signal, "DBS_Signal")
-        check_non_zero_elements(DBS_times, "DBS_times")
-
 
         DBS_Signal = np.hstack((np.array([0, 0]), DBS_Signal))
         DBS_times = np.hstack((np.array([0, steady_state_duration + 10]), DBS_times))
 
-        print("DBS SIGNAL P2 ")
-        check_non_zero_elements(DBS_Signal, "DBS_Signal")
-        check_non_zero_elements(DBS_times, "DBS_times")
 
         # Get DBS time indexes which corresponds to controller call times
         controller_DBS_indices = []
@@ -502,9 +455,6 @@ if __name__ == "__main__":
             if len(indices) > 0:
                 controller_DBS_indices.extend([indices[0]])
 
-        print("DBS SIGNAL P3 ")
-        check_non_zero_elements(DBS_Signal, "DBS_Signal")
-        check_non_zero_elements(DBS_times, "DBS_times")
 
         # Set first portion of DBS signal (Up to first controller call after
         # steady state) to zero amplitude
@@ -512,16 +462,8 @@ if __name__ == "__main__":
         next_DBS_pulse_time = controller_call_times[0]
 
 
-
-        print("DBS SIGNAL P4 ")
-        check_non_zero_elements(DBS_Signal, "DBS_Signal")
-        check_non_zero_elements(DBS_times, "DBS_times")
-
         DBS_Signal_neuron = h.Vector(DBS_Signal)
         DBS_times_neuron = h.Vector(DBS_times)
-        check_non_zero_elements(DBS_Signal_neuron, "DBS_Signal_neuron")
-        check_non_zero_elements(DBS_times_neuron, "DBS_times_neuron")
-
 
 
         # Play DBS signal to global variable is_xtra
@@ -649,7 +591,7 @@ if __name__ == "__main__":
 
         # Play ctx signal to global variable is_xtra
         ctx_Signal_neuron.play(h._ref_is_xtra, ctx_times_neuron, 1)
-        print("ctx signal played in...")
+
 
         # Get DBS_Signal_neuron as a numpy array for easy updating
         updated_ctx_signal = ctx_Signal_neuron.as_numpy()
