@@ -73,9 +73,7 @@ from functools import reduce
 # Import global variables and configuration management
 import Global_Variables as GV
 from config import Config as c, global_ctx_stimulation, global_DBS_stimulation
-#
-# global_ctx_stimulation = c.ctx_stimulation
-# global_DBS_stimulation =c.DBS_stimulation
+
 
 def _new_property(obj_hierarchy, attr_name):
     """
@@ -286,8 +284,8 @@ class Cortical_Neuron(object):
 
         if global_ctx_stimulation:
             # Add extracellular and xtra mechanism to soma
-            self.soma.insert("extracellular")
-            self.soma.insert("xtra")
+            # self.soma.insert("extracellular")
+            # self.soma.insert("xtra") #commented to check effect of soma
 
             # Add extracellular and xtra mechanism to AIS
             self.ais.insert("extracellular")
@@ -298,14 +296,14 @@ class Cortical_Neuron(object):
                 n.insert("extracellular")
                 n.insert("xtra")
 
-            # Assign default rx values to soma, ais and main axon nodes
-            for seg in self.soma:
-                seg.xtra.rx = seg.x * 3e-1
+            # # Assign default rx values to soma, ais and main axon nodes
+            # for seg in self.soma:
+            #     seg.xtra.rx = seg.x * 3e-1
 
-            # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
-            for seg in self.soma:
-                h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
-                h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+            # # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
+            # for seg in self.soma:
+            #     h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
+            #     h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
 
             for n in self.node:
                 n(0.5).xtra.rx = n(0.5).x * 3e-1
@@ -342,13 +340,13 @@ class Cortical_Neuron(object):
 
         # needed for PyNN
         self.source = {
-            "soma": self.soma(0.5)._ref_v,
+            #"soma": self.soma(0.5)._ref_v,
             "middle_axon_node": self.middle_node(0.5)._ref_v,
             "ais": self.ais(0.5)._ref_v,
             "collateral": self.collateral(0.5)._ref_v,
         }
         self.source_section = {
-            "soma": self.soma,
+            #"soma": self.soma,
             "middle_axon_node": self.middle_node,
             "ais": self.ais,
             "collateral": self.collateral,
@@ -421,10 +419,10 @@ class Cortical_Neuron_Type(NativeCellType):
         initial_ais_rx_Sequence = Sequence(initial_ais_rx)
         default_parameters["ais_rx"] = initial_ais_rx_Sequence
 
-        # Define initial vector of transfer resistances for the soma segments
-        initial_soma_rx = np.zeros((1, default_parameters["soma_nseg"])).flatten()
-        initial_soma_rx_Sequence = Sequence(initial_soma_rx)
-        default_parameters["soma_rx"] = initial_soma_rx_Sequence
+        # # Define initial vector of transfer resistances for the soma segments
+        # initial_soma_rx = np.zeros((1, default_parameters["soma_nseg"])).flatten()
+        # initial_soma_rx_Sequence = Sequence(initial_soma_rx)
+        # default_parameters["soma_rx"] = initial_soma_rx_Sequence
 
         # Define initial vector of transfer resistances for the nodes segments
         initial_nodes_rx = np.zeros((1, default_parameters["node_nseg"])).flatten()

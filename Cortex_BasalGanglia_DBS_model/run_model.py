@@ -360,25 +360,25 @@ if __name__ == "__main__":
         for ii, cell in enumerate(Cortical_Pop):
             cell.ais_rx = ais_rx_seq[ii]
 
-        # Calculate transfer resistances for each soma segments for xtra
-        soma_rx = (
-                0.01
-                * (rho / (4 * math.pi))
-                * (1 / segment_electrode_distances_soma)
-        )
-        check_for_invalid_values(soma_rx, "soma_rx")
-
-        # Convert ndarray to array of Sequence objects - needed to set cortical
-        # soma transfer resistances
-        soma_rx_seq = np.ndarray(
-            shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        ).flatten()
-        for ii in range(0, Cortical_Pop.local_size):
-            soma_rx_seq[ii] = Sequence(soma_rx[ii, :].flatten())
-
-        # Assign transfer resistances values to somas
-        for ii, cell in enumerate(Interneuron_Pop):
-            cell.soma_rx = soma_rx_seq[ii]
+        # # Calculate transfer resistances for each soma segments for xtra
+        # soma_rx = (
+        #         0.01
+        #         * (rho / (4 * math.pi))
+        #         * (1 / segment_electrode_distances_soma)
+        # )
+        # check_for_invalid_values(soma_rx, "soma_rx")
+        #
+        # # Convert ndarray to array of Sequence objects - needed to set cortical
+        # # soma transfer resistances
+        # soma_rx_seq = np.ndarray(
+        #     shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        # ).flatten()
+        # for ii in range(0, Cortical_Pop.local_size):
+        #     soma_rx_seq[ii] = Sequence(soma_rx[ii, :].flatten())
+        #
+        # # Assign transfer resistances values to somas
+        # for ii, cell in enumerate(Interneuron_Pop):
+        #     cell.soma_rx = soma_rx_seq[ii]
 
         # # Calculate transfer resistances for each segment in the Interneurons for xtra
         # inter_rx = (
