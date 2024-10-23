@@ -8,5 +8,18 @@ computed from specific FEA models of the DBS electrode and head model.
 """
 
 import numpy as np
+import os
 
-# will need a function to extract the filename from the config and load the data into a sorted array
+def get_data_from_filename(filename):
+    coupled_dir = Path("coupled_models")
+    coupled_script = coupled_dir / filename
+    ex_values = np.loadtxt(coupled_script, delimiter=",")
+    return ex_values
+
+
+def sort_ex_values(ex_values):
+    """this will sort the loaded extracellular potential values into an n x d array, where n is the number of rows,
+        corresponding to the number of segments in the collateral, and d is the number of cells in the Cortical pop.
+
+    """
+

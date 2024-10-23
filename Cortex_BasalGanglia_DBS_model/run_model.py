@@ -222,25 +222,26 @@ if __name__ == "__main__":
     # rho needs units of ohm cm for xtra mechanism (S/m -> S/cm)
     rho = 1 / (sigma * 1e-2)
 
-    # Calculate transfer resistances for each collateral segment for xtra
-    # units are Mohms
-    collateral_rx = (
-        0.01
-        * (rho / (4 * math.pi))
-        * (1 / Cortical_Collateral_stimulating_electrode_distances)
-    )
+    if not Coupled_model:
+        # Calculate transfer resistances for each collateral segment for xtra
+        # units are Mohms
+        collateral_rx = (
+            0.01
+            * (rho / (4 * math.pi))
+            * (1 / Cortical_Collateral_stimulating_electrode_distances)
+        )
 
-    # Convert ndarray to array of Sequence objects - needed to set cortical
-    # collateral transfer resistances
-    collateral_rx_seq = np.ndarray(
-        shape=(1, Cortical_Pop.local_size), dtype=Sequence
-    ).flatten()
-    for ii in range(0, Cortical_Pop.local_size):
-        collateral_rx_seq[ii] = Sequence(collateral_rx[ii, :].flatten())
+        # Convert ndarray to array of Sequence objects - needed to set cortical
+        # collateral transfer resistances
+        collateral_rx_seq = np.ndarray(
+            shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        ).flatten()
+        for ii in range(0, Cortical_Pop.local_size):
+            collateral_rx_seq[ii] = Sequence(collateral_rx[ii, :].flatten())
 
-    # Assign transfer resistances values to collaterals
-    for ii, cell in enumerate(Cortical_Pop):
-        cell.collateral_rx = collateral_rx_seq[ii]
+        # Assign transfer resistances values to collaterals
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.collateral_rx = collateral_rx_seq[ii]
 
     # Create times for when the DBS controller will be called
     # Window length for filtering biomarker
