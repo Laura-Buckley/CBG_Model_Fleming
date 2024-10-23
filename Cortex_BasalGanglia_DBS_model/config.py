@@ -86,6 +86,7 @@ class Config(object):
         fix_kp={"type": "boolean", "coerce": bool, "default": False},
         fix_ti={"type": "boolean", "coerce": bool, "default": False},
         stimulation_amplitude={"type": "float", "coerce": float, "default": 0},
+        Coupled_model={"type": "boolean", "coerce": bool, "default": False},
         cortical_beta_mechanism={
             "type": "string",
             "coerce": (str, lambda x: x.lower()),
