@@ -42,7 +42,7 @@ import numpy as np
 import math
 import argparse
 from utils import make_beta_cheby1_filter, calculate_avg_beta_power
-from model import create_network, load_network, electrode_distance
+from model import create_network, load_network, electrode_distance, initialize_model
 from config import Config, get_controller_kwargs, global_DBS_stimulation, global_ctx_stimulation
 from Cortical_Basal_Ganglia_Cell_Classes import Cortical_Neuron_Type, initialize_cell_classes
 
@@ -75,6 +75,7 @@ if __name__ == "__main__":
 
     # Initialize global variables with config settings
     initialize_cell_classes(c)
+    initialize_model(c)
 
     os.chdir(newpwd)
 
@@ -231,7 +232,7 @@ if __name__ == "__main__":
         stimulating_electrode_position = np.array([0, 0, 250])
 
     if ctx_stimulation:
-        stimulating_electrode_position = np.array([0, 8000, 1000])
+        stimulating_electrode_position = np.array([0, 8000, -1000])
 
 
     # Call the electrode_distance function with the required parameters

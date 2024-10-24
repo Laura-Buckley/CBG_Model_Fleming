@@ -30,6 +30,13 @@ import utils as u
 from pathlib import Path
 
 
+def initialize_model(config):
+    global global_ctx_stimulation
+    global global_DBS_stimulation
+
+    global_ctx_stimulation = config.ctx_stimulation
+    global_DBS_stimulation = config.DBS_stimulation
+
 def create_network(
     Pop_size,
     steady_state_duration,
@@ -48,15 +55,17 @@ def create_network(
     np.random.seed(rng_seed)
     structure_save_dir = Path("network_structure")
 
+
     # Sphere with radius 2000 um
     STN_space = space.RandomStructure(
         boundary=space.Sphere(2000), rng=NumpyRNG(seed=rng_seed)
     )
 
-    # #Sphere with radius 1500 um for interneuron distribution
-    # cortical_layers_space =  space.RandomStructure(
-    #     boundary=space.Sphere(1500), origin = (0, 5500, 0) , rng=NumpyRNG(seed=rng_seed)
-    # )
+    if global_ctx_stimulation:
+        # Sphere with radius 2000 um for interneuron distribution in X-Z plane
+        cortical_layers_space = space.RandomStructure(
+            boundary=space.Sphere(2000), origin=(0, 8000, -1000), rng=NumpyRNG(seed=rng_seed)
+        )
 
     # Generate Poisson-distributed Striatal Spike trains
     striatal_spike_times = u.generate_poisson_spike_times(
@@ -167,23 +176,41 @@ def create_network(
                 dt=1.0,
             )
         )
+    if global_DBS_stimulation:
+        # Position Check -
+        # 1) Make sure cells are bounded in 4mm space in x, y coordinates
+        # 2) Make sure no cells are placed inside the stimulating/recording
+        # electrode -0.5mm<x<0.5mm, -1.5mm<y<2mm
+        for Cortical_cell in Cortical_Pop:
+            while (
+                (np.abs(Cortical_cell.position[0]) > 2000)
+                or ((np.abs(Cortical_cell.position[1]) > 2000))
+            ) or (
+                (np.abs(Cortical_cell.position[0]) < 500)
+                and (-1500 < Cortical_cell.position[1] < 2000)
+            ):
+                Cortical_cell.position = STN_space.generate_positions(1).flatten()
 
-    # Position Check -
-    # 1) Make sure cells are bounded in 4mm space in x, y coordinates
-    # 2) Make sure no cells are placed inside the stimulating/recording
-    # electrode -0.5mm<x<0.5mm, -1.5mm<y<2mm
-    for Cortical_cell in Cortical_Pop:
-        while (
-            (np.abs(Cortical_cell.position[0]) > 2000)
-            or ((np.abs(Cortical_cell.position[1]) > 2000))
-        ) or (
-            (np.abs(Cortical_cell.position[0]) < 500)
-            and (-1500 < Cortical_cell.position[1] < 2000)
-        ):
-            Cortical_cell.position = STN_space.generate_positions(1).flatten()
+        # Save the generated cortical xy positions to a textfile
+        np.savetxt(structure_save_dir / "cortical_xy_pos.txt", Cortical_Pop.positions, delimiter=",")
 
-    # Save the generated cortical xy positions to a textfile
-    np.savetxt(structure_save_dir / "cortical_xy_pos.txt", Cortical_Pop.positions, delimiter=",")
+    if global_ctx_stimulation:
+        # Position Check -
+        # 1) Ensure cells are bounded in the 2000 um radius in both x and z, considering the center at Z = -1000
+        # 2) Ensure cells are not too close to the new stimulating electrode at [0, 8000, -1000]
+        for Cortical_cell in Cortical_Pop:
+            while (
+                    (np.abs(Cortical_cell.position[0]) > 2000)  # x-limit check within 2000 um radius
+                    or (np.abs(Cortical_cell.position[2] + 1000) > 2000)  # z-limit check relative to Z = -1000
+            ) or (
+                    (np.abs(Cortical_cell.position[0]) < 500)  # Exclude region close to electrode in x
+                    and (-1500 < Cortical_cell.position[2] < -500)  # Exclude region near electrode in z
+            ):
+                # Re-generate position if the conditions above are violated
+                Cortical_cell.position = cortical_layers_space.generate_positions(1).flatten()
+
+        # Save the generated cortical xz positions to a text file
+        np.savetxt(structure_save_dir / "cortical_xz_pos.txt", Cortical_Pop.positions[:, [0, 2]], delimiter=",")
 
     for STN_cell in STN_Pop:
         while (
@@ -570,22 +597,40 @@ def load_network(
             sim_total_time
         )
 
-    # Load cortical positions - Comment/Remove to generate new positions
-    Cortical_Neuron_xy_Positions = np.loadtxt(structure_save_dir / "cortical_xy_pos.txt", delimiter=",")
-    cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
-    Cortical_Neuron_x_Positions = Cortical_Neuron_xy_Positions[0, cortex_local_indices]
-    Cortical_Neuron_y_Positions = Cortical_Neuron_xy_Positions[1, cortex_local_indices]
+    if global_DBS_stimulation:
+        # Load cortical positions - Comment/Remove to generate new positions
+        Cortical_Neuron_xy_Positions = np.loadtxt(structure_save_dir / "cortical_xy_pos.txt", delimiter=",")
+        cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
+        Cortical_Neuron_x_Positions = Cortical_Neuron_xy_Positions[0, cortex_local_indices]
+        Cortical_Neuron_y_Positions = Cortical_Neuron_xy_Positions[1, cortex_local_indices]
 
-    # Set cortical xy positions to those loaded in
-    for ii, cell in enumerate(Cortical_Pop):
-        cell.position[0] = Cortical_Neuron_x_Positions[ii]
-        cell.position[1] = Cortical_Neuron_y_Positions[ii]
+        # Set cortical xy positions to those loaded in
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.position[0] = Cortical_Neuron_x_Positions[ii]
+            cell.position[1] = Cortical_Neuron_y_Positions[ii]
 
-    # Load STN positions - Comment/Remove to generate new positions
-    STN_Neuron_xy_Positions = np.loadtxt(structure_save_dir / "STN_xy_pos.txt", delimiter=",")
-    stn_local_indices = [cell in STN_Pop for cell in STN_Pop.all_cells]
-    STN_Neuron_x_Positions = STN_Neuron_xy_Positions[0, stn_local_indices]
-    STN_Neuron_y_Positions = STN_Neuron_xy_Positions[1, stn_local_indices]
+        # Load STN positions - Comment/Remove to generate new positions
+        STN_Neuron_xy_Positions = np.loadtxt(structure_save_dir / "STN_xy_pos.txt", delimiter=",")
+        stn_local_indices = [cell in STN_Pop for cell in STN_Pop.all_cells]
+        STN_Neuron_x_Positions = STN_Neuron_xy_Positions[0, stn_local_indices]
+        STN_Neuron_y_Positions = STN_Neuron_xy_Positions[1, stn_local_indices]
+
+    if global_ctx_stimulation:
+        # Load cortical positions in X-Z plane - Comment/Remove to generate new positions
+        Cortical_Neuron_xz_Positions = np.loadtxt(structure_save_dir / "cortical_xz_pos.txt", delimiter=",")
+
+        # Identify local indices of cortical neurons
+        cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
+
+        # Separate the loaded X and Z positions for each neuron
+        Cortical_Neuron_x_Positions = Cortical_Neuron_xz_Positions[0, cortex_local_indices]
+        Cortical_Neuron_z_Positions = Cortical_Neuron_xz_Positions[1, cortex_local_indices]
+
+        # Set cortical X-Z positions to those loaded in
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.position[0] = Cortical_Neuron_x_Positions[ii]  # Set X position
+            cell.position[2] = Cortical_Neuron_z_Positions[ii]  # Set Z position
+            cell.position[1] = 0 #Set all Y positions at 0- axon projects up toward electrode
 
     # Set STN xy positions to those loaded in
     for ii, cell in enumerate(STN_Pop):
