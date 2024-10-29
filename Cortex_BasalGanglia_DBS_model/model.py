@@ -63,6 +63,7 @@ def create_network(
 
     if global_ctx_stimulation:
         # Sphere with radius 2000 um for interneuron distribution in X-Z plane
+        print("Making cortical space..")
         cortical_layers_space = space.RandomStructure(
             boundary=space.Sphere(2000), origin=(0, 8000, -1000), rng=NumpyRNG(seed=rng_seed)
         )
@@ -195,6 +196,7 @@ def create_network(
         np.savetxt(structure_save_dir / "cortical_xy_pos.txt", Cortical_Pop.positions, delimiter=",")
 
     if global_ctx_stimulation:
+        print("Assigning cortical axon coordinates..")
         # Position Check -
         # 1) Ensure cells are bounded in the 2000 um radius in both x and z, considering the center at Z = -1000
         # 2) Ensure cells are not too close to the new stimulating electrode at [0, 8000, -1000]
@@ -211,6 +213,7 @@ def create_network(
 
         # Save the generated cortical xz positions to a text file
         np.savetxt(structure_save_dir / "cortical_xz_pos.txt", Cortical_Pop.positions[:, [0, 2]], delimiter=",")
+        print("saved coordinates")
 
     for STN_cell in STN_Pop:
         while (
