@@ -54,7 +54,13 @@ def create_network(
 
     np.random.seed(rng_seed)
     structure_save_dir = Path("network_structure")
-
+    # Check if directory exists
+    if not structure_save_dir.exists():
+        print(f"Directory '{structure_save_dir}' does not exist. Creating it now...")
+        structure_save_dir.mkdir(parents=True, exist_ok=True)
+        print(f"Directory '{structure_save_dir}' created.")
+    else:
+        print(f"Directory '{structure_save_dir}' already exists.")
 
     # Sphere with radius 2000 um
     STN_space = space.RandomStructure(
