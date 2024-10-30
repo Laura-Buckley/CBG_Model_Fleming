@@ -200,7 +200,11 @@ if __name__ == "__main__":
         if rank == 0:
             print("Network created")
 
-
+    for cell in Cortical_Pop:
+        if cell.position[1] != 0:
+            print(f"non zero y position present, y is {cell.position[1]}, before sim")
+            count += 1
+    print(f"total cells with y not at zero is {count}, before sim")
 
     # Define state variables to record from each population
     if c.save_ctx_voltage:
