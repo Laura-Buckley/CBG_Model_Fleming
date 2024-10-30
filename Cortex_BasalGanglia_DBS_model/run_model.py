@@ -950,7 +950,9 @@ if __name__ == "__main__":
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_soma_im.mat"), "soma(0.5).i_membrane_", clear=False)
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_collateral_im.mat"), "collateral(0.5).i_membrane_", clear=False)
         print("saving cortical cell positions...")
-        np.savetxt(simulation_output_dir / "cortical_xz_pos.txt", Cortical_Pop.positions, delimiter=",")
+        print(Cortical_Pop.positions.shape)
+        np.savetxt(simulation_output_dir / "cortical_xz_pos.txt", Cortical_Pop.positions[:, [0, 2]], delimiter=",")
+        #np.savetxt(simulation_output_dir / "cortical_xz_pos.txt", Cortical_Pop.positions, delimiter=",")
         # Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_node_ex.mat"), "middle_node(0.5).ref_e_extracellular", clear=False)
 
     # Write controller values to csv files
