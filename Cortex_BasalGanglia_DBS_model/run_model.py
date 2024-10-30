@@ -199,7 +199,7 @@ if __name__ == "__main__":
         )
         if rank == 0:
             print("Network created")
-
+    count = 0
     for cell in Cortical_Pop:
         if cell.position[1] != 0:
             print(f"non zero y position present, y is {cell.position[1]}, before sim")
