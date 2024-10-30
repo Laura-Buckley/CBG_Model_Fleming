@@ -218,6 +218,8 @@ def create_network(
                 Cortical_cell.position = cortical_layers_space.generate_positions(1).flatten()
 
         # Save the generated cortical xz positions to a text file
+        for Cortical_cell in Cortical_Pop:
+            print(f"cell position is: X = {Cortical_cell.position[0]}, Y = {Cortical_cell.position[1]}, Z = {Cortical_cell.position[2]} ")
         #np.savetxt(structure_save_dir / "cortical_xz_pos.txt", Cortical_Pop.positions[:, [0, 2]], delimiter=",")
         np.savetxt(structure_save_dir / "cortical_xz_pos.txt", Cortical_Pop.positions, delimiter=",")
         print("saved coordinates")
