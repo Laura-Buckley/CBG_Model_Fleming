@@ -412,6 +412,7 @@ class Cortical_Neuron_Type(NativeCellType):
         initial_collateral_rx_Sequence = Sequence(initial_collateral_rx)
         default_parameters["collateral_rx"] = initial_collateral_rx_Sequence
 
+    print(f'The value of ctx stim before cortical extra is: {global_ctx_stimulation}')
     if global_ctx_stimulation:
         # Define initial vector of transfer resistances for the ais segments
         initial_ais_rx = np.zeros((1, default_parameters["ais_nseg"])).flatten()
@@ -699,7 +700,7 @@ class GP_Neuron(object):
         self.stim.dur = 1e12
         self.stim.amp = parameters["bias_current"]
 
-        print(f'The value of DBS stim before GP extra is: {global_DBS_stimulation}')
+
 
         if global_DBS_stimulation:
             # Add DBS stimulation current to neuron model

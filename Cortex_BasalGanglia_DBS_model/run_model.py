@@ -281,7 +281,7 @@ if __name__ == "__main__":
             cell.collateral_rx = collateral_rx_seq[ii]
 
 
-
+    print(f"ctx is {ctx_stimulation} before inserting rx")
     if ctx_stimulation:
 
         # Calculate transfer resistances for each node segment for xtra
@@ -538,6 +538,7 @@ if __name__ == "__main__":
     print(f"Ctx Stimulation amplitude: {stimulation_amplitude}")
     print(f"Ctx Stimulation frequency: {stimulation_frequency}")
 
+    print(f"ctx is {ctx_stimulation} before ctx signal")
     if ctx_stimulation:
 
         # Generate an equivalent signal for the cortex
