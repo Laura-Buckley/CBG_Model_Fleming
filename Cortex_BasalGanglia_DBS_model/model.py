@@ -71,7 +71,7 @@ def create_network(
         # Sphere with radius 2000 um for interneuron distribution in X-Z plane
         print("Making cortical space..")
         cortical_layers_space = space.RandomStructure(
-            boundary=space.Sphere(2000), origin=(0, 8000, -1000), rng=NumpyRNG(seed=rng_seed)
+            boundary=space.Sphere(2000), origin=(0, 0, -1000), rng=NumpyRNG(seed=rng_seed)
         )
 
     # Generate Poisson-distributed Striatal Spike trains
