@@ -953,8 +953,8 @@ if __name__ == "__main__":
         print(Cortical_Pop.positions.shape)
         count = 0
         for cell in Cortical_Pop:
-            if Cortical_Pop.position[1] != 0:
-                print(f"non zero y position present, y is {Cortical_Pop.position[1]}")
+            if cell.position[1] != 0:
+                print(f"non zero y position present, y is {cell.position[1]}")
                 count += 1
         print(f"total cells with y not at zero is {count}")
         np.savetxt(simulation_output_dir / "cortical_xz_pos.txt", Cortical_Pop.positions, delimiter=",")
