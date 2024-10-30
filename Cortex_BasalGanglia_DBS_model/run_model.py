@@ -951,6 +951,12 @@ if __name__ == "__main__":
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_collateral_im.mat"), "collateral(0.5).i_membrane_", clear=False)
         print("saving cortical cell positions...")
         print(Cortical_Pop.positions.shape)
+        count = 0
+        for cell in Cortical_Pop:
+            if Cortical_Pop.position[1] != 0:
+                print(f"non zero y position present, y is {Cortical_Pop.position[1]}")
+                count += 1
+        print(f"total cells with y not at zero is {count}")
         np.savetxt(simulation_output_dir / "cortical_xz_pos.txt", Cortical_Pop.positions, delimiter=",")
         np.savetxt(simulation_output_dir / "cortical_xz_pos_transposed.txt", Cortical_Pop.positions.T, delimiter=",")
         # Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_node_ex.mat"), "middle_node(0.5).ref_e_extracellular", clear=False)
