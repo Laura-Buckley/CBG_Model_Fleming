@@ -98,6 +98,15 @@ if __name__ == "__main__":
     stimulation_frequency = c.stimulation_frequency
 
 
+    def check_non_zero_values(vector):
+        non_zero_count = sum(1 for value in vector if value != 0)
+
+        if non_zero_count > 0:
+            print(f"Number of non-zero values: {non_zero_count}")
+        else:
+            print("All values are zero.")
+
+
     sim_total_time = (
         steady_state_duration + simulation_runtime + timestep
     )  # Total simulation time
@@ -593,7 +602,7 @@ if __name__ == "__main__":
         ctx_Signal_neuron = h.Vector(ctx_Signal)
         ctx_times_neuron = h.Vector(ctx_times)
 
-
+        check_non_zero_values(ctx_Signal_neuron)
 
         # Play ctx signal to global variable is_xtra
         ctx_Signal_neuron.play(h._ref_is_xtra, ctx_times_neuron, 1)
@@ -842,7 +851,7 @@ if __name__ == "__main__":
 
             if c.Modulation == "frequency":
                 # Calculate the updated DBS Frequency
-                ctx_amp = 1.5
+                ctx_amp = stimulation_amplitude
                 ctx_freq = controller.update(
                     state_value=lfp_beta_average_value, current_time=simulator.state.t
                 )
