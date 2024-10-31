@@ -239,22 +239,22 @@ if __name__ == "__main__":
         stimulating_electrode_position = np.array([0, 8000, -1000])
 
 
-    # Call the electrode_distance function with the required parameters
-    (
-        STN_recording_electrode_1_distances,
-        STN_recording_electrode_2_distances,
-        Cortical_Collateral_stimulating_electrode_distances,
-        segment_electrode_distances_nodes,
-        segment_electrode_distances_ais,
-        segment_electrode_distances_soma,
-        #Interneuron_electrode_distances
-    ) = electrode_distance(
-        recording_electrode_1_position,
-        recording_electrode_2_position,
-        STN_Pop,
-        stimulating_electrode_position,
-        Cortical_Pop,
-    )
+    # # Call the electrode_distance function with the required parameters
+    # (
+    #     STN_recording_electrode_1_distances,
+    #     STN_recording_electrode_2_distances,
+    #     Cortical_Collateral_stimulating_electrode_distances,
+    #     segment_electrode_distances_nodes,
+    #     segment_electrode_distances_ais,
+    #     segment_electrode_distances_soma,
+    #     #Interneuron_electrode_distances
+    # ) = electrode_distance(
+    #     recording_electrode_1_position,
+    #     recording_electrode_2_position,
+    #     STN_Pop,
+    #     stimulating_electrode_position,
+    #     Cortical_Pop,
+    # )
 
 
     # Conductivity and resistivity values for homogenous, isotropic medium
@@ -286,44 +286,44 @@ if __name__ == "__main__":
 
 
     print(f"ctx is {ctx_stimulation} before inserting rx")
-    if ctx_stimulation:
-
-        # Calculate transfer resistances for each node segment for xtra
-        nodes_rx = (
-            0.01
-            * (rho / (4 * math.pi))
-            * (1 / segment_electrode_distances_nodes)
-        )
-
-
-        nodes_rx_seq = np.ndarray(
-            shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        ).flatten()
-        for ii in range(0, Cortical_Pop.local_size):
-            nodes_rx_seq[ii] = Sequence(nodes_rx[ii, :].flatten())
-
-        # Assign transfer resistances values to ais
-        for ii, cell in enumerate(Cortical_Pop):
-            cell.nodes_rx = nodes_rx_seq[ii]
-
-        # Calculate transfer resistances for each ais segment for xtra
-        ais_rx = (
-                0.01
-                * (rho / (4 * math.pi))
-                * (1 / segment_electrode_distances_ais)
-        )
-
-        # Convert ndarray to array of Sequence objects - needed to set cortical
-        # collateral transfer resistances
-        ais_rx_seq = np.ndarray(
-            shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        ).flatten()
-        for ii in range(0, Cortical_Pop.local_size):
-            ais_rx_seq[ii] = Sequence(ais_rx[ii, :].flatten())
-
-        # Assign transfer resistances values to ais
-        for ii, cell in enumerate(Cortical_Pop):
-            cell.ais_rx = ais_rx_seq[ii]
+    # if ctx_stimulation:
+    #
+    #     # Calculate transfer resistances for each node segment for xtra
+    #     nodes_rx = (
+    #         0.01
+    #         * (rho / (4 * math.pi))
+    #         * (1 / segment_electrode_distances_nodes)
+    #     )
+    #
+    #
+    #     nodes_rx_seq = np.ndarray(
+    #         shape=(1, Cortical_Pop.local_size), dtype=Sequence
+    #     ).flatten()
+    #     for ii in range(0, Cortical_Pop.local_size):
+    #         nodes_rx_seq[ii] = Sequence(nodes_rx[ii, :].flatten())
+    #
+    #     # Assign transfer resistances values to ais
+    #     for ii, cell in enumerate(Cortical_Pop):
+    #         cell.nodes_rx = nodes_rx_seq[ii]
+    #
+    #     # Calculate transfer resistances for each ais segment for xtra
+    #     ais_rx = (
+    #             0.01
+    #             * (rho / (4 * math.pi))
+    #             * (1 / segment_electrode_distances_ais)
+    #     )
+    #
+    #     # Convert ndarray to array of Sequence objects - needed to set cortical
+    #     # collateral transfer resistances
+    #     ais_rx_seq = np.ndarray(
+    #         shape=(1, Cortical_Pop.local_size), dtype=Sequence
+    #     ).flatten()
+    #     for ii in range(0, Cortical_Pop.local_size):
+    #         ais_rx_seq[ii] = Sequence(ais_rx[ii, :].flatten())
+    #
+    #     # Assign transfer resistances values to ais
+    #     for ii, cell in enumerate(Cortical_Pop):
+    #         cell.ais_rx = ais_rx_seq[ii]
 
         # # Calculate transfer resistances for each soma segments for xtra
         # soma_rx = (
