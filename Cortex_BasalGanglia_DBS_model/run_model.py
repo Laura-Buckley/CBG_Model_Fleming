@@ -240,21 +240,21 @@ if __name__ == "__main__":
 
 
     # # Call the electrode_distance function with the required parameters
-    # (
-    #     STN_recording_electrode_1_distances,
-    #     STN_recording_electrode_2_distances,
+    (
+        STN_recording_electrode_1_distances,
+        STN_recording_electrode_2_distances,
     #     Cortical_Collateral_stimulating_electrode_distances,
     #     segment_electrode_distances_nodes,
     #     segment_electrode_distances_ais,
     #     segment_electrode_distances_soma,
     #     #Interneuron_electrode_distances
-    # ) = electrode_distance(
-    #     recording_electrode_1_position,
-    #     recording_electrode_2_position,
-    #     STN_Pop,
-    #     stimulating_electrode_position,
-    #     Cortical_Pop,
-    # )
+    ) = electrode_distance(
+        recording_electrode_1_position,
+        recording_electrode_2_position,
+        STN_Pop,
+        # stimulating_electrode_position,
+        # Cortical_Pop,
+    )
 
 
     # Conductivity and resistivity values for homogenous, isotropic medium
