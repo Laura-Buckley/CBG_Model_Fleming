@@ -243,17 +243,17 @@ if __name__ == "__main__":
     (
         STN_recording_electrode_1_distances,
         STN_recording_electrode_2_distances,
-    #     Cortical_Collateral_stimulating_electrode_distances,
-    #     segment_electrode_distances_nodes,
-    #     segment_electrode_distances_ais,
-    #     segment_electrode_distances_soma,
+        Cortical_Collateral_stimulating_electrode_distances,
+        segment_electrode_distances_nodes,
+        segment_electrode_distances_ais,
+        segment_electrode_distances_soma,
     #     #Interneuron_electrode_distances
     ) = electrode_distance(
         recording_electrode_1_position,
         recording_electrode_2_position,
         STN_Pop,
-        # stimulating_electrode_position,
-        # Cortical_Pop,
+        stimulating_electrode_position,
+        Cortical_Pop,
     )
 
 
@@ -286,44 +286,44 @@ if __name__ == "__main__":
 
 
     print(f"ctx is {ctx_stimulation} before inserting rx")
-    # if ctx_stimulation:
-    #
-    #     # Calculate transfer resistances for each node segment for xtra
-    #     nodes_rx = (
-    #         0.01
-    #         * (rho / (4 * math.pi))
-    #         * (1 / segment_electrode_distances_nodes)
-    #     )
-    #
-    #
-    #     nodes_rx_seq = np.ndarray(
-    #         shape=(1, Cortical_Pop.local_size), dtype=Sequence
-    #     ).flatten()
-    #     for ii in range(0, Cortical_Pop.local_size):
-    #         nodes_rx_seq[ii] = Sequence(nodes_rx[ii, :].flatten())
-    #
-    #     # Assign transfer resistances values to ais
-    #     for ii, cell in enumerate(Cortical_Pop):
-    #         cell.nodes_rx = nodes_rx_seq[ii]
-    #
-    #     # Calculate transfer resistances for each ais segment for xtra
-    #     ais_rx = (
-    #             0.01
-    #             * (rho / (4 * math.pi))
-    #             * (1 / segment_electrode_distances_ais)
-    #     )
-    #
-    #     # Convert ndarray to array of Sequence objects - needed to set cortical
-    #     # collateral transfer resistances
-    #     ais_rx_seq = np.ndarray(
-    #         shape=(1, Cortical_Pop.local_size), dtype=Sequence
-    #     ).flatten()
-    #     for ii in range(0, Cortical_Pop.local_size):
-    #         ais_rx_seq[ii] = Sequence(ais_rx[ii, :].flatten())
-    #
-    #     # Assign transfer resistances values to ais
-    #     for ii, cell in enumerate(Cortical_Pop):
-    #         cell.ais_rx = ais_rx_seq[ii]
+    if ctx_stimulation:
+
+        # Calculate transfer resistances for each node segment for xtra
+        nodes_rx = (
+            0.01
+            * (rho / (4 * math.pi))
+            * (1 / segment_electrode_distances_nodes)
+        )
+
+
+        nodes_rx_seq = np.ndarray(
+            shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        ).flatten()
+        for ii in range(0, Cortical_Pop.local_size):
+            nodes_rx_seq[ii] = Sequence(nodes_rx[ii, :].flatten())
+
+        # Assign transfer resistances values to ais
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.nodes_rx = nodes_rx_seq[ii]
+
+        # Calculate transfer resistances for each ais segment for xtra
+        ais_rx = (
+                0.01
+                * (rho / (4 * math.pi))
+                * (1 / segment_electrode_distances_ais)
+        )
+
+        # Convert ndarray to array of Sequence objects - needed to set cortical
+        # collateral transfer resistances
+        ais_rx_seq = np.ndarray(
+            shape=(1, Cortical_Pop.local_size), dtype=Sequence
+        ).flatten()
+        for ii in range(0, Cortical_Pop.local_size):
+            ais_rx_seq[ii] = Sequence(ais_rx[ii, :].flatten())
+
+        # Assign transfer resistances values to ais
+        for ii, cell in enumerate(Cortical_Pop):
+            cell.ais_rx = ais_rx_seq[ii]
 
         # # Calculate transfer resistances for each soma segments for xtra
         # soma_rx = (
@@ -953,16 +953,9 @@ if __name__ == "__main__":
         print("Saving collateral and soma currents...")
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_soma_im.mat"), "soma(0.5).i_membrane_", clear=False)
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_collateral_im.mat"), "collateral(0.5).i_membrane_", clear=False)
-        print("saving cortical cell positions...")
+        print("saving cortical cell positions after calculating distances")
         print(Cortical_Pop.positions.shape)
-        count = 0
-        for cell in Cortical_Pop:
-            if cell.position[1] != 0:
-                print(f"non zero y position present, y is {cell.position[1]}")
-                count += 1
-        print(f"total cells with y not at zero is {count}")
-        np.savetxt(simulation_output_dir / "cortical_xz_pos.txt", Cortical_Pop.positions, delimiter=",")
-        np.savetxt(simulation_output_dir / "cortical_xz_pos_transposed.txt", Cortical_Pop.positions.T, delimiter=",")
+        np.savetxt(simulation_output_dir / "cortical_new_pos_transposed.txt", Cortical_Pop.positions.T, delimiter=",")
         # Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_node_ex.mat"), "middle_node(0.5).ref_e_extracellular", clear=False)
 
     # Write controller values to csv files

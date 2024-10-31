@@ -458,10 +458,13 @@ def load_network(
     STN_space = space.RandomStructure(
         boundary=space.Sphere(2000), rng=NumpyRNG(seed=rng_seed)
     )
-    # # Sphere with radius 1500 um for interneuron distribution
-    # cortical_layers_space = space.RandomStructure(
-    #     boundary=space.Sphere(1500), origin=(0, 5500, 0), rng=NumpyRNG(seed=rng_seed)
-    # )
+    # Sphere with radius 1500 um for interneuron distribution
+    cortical_layers_space = space.RandomStructure(
+        boundary=space.Sphere(1500), origin=(0, 0, -1000), rng=NumpyRNG(seed=rng_seed)
+    )
+    if global_ctx_stimulation:
+        cortical_structure = cortical_layers_space
+    else: cortical_structure = STN_space
 
     # Load striatal spike times from file
     striatal_spike_times = np.load(structure_save_dir / "Striatal_Spike_Times.npy", allow_pickle=True)
@@ -475,7 +478,7 @@ def load_network(
     Cortical_Pop = Population(
         Pop_size,
         Cortical_Neuron_Type(soma_bias_current_amp=0.245),
-        structure=STN_space,
+        structure=cortical_structure,
         label="Cortical Neurons",
     )
     Interneuron_Pop = Population(
@@ -631,15 +634,15 @@ def load_network(
 
     if global_ctx_stimulation:
         # Load cortical neuron positions (each row represents a cell, each column a coordinate)
-        Cortical_Neuron_xyz_Positions = np.loadtxt(structure_save_dir / "cortical_xz_pos.txt", delimiter=",")
+        Cortical_Neuron_xyz_Positions = np.loadtxt(structure_save_dir / "cortical_xyz_pos.txt", delimiter=",")
 
         # Identify local indices of cortical neurons
         cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
 
         # Separate the loaded X, Y, and Z positions for each neuron
-        Cortical_Neuron_x_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 0]  # X coordinates
-        Cortical_Neuron_y_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 1]  # Y coordinates
-        Cortical_Neuron_z_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 2]  # Z coordinates
+        Cortical_Neuron_x_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 0]  # X coordinates from first column
+        Cortical_Neuron_y_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 1]  # Y coordinates from second column
+        Cortical_Neuron_z_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 2]  # Z coordinates from third column
 
         # Set cortical XYZ positions to those loaded in
         for ii, cell in enumerate(Cortical_Pop):
@@ -824,8 +827,8 @@ def electrode_distance(
     recording_electrode_1_position,
     recording_electrode_2_position,
     STN_Pop,
-    #stimulating_electrode_position,
-    #Cortical_Pop,
+    stimulating_electrode_position,
+    Cortical_Pop,
    # Interneuron_Pop,
 ):
     # Calculate STN cell distances to each recording electrode
@@ -845,34 +848,34 @@ def electrode_distance(
     # Calculate Cortical Collateral distances from the stimulating electrode -
     # using xyz coordinates for distance
     # calculation - these distances need to be in um for xtra mechanism
-    # Cortical_Collateral_stimulating_electrode_distances = collateral_distances_to_electrode(
-    #     stimulating_electrode_position, Cortical_Pop, L=500, nseg=11
-    # )
+    Cortical_Collateral_stimulating_electrode_distances = collateral_distances_to_electrode(
+        stimulating_electrode_position, Cortical_Pop, L=500, nseg=11
+    )
 
-    #(
-    #     segment_electrode_distances_nodes,
-    #     segment_electrode_distances_ais,
-    #     segment_electrode_distances_soma
-    # ) = axon_distances_to_electrode(
-    #     stimulating_electrode_position,
-    #     Cortical_Pop,
-    #     node_L = 2,
-    #     myelin_L = 500,
-    #     ais_L = 20,
-    #     soma_L = 35,
-    #     myelin_L_0 = 80,
-    #     num_axon_compartments = 10,
-    #     ais_nseg = 5,
-    #     soma_nseg = 1
-    # )
+    (
+        segment_electrode_distances_nodes,
+        segment_electrode_distances_ais,
+        segment_electrode_distances_soma
+    ) = axon_distances_to_electrode(
+        stimulating_electrode_position,
+        Cortical_Pop,
+        node_L = 2,
+        myelin_L = 500,
+        ais_L = 20,
+        soma_L = 35,
+        myelin_L_0 = 80,
+        num_axon_compartments = 10,
+        ais_nseg = 5,
+        soma_nseg = 1
+    )
 
     return (
         STN_recording_electrode_1_distances,
         STN_recording_electrode_2_distances,
-        # Cortical_Collateral_stimulating_electrode_distances,
-        # segment_electrode_distances_nodes,
-        # segment_electrode_distances_ais,
-        # segment_electrode_distances_soma,
+        Cortical_Collateral_stimulating_electrode_distances,
+        segment_electrode_distances_nodes,
+        segment_electrode_distances_ais,
+        segment_electrode_distances_soma,
         #Interneuron_electrode_distances
     )
 
