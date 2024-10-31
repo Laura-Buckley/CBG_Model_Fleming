@@ -216,9 +216,9 @@ def create_network(
             ):
                 # Re-generate position if the conditions above are violated
                 Cortical_cell.position = cortical_layers_space.generate_positions(1).flatten()
-        for Cortical_cell in Cortical_Pop:
-            Cortical_cell.position[1] = 0
-            print("Y position of cell fixed to zero")
+
+        Cortical_Pop.positions[1, :] = 0
+        print("Y position of cell fixed to zero")
         # Save the generated cortical xz positions to a text file
         # for Cortical_cell in Cortical_Pop:
         #     print(f"cell position is: X = {Cortical_cell.position[0]}, Y = {Cortical_cell.position[1]}, Z = {Cortical_cell.position[2]} ")
