@@ -391,14 +391,14 @@ if __name__ == "__main__":
         # # Assign transfer resistances values to interneurons
         # for ii, cell in enumerate(Interneuron_Pop):
         #     cell.inter_rx = inter_rx_seq[ii]
-    cortical_y = None
-    cortical_y = Cortical_Pop.positions[1, :]
-    count = 0
-    for i in cortical_y:
-        if i != 0:
-            print(f"non zero y position present, y is {i}, after rx")
-            count += 1
-    print(f"total cells with y not at zero is {count}, after rx")
+    # cortical_y = None
+    # cortical_y = Cortical_Pop.positions[1, :]
+    # count = 0
+    # for i in cortical_y:
+    #     if i != 0:
+    #         print(f"non zero y position present, y is {i}, after rx")
+    #         count += 1
+    # print(f"total cells with y not at zero is {count}, after rx")
 
     # Create times for when the DBS controller will be called
     # Window length for filtering biomarker

@@ -633,29 +633,42 @@ def load_network(
         print("loading cortical xyz positions")
         # Load cortical neuron positions (each row represents a cell, each column a coordinate)
         Cortical_Neuron_xyz_Positions = np.loadtxt(structure_save_dir / "cortical_xyz_pos.txt", delimiter=",")
-
+        print("Loaded cortical neuron positions (first 5 rows):")
+        print(Cortical_Neuron_xyz_Positions[:5, :])
         # Identify local indices of cortical neurons
         cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
+        print(f"Cortex local indices length: {len(cortex_local_indices)}")
 
         # Separate the loaded X, Y, and Z positions for each neuron
         Cortical_Neuron_x_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 0]  # X coordinates from first column
         Cortical_Neuron_y_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 1]  # Y coordinates from second column
         Cortical_Neuron_z_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 2]  # Z coordinates from third column
 
-        # Set cortical XYZ positions to those loaded in
+        # Debug: Check that Y values are all zero as expected
+        if np.any(Cortical_Neuron_y_Positions != 0):
+            print("Warning: Some Y positions are not zero in the loaded data.")
+
+        print("Assigning positions to cortical cells...")
         for ii, cell in enumerate(Cortical_Pop):
-            cell.position[0] = Cortical_Neuron_x_Positions[ii]  # Set X position
-            cell.position[1] = Cortical_Neuron_y_Positions[ii]  # Set Y position
-            cell.position[2] = Cortical_Neuron_z_Positions[ii]  # Set Z position
+            initial_position = cell.position.copy()  # Keep initial for comparison
+
+            # Assign loaded positions
+            cell.position[0] = Cortical_Neuron_x_Positions[ii]
+            cell.position[1] = Cortical_Neuron_y_Positions[ii]
+            cell.position[2] = Cortical_Neuron_z_Positions[ii]
+
+            # Debug: Compare before and after for Y coordinate
+            if cell.position[1] != initial_position[1]:
+                print(f"Cell {ii} Y position changed from {initial_position[1]} to {cell.position[1]}")
 
         cortical_y = None
         cortical_y = Cortical_Pop.positions[1, :]
         count = 0
-        for i in cortical_y:
-            if i != 0:
-                print(f"non zero y position present, y is {i}, after assigning")
+        for idx, y in enumerate(cortical_y):
+            if y != 0:
+                print(f"Non-zero Y position found at index {idx}: Y = {y}")
                 count += 1
-        print(f"total cells with y not at zero is {count}, after assigning")
+        print(f"Total cells with Y not at zero: {count} after assigning")
 
     # Load STN positions - Comment/Remove to generate new positions
     STN_Neuron_xy_Positions = np.loadtxt(structure_save_dir / "STN_xy_pos.txt", delimiter=",")
