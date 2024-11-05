@@ -469,6 +469,8 @@ def load_network(
     # Load striatal spike times from file
     striatal_spike_times = np.load(structure_save_dir / "Striatal_Spike_Times.npy", allow_pickle=True)
     Pop_size = len(striatal_spike_times[:, 0])
+    print(f"the pop size is: {Pop_size}")
+
     for i in range(Pop_size):
         spike_times = striatal_spike_times[i][0].value
         spike_times = spike_times[spike_times > steady_state_duration]
