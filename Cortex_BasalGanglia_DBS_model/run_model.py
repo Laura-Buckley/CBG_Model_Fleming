@@ -208,10 +208,12 @@ if __name__ == "__main__":
         )
         if rank == 0:
             print("Network created")
+
+    cortical_y = Cortical_Pop.positions[1, :]
     count = 0
-    for cell in Cortical_Pop:
-        if cell.position[1] != 0:
-            print(f"non zero y position present, y is {cell.position[1]}, before sim")
+    for i in cortical_y:
+        if i != 0:
+            print(f"non zero y position present, y is {i}, before sim")
             count += 1
     print(f"total cells with y not at zero is {count}, before sim")
 
@@ -389,11 +391,12 @@ if __name__ == "__main__":
         # # Assign transfer resistances values to interneurons
         # for ii, cell in enumerate(Interneuron_Pop):
         #     cell.inter_rx = inter_rx_seq[ii]
-
+    cortical_y = None
+    cortical_y = Cortical_Pop.positions[1, :]
     count = 0
-    for cell in Cortical_Pop:
-        if cell.position[1] != 0:
-            print(f"non zero y position present, y is {cell.position[1]}, after rx")
+    for i in cortical_y:
+        if i != 0:
+            print(f"non zero y position present, y is {i}, after rx")
             count += 1
     print(f"total cells with y not at zero is {count}, after rx")
 
@@ -977,10 +980,12 @@ if __name__ == "__main__":
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_GABAa_i.mat"), "GABAa.i", clear=False)
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_AMPA_i.mat"), "AMPA.i", clear=False)
 
+    cortical_y = None
+    cortical_y = Cortical_Pop.positions[1, :]
     count = 0
-    for cell in Cortical_Pop:
-        if cell.position[1] != 0:
-            print(f"non zero y position present, y is {cell.position[1]}, before saving")
+    for i in cortical_y:
+        if i != 0:
+            print(f"non zero y position present, y is {i}, before saving")
             count += 1
     print(f"total cells with y not at zero is {count}, before saving")
 

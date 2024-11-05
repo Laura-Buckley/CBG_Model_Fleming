@@ -629,6 +629,7 @@ def load_network(
 
 
     if global_ctx_stimulation:
+        print("loading cortical positions")
         # Load cortical neuron positions (each row represents a cell, each column a coordinate)
         Cortical_Neuron_xyz_Positions = np.loadtxt(structure_save_dir / "cortical_xyz_pos.txt", delimiter=",")
 
