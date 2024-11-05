@@ -151,16 +151,14 @@ def axon_distances_to_electrode(src_electrode, tgt_pop, node_L, myelin_L, ais_L,
         Y_coords_nodes[n] = (num_axon_compartments-1-n)*(node_L+myelin_L) + (node_L*0.5)
 
     for ii, tgt_cell in enumerate(tgt_pop):
+        # Record distances for axon nodes
+        original_position = tgt_cell.position.copy()
         for n in np.arange(num_axon_compartments):
-            tgt_cell.position = np.array(
-                [tgt_cell.position[0], (tgt_cell.position[1] + Y_coords_nodes[n]),
-                 tgt_cell.position[2]]
-            )
-            segment_electrode_distances_nodes[ii][n] = distance_to_electrode(
-                src_electrode, tgt_cell
-            )
+            node_position = np.array(
+                [original_position[0], original_position[1] + Y_coords_nodes[n], original_position[2]])
+            segment_electrode_distances_nodes[ii][n] = distance_to_electrode(src_electrode, node_position)
 
-    axon_L = Y_coords_nodes[0] + node_L + myelin_L_0
+    axon_L = Y_coords_nodes[0] + node_L/2 + myelin_L_0
 
     # initialise array for storage of electrode distances for each segment for every compartment
     segment_electrode_distances_ais = np.zeros((tgt_pop.local_size, ais_nseg))
@@ -175,32 +173,24 @@ def axon_distances_to_electrode(src_electrode, tgt_pop, node_L, myelin_L, ais_L,
 
     for ii, tgt_cell in enumerate(tgt_pop):
         for seg in np.arange(ais_nseg):
-            tgt_cell.position = np.array(
-                [tgt_cell.position[0], (Y_coords_ais[seg] + axon_L), tgt_cell.position[2]]
-            )
-            segment_electrode_distances_ais[ii][seg] = distance_to_electrode(
-                src_electrode, tgt_cell
-            )
+            ais_position = np.array([original_position[0], Y_coords_ais[seg] + axon_L, original_position[2]])
+            segment_electrode_distances_ais[ii][seg] = distance_to_electrode(src_electrode, ais_position)
 
-        # initialise array for storage of electrode distances for each segment for every compartment
-        segment_electrode_distances_soma = np.zeros((tgt_pop.local_size, soma_nseg))
+    # initialise array for storage of electrode distances for each segment for every compartment
+    segment_electrode_distances_soma = np.zeros((tgt_pop.local_size, soma_nseg))
 
-        segment_centres_soma = np.arange(0, soma_nseg + 3 - 1) * (1 / soma_nseg)
-        segment_centres_soma = segment_centres_soma - (1 / (2 * soma_nseg))
-        segment_centres_soma[0] = 0
-        segment_centres_soma[-1] = 1
-        segment_centres_soma = segment_centres_soma[1: len(segment_centres_soma) - 1]
+    segment_centres_soma = np.arange(0, soma_nseg + 3 - 1) * (1 / soma_nseg)
+    segment_centres_soma = segment_centres_soma - (1 / (2 * soma_nseg))
+    segment_centres_soma[0] = 0
+    segment_centres_soma[-1] = 1
+    segment_centres_soma = segment_centres_soma[1: len(segment_centres_soma) - 1]
 
-        Y_coords_soma = soma_L * segment_centres_soma
-        total_L = axon_L + ais_L
-        for ii, tgt_cell in enumerate(tgt_pop):
-            for seg in np.arange(soma_nseg):
-                tgt_cell.position = np.array(
-                    [tgt_cell.position[0], (Y_coords_soma[seg] + total_L), tgt_cell.position[2]]
-                )
-                segment_electrode_distances_soma[ii][seg] = distance_to_electrode(
-                    src_electrode, tgt_cell
-                )
+    Y_coords_soma = soma_L * segment_centres_soma
+    total_L = axon_L + ais_L
+    for ii, tgt_cell in enumerate(tgt_pop):
+        for seg in np.arange(soma_nseg):
+            soma_position = np.array([original_position[0], Y_coords_soma[seg] + total_L, original_position[2]])
+            segment_electrode_distances_soma[ii][seg] = distance_to_electrode(src_electrode, soma_position)
 
     return segment_electrode_distances_nodes, segment_electrode_distances_ais, segment_electrode_distances_soma
 
