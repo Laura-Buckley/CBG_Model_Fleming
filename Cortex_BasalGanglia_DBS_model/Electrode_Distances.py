@@ -182,6 +182,7 @@ def axon_distances_to_electrode(src_electrode, tgt_pop, node_L, myelin_L, ais_L,
     Y_coords_ais = ais_L*segment_centres_ais
 
     for ii, tgt_cell in enumerate(tgt_pop):
+        original_position = tgt_cell.position.copy()
         for seg in np.arange(ais_nseg):
             ais_position = np.array([original_position[0], Y_coords_ais[seg] + axon_L, original_position[2]])
             segment_electrode_distances_ais[ii][seg] = distance_3d(src_electrode, ais_position)
@@ -198,6 +199,7 @@ def axon_distances_to_electrode(src_electrode, tgt_pop, node_L, myelin_L, ais_L,
     Y_coords_soma = soma_L * segment_centres_soma
     total_L = axon_L + ais_L
     for ii, tgt_cell in enumerate(tgt_pop):
+        original_position = tgt_cell.position.copy()
         for seg in np.arange(soma_nseg):
             soma_position = np.array([original_position[0], Y_coords_soma[seg] + total_L, original_position[2]])
             segment_electrode_distances_soma[ii][seg] = distance_3d(src_electrode, soma_position)
