@@ -241,29 +241,39 @@ if __name__ == "__main__":
     # Assign Positions for recording and stimulating electrode point sources
     recording_electrode_1_position = np.array([0, -1500, 250])
     recording_electrode_2_position = np.array([0, 1500, 250])
+    # Set the stimulation electrode position based on the stimulation type
+    stimulating_electrode_position = None
     if DBS_stimulation:
         stimulating_electrode_position = np.array([0, 0, 250])
 
     if ctx_stimulation:
         stimulating_electrode_position = np.array([0, 8000, -1000])
 
-
     # # Call the electrode_distance function with the required parameters
-    (
-        STN_recording_electrode_1_distances,
-        STN_recording_electrode_2_distances,
-        Cortical_Collateral_stimulating_electrode_distances,
-        segment_electrode_distances_nodes,
-        segment_electrode_distances_ais,
-        segment_electrode_distances_soma,
-    #     #Interneuron_electrode_distances
-    ) = electrode_distance(
+    # Call the electrode_distance function
+    distances = electrode_distance(
         recording_electrode_1_position,
         recording_electrode_2_position,
         STN_Pop,
         stimulating_electrode_position,
         Cortical_Pop,
     )
+
+    # Unpack mandatory distances
+    STN_recording_electrode_1_distances = distances[0]
+    STN_recording_electrode_2_distances = distances[1]
+
+    # Unpack additional return values based on active stimulation types
+    if DBS_stimulation:
+        Cortical_Collateral_stimulating_electrode_distances = distances[2]
+        start_index = 3  # Adjust index based on the return order
+    else:
+        start_index = 2
+
+    if ctx_stimulation:
+        segment_electrode_distances_nodes = distances[start_index]
+        segment_electrode_distances_ais = distances[start_index + 1]
+        segment_electrode_distances_soma = distances[start_index + 2]
 
 
     # Conductivity and resistivity values for homogenous, isotropic medium

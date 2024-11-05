@@ -842,44 +842,50 @@ def electrode_distance(
         recording_electrode_2_position, STN_Pop
     )
 
+    return_values = [
+        STN_recording_electrode_1_distances,
+        STN_recording_electrode_2_distances,
+    ]
     # #Calculate Interneuron cell distances to electrode
     # Interneuron_electrode_distances = Interneuron_distances_to_electrode(
     #     stimulating_electrode_position, Interneuron_Pop
     # )
 
-    # Calculate Cortical Collateral distances from the stimulating electrode -
-    # using xyz coordinates for distance
-    # calculation - these distances need to be in um for xtra mechanism
-    Cortical_Collateral_stimulating_electrode_distances = collateral_distances_to_electrode(
-        stimulating_electrode_position, Cortical_Pop, L=500, nseg=11
-    )
+    if global_DBS_stimulation:
+        print('calculating DBS collaterals distances...')
+        # Calculate Cortical Collateral distances from the stimulating electrode -
+        # using xyz coordinates for distance
+        # calculation - these distances need to be in um for xtra mechanism
+        Cortical_Collateral_stimulating_electrode_distances = collateral_distances_to_electrode(
+            stimulating_electrode_position, Cortical_Pop, L=500, nseg=11
+        )
+        return_values.append(Cortical_Collateral_stimulating_electrode_distances)
 
-    (
-        segment_electrode_distances_nodes,
-        segment_electrode_distances_ais,
-        segment_electrode_distances_soma
-    ) = axon_distances_to_electrode(
-        stimulating_electrode_position,
-        Cortical_Pop,
-        node_L = 2,
-        myelin_L = 500,
-        ais_L = 20,
-        soma_L = 35,
-        myelin_L_0 = 80,
-        num_axon_compartments = 10,
-        ais_nseg = 5,
-        soma_nseg = 1
-    )
+    if global_ctx_stimulation:
+        print('calculating ctx axon distances...')
+        (
+            segment_electrode_distances_nodes,
+            segment_electrode_distances_ais,
+            segment_electrode_distances_soma
+        ) = axon_distances_to_electrode(
+            stimulating_electrode_position,
+            Cortical_Pop,
+            node_L = 2,
+            myelin_L = 500,
+            ais_L = 20,
+            soma_L = 35,
+            myelin_L_0 = 80,
+            num_axon_compartments = 10,
+            ais_nseg = 5,
+            soma_nseg = 1
+        )
+        return_values.extend([
+            segment_electrode_distances_nodes,
+            segment_electrode_distances_ais,
+            segment_electrode_distances_soma
+        ])
 
-    return (
-        STN_recording_electrode_1_distances,
-        STN_recording_electrode_2_distances,
-        Cortical_Collateral_stimulating_electrode_distances,
-        segment_electrode_distances_nodes,
-        segment_electrode_distances_ais,
-        segment_electrode_distances_soma,
-        #Interneuron_electrode_distances
-    )
+    return tuple(return_values)
 
 
 
