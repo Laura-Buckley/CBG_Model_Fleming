@@ -637,6 +637,8 @@ def load_network(
         # Identify local indices of cortical neurons
         cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
         print(f"Cortex local indices length: {len(cortex_local_indices)}")
+        print(f"cortex_local_indices: {cortex_local_indices}")
+        print(f"Number of True values: {sum(cortex_local_indices)}")
 
         # Separate the loaded X, Y, and Z positions for each neuron
         Cortical_Neuron_x_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 0]  # X coordinates from first column
