@@ -275,6 +275,12 @@ if __name__ == "__main__":
         segment_electrode_distances_ais = distances[start_index + 1]
         segment_electrode_distances_soma = distances[start_index + 2]
 
+    count = 0
+    for cell in Cortical_Pop:
+        if cell.position[1] != 0:
+            print(f"non zero y position present, y is {cell.position[1]}, after dist calc")
+            count += 1
+    print(f"total cells with y not at zero is {count}, after dist calc")
 
     # Conductivity and resistivity values for homogenous, isotropic medium
     sigma = 0.27  # Latikka et al. 2001 - Conductivity of Brain tissue S/m
