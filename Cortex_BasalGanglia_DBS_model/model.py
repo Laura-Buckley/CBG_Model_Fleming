@@ -619,6 +619,7 @@ def load_network(
         # Load cortical positions - Comment/Remove to generate new positions
         Cortical_Neuron_xy_Positions = np.loadtxt(structure_save_dir / "cortical_xy_pos.txt", delimiter=",")
         cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
+        print(f"Number of True values: {sum(cortex_local_indices)}")
         Cortical_Neuron_x_Positions = Cortical_Neuron_xy_Positions[0, cortex_local_indices]
         Cortical_Neuron_y_Positions = Cortical_Neuron_xy_Positions[1, cortex_local_indices]
 
