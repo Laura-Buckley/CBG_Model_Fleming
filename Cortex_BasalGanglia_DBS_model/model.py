@@ -615,6 +615,7 @@ def load_network(
         )
 
     if global_DBS_stimulation:
+        print("loading cortical xy positions")
         # Load cortical positions - Comment/Remove to generate new positions
         Cortical_Neuron_xy_Positions = np.loadtxt(structure_save_dir / "cortical_xy_pos.txt", delimiter=",")
         cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
@@ -629,7 +630,7 @@ def load_network(
 
 
     if global_ctx_stimulation:
-        print("loading cortical positions")
+        print("loading cortical xyz positions")
         # Load cortical neuron positions (each row represents a cell, each column a coordinate)
         Cortical_Neuron_xyz_Positions = np.loadtxt(structure_save_dir / "cortical_xyz_pos.txt", delimiter=",")
 
@@ -647,6 +648,14 @@ def load_network(
             cell.position[1] = Cortical_Neuron_y_Positions[ii]  # Set Y position
             cell.position[2] = Cortical_Neuron_z_Positions[ii]  # Set Z position
 
+        cortical_y = None
+        cortical_y = Cortical_Pop.positions[1, :]
+        count = 0
+        for i in cortical_y:
+            if i != 0:
+                print(f"non zero y position present, y is {i}, after assigning")
+                count += 1
+        print(f"total cells with y not at zero is {count}, after assigning")
 
     # Load STN positions - Comment/Remove to generate new positions
     STN_Neuron_xy_Positions = np.loadtxt(structure_save_dir / "STN_xy_pos.txt", delimiter=",")
