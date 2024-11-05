@@ -390,9 +390,12 @@ if __name__ == "__main__":
         # for ii, cell in enumerate(Interneuron_Pop):
         #     cell.inter_rx = inter_rx_seq[ii]
 
-
-
-
+    count = 0
+    for cell in Cortical_Pop:
+        if cell.position[1] != 0:
+            print(f"non zero y position present, y is {cell.position[1]}, after rx")
+            count += 1
+    print(f"total cells with y not at zero is {count}, after rx")
 
     # Create times for when the DBS controller will be called
     # Window length for filtering biomarker
@@ -973,6 +976,13 @@ if __name__ == "__main__":
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_AMPA_i.mat"), "AMPA.i", clear=False)
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_GABAa_i.mat"), "GABAa.i", clear=False)
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_AMPA_i.mat"), "AMPA.i", clear=False)
+
+    count = 0
+    for cell in Cortical_Pop:
+        if cell.position[1] != 0:
+            print(f"non zero y position present, y is {cell.position[1]}, before saving")
+            count += 1
+    print(f"total cells with y not at zero is {count}, before saving")
 
     if DBS_stimulation or ctx_stimulation:
         print("Saving collateral and soma currents...")
