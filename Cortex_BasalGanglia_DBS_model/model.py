@@ -633,8 +633,7 @@ def load_network(
         print("loading cortical xyz positions")
         # Load cortical neuron positions (each row represents a cell, each column a coordinate)
         Cortical_Neuron_xyz_Positions = np.loadtxt(structure_save_dir / "cortical_xyz_pos.txt", delimiter=",")
-        print("Loaded cortical neuron positions (first 5 rows):")
-        print(Cortical_Neuron_xyz_Positions[:5, :])
+
         # Identify local indices of cortical neurons
         cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
         print(f"Cortex local indices length: {len(cortex_local_indices)}")
@@ -651,19 +650,22 @@ def load_network(
         for cell in Cortical_Pop:
             cell.position[:] = [0, 0, 0]  # Reset each cell's position to zero
 
-        print("Assigning positions to cortical cells...")
-        for ii, cell in enumerate(Cortical_Pop):
-            initial_position = cell.position.copy()  # Keep initial for comparison
-
-            # Assign loaded positions
-            cell.position[0] = Cortical_Neuron_x_Positions[ii]
-            cell.position[1] = Cortical_Neuron_y_Positions[ii]
-            cell.position[2] = Cortical_Neuron_z_Positions[ii]
-
-            # Debug: Compare before and after for Y coordinate
-            if cell.position[1] != initial_position[1]:
-                print(f"Cell {ii} Y position changed from {initial_position[1]} to {cell.position[1]}")
-            print(f"Cell {ii} assigned position: {cell.position}")
+        # print("Assigning positions to cortical cells...")
+        # for ii, cell in enumerate(Cortical_Pop):
+        #     initial_position = cell.position.copy()  # Keep initial for comparison
+        #
+        #     # Assign loaded positions
+        #     cell.position[0] = Cortical_Neuron_x_Positions[ii]
+        #     cell.position[1] = Cortical_Neuron_y_Positions[ii]
+        #     cell.position[2] = Cortical_Neuron_z_Positions[ii]
+        #
+        #     # Debug: Compare before and after for Y coordinate
+        #     if cell.position[1] != initial_position[1]:
+        #         print(f"Cell {ii} Y position changed from {initial_position[1]} to {cell.position[1]}")
+        #     print(f"Cell {ii} assigned position: {cell.position}")
+        Cortical_Pop.positions[0, :] = Cortical_Neuron_x_Positions  # Assign x-coordinates
+        Cortical_Pop.positions[1, :] = Cortical_Neuron_y_Positions  # Assign y-coordinates
+        Cortical_Pop.positions[2, :] = Cortical_Neuron_z_Positions  # Assign z-coordinates
 
         cortical_y = None
         cortical_y = Cortical_Pop.positions[1, :]

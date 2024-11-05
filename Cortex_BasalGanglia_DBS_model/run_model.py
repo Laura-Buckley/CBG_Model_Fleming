@@ -75,7 +75,9 @@ if __name__ == "__main__":
 
     # Initialize global variables with config settings
     initialize_cell_classes(c)
+    print("cell class initialised")
     initialize_model(c)
+    print("model network initialised")
 
     os.chdir(newpwd)
 
