@@ -643,6 +643,11 @@ def load_network(
         Cortical_Neuron_y_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 1]  # Y coordinates from second column
         Cortical_Neuron_z_Positions = Cortical_Neuron_xyz_Positions[cortex_local_indices, 2]  # Z coordinates from third column
 
+        print("Shape of Cortical_Pop.positions:", Cortical_Pop.positions.shape)
+        print("Shape of Cortical_Neuron_x_Positions:", Cortical_Neuron_x_Positions.shape)
+        print("Shape of Cortical_Neuron_y_Positions:", Cortical_Neuron_y_Positions.shape)
+        print("Shape of Cortical_Neuron_z_Positions:", Cortical_Neuron_z_Positions.shape)
+
         # Debug: Check that Y values are all zero as expected
         if np.any(Cortical_Neuron_y_Positions != 0):
             print("Warning: Some Y positions are not zero in the loaded data.")
