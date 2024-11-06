@@ -982,14 +982,14 @@ if __name__ == "__main__":
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_GABAa_i.mat"), "GABAa.i", clear=False)
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_AMPA_i.mat"), "AMPA.i", clear=False)
 
-    cortical_y = None
-    cortical_y = Cortical_Pop.positions[1, :]
-    count = 0
-    for i in cortical_y:
-        if i != 0:
-            print(f"non zero y position present, y is {i}, before saving")
-            count += 1
-    print(f"total cells with y not at zero is {count}, before saving")
+    # cortical_y = None
+    # cortical_y = Cortical_Pop.positions[1, :]
+    # count = 0
+    # for i in cortical_y:
+    #     if i != 0:
+    #         print(f"non zero y position present, y is {i}, before saving")
+    #         count += 1
+    # print(f"total cells with y not at zero is {count}, before saving")
 
     if DBS_stimulation or ctx_stimulation:
         print("Saving collateral and soma currents...")
@@ -1105,9 +1105,6 @@ if __name__ == "__main__":
 
     if DBS_stimulation:
         print("Saving DBS signal")
-        check_non_zero_elements(DBS_Signal, "DBS_Signal")
-        check_non_zero_elements(DBS_times, "DBS_times")
-
         # Write the DBS Signal to .mat file
         # DBS Amplitude
         DBS_Block = neo.Block(name="DBS_Signal")
