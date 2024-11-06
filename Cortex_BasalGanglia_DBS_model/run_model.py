@@ -997,21 +997,28 @@ if __name__ == "__main__":
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_collateral_im.mat"), "collateral(0.5).i_membrane_", clear=False)
         # Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_node_ex.mat"), "middle_node(0.5).ref_e_extracellular", clear=False)
 
-    # saving cortical cells
-    print("saving cortical cell positions for storage")
-    print(Cortical_Pop.positions.shape)# Initialize the 100x3 array to store coordinates
+    # Saving cortical cells
+    print("Saving cortical cell positions for storage")
+    print("Shape of Cortical_Pop.positions:", Cortical_Pop.positions.shape)
+
+    # Initialize the 100x3 array to store positions for all cells
     Cortical_positions_array = np.zeros((100, 3))
+
     # Identify local indices for cortical neurons
     cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
-    cortical_x_pos = Cortical_Pop.positions[0, cortex_local_indices]
-    cortical_y_pos = Cortical_Pop.positions[1, cortex_local_indices]
-    cortical_z_pos = Cortical_Pop.positions[2, cortex_local_indices]
-    for i in cortical_x_pos:
-        Cortical_positions_array[i, 0] = cortical_x_pos[i]
-        Cortical_positions_array[i, 1] = cortical_y_pos[i]
-        Cortical_positions_array[i, 2] = cortical_z_pos[i]
-    np.savetxt(simulation_output_dir / "cortical_new_pos_transposed.txt", Cortical_positions_array, delimiter=",")
 
+    # Fill the array row-by-row, where each row represents a cell's [x, y, z] position
+    row = 0
+    for i in range(Cortical_Pop.positions.shape[1]):  # Loop over all cells
+        if cortex_local_indices[i]:  # Only include local cells
+            # Extract x, y, z for the current cell and assign it to the row in the array
+            Cortical_positions_array[row, 0] = Cortical_Pop.positions[0, i]  # X position
+            Cortical_positions_array[row, 1] = Cortical_Pop.positions[1, i]  # Y position
+            Cortical_positions_array[row, 2] = Cortical_Pop.positions[2, i]  # Z position
+            row += 1  # Move to the next row
+
+    # Save to file, ensuring x, y, z are in columns and each row corresponds to a cell
+    np.savetxt(simulation_output_dir / "cortical_new_pos_transposed.txt", Cortical_positions_array, delimiter=",")
 
     # Write controller values to csv files
     controller_measured_beta_values = np.asarray(controller.state_history)
