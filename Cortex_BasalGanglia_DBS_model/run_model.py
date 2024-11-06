@@ -995,10 +995,23 @@ if __name__ == "__main__":
         print("Saving collateral and soma currents...")
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_soma_im.mat"), "soma(0.5).i_membrane_", clear=False)
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_collateral_im.mat"), "collateral(0.5).i_membrane_", clear=False)
-        print("saving cortical cell positions after calculating distances")
-        print(Cortical_Pop.positions.shape)
-        np.savetxt(simulation_output_dir / "cortical_new_pos_transposed.txt", Cortical_Pop.positions.T, delimiter=",")
         # Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_node_ex.mat"), "middle_node(0.5).ref_e_extracellular", clear=False)
+
+    # saving cortical cells
+    print("saving cortical cell positions for storage")
+    print(Cortical_Pop.positions.shape)# Initialize the 100x3 array to store coordinates
+    Cortical_positions_array = np.zeros((100, 3))
+    # Identify local indices for cortical neurons
+    cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
+    cortical_x_pos = Cortical_Pop.positions[0, cortex_local_indices]
+    cortical_y_pos = Cortical_Pop.positions[1, cortex_local_indices]
+    cortical_z_pos = Cortical_Pop.positions[2, cortex_local_indices]
+    for i in cortical_x_pos:
+        Cortical_positions_array[i, 0] = cortical_x_pos[i]
+        Cortical_positions_array[i, 1] = cortical_y_pos[i]
+        Cortical_positions_array[i, 2] = cortical_z_pos[i]
+    np.savetxt(simulation_output_dir / "cortical_new_pos_transposed.txt", Cortical_positions_array, delimiter=",")
+
 
     # Write controller values to csv files
     controller_measured_beta_values = np.asarray(controller.state_history)
