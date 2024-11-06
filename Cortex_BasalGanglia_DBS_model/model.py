@@ -654,7 +654,7 @@ def load_network(
         if np.any(Cortical_Neuron_y_Positions != 0):
             print("Warning: Some Y positions are not zero in the loaded data.")
 
-
+        j = 0
         print("Assigning positions to cortical cells...")
         for ii, cell in enumerate(Cortical_Pop):
         #     initial_position = cell.position.copy()  # Keep initial for comparison
@@ -663,12 +663,12 @@ def load_network(
             cell.position[0] = Cortical_Neuron_x_Positions[ii]
             cell.position[1] = Cortical_Neuron_y_Positions[ii]
             cell.position[2] = Cortical_Neuron_z_Positions[ii]
-
+            j+=1
         #     # Debug: Compare before and after for Y coordinate
         #     if cell.position[1] != initial_position[1]:
         #         print(f"Cell {ii} Y position changed from {initial_position[1]} to {cell.position[1]}")
         #     print(f"Cell {ii} assigned position: {cell.position}")
-
+        print(f"Total number of cells assigned positions was {j}")
 
         cortical_y = None
         cortical_y = Cortical_Pop.positions[1, :]
