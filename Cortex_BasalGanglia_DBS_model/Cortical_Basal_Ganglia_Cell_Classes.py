@@ -93,10 +93,6 @@ def _new_property(obj_hierarchy, attr_name):
 
     return property(fset=set, fget=get)
 
-def initialize_model_mechanism(config):
-    global global_Coupled_model
-
-    global_Coupled_model = config.Coupled_model
 
 
 class Cortical_Neuron(object):
@@ -207,8 +203,7 @@ class Cortical_Neuron(object):
         # Add extracellular mechanisms to collateral
         self.collateral.insert("extracellular")
         #only apply xtra if calculating ex in model
-        if not global_Coupled_model:
-            self.collateral.insert("extracellular")
+
 
 
         # Assign default rx values to the segments rx_xtra
@@ -217,15 +212,13 @@ class Cortical_Neuron(object):
         #    for each collateral segments to the stimulation
         #    electrode in the homogenous extracellular medium
 
-        ##only do this if model is not coupled to FEA
-        if not global_Coupled_model:
-            for seg in self.collateral:
-                seg.xtra.rx = seg.x * 3e-1
+        for seg in self.collateral:
+            seg.xtra.rx = seg.x * 3e-1
 
-            # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
-            for seg in self.collateral:
-                h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
-                h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
+        # Setting pointers to couple extracellular and xtra mechanisms for simulating extracellular DBS
+        for seg in self.collateral:
+            h.setpointer(seg._ref_e_extracellular, "ex", seg.xtra)
+            h.setpointer(seg._ref_i_membrane, "im", seg.xtra)
 
         # Add bias current to neuron model - current amplitude is in terms of original model paper, nA
         self.stim = h.IClamp(0.5, sec=self.soma)
@@ -316,13 +309,13 @@ class Cortical_Neuron_Type(NativeCellType):
         "num_axon_compartments": 10,
     }
 
-    if not Coupled_model:
-        # Define initial vector of transfer resistances for the collateral segments
-        initial_collateral_rx = np.zeros(
-            (1, default_parameters["collateral_nseg"])
-        ).flatten()
-        initial_collateral_rx_Sequence = Sequence(initial_collateral_rx)
-        default_parameters["collateral_rx"] = initial_collateral_rx_Sequence
+
+    # Define initial vector of transfer resistances for the collateral segments
+    initial_collateral_rx = np.zeros(
+        (1, default_parameters["collateral_nseg"])
+    ).flatten()
+    initial_collateral_rx_Sequence = Sequence(initial_collateral_rx)
+    default_parameters["collateral_rx"] = initial_collateral_rx_Sequence
 
     default_initial_values = {"v": -68.0}
     recordable = [

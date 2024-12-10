@@ -44,7 +44,6 @@ import argparse
 from utils import make_beta_cheby1_filter, calculate_avg_beta_power
 from model import create_network, load_network, electrode_distance
 from config import Config, get_controller_kwargs
-from Cortical_Basal_Ganglia_Cell_Classes import initialize_model_mechanism
 # Import global variables for GPe DBS
 import Global_Variables as GV
 
@@ -65,9 +64,6 @@ if __name__ == "__main__":
     c = Config(args.config_file)
     os.chdir(newpwd)
 
-    #Make sure cortical class initialised properly before loading network
-    initialize_model_mechanism(c)
-
     simulation_runtime = c.RunTime
     controller_type = c.Controller
     rng_seed = c.RandomSeed
@@ -82,6 +78,11 @@ if __name__ == "__main__":
     ctx_slow_modulation_amplitude = c.ctx_slow_modulation_amplitude
     ctx_slow_modulation_step_count = c.ctx_slow_modulation_step_count
     Coupled_model = c.Coupled_model
+    model_filename = c.filename
+
+    if Coupled_model:
+        voltage_data = sort_data_by_yz(model_filename)
+
 
     sim_total_time = (
         steady_state_duration + simulation_runtime + timestep
@@ -200,6 +201,9 @@ if __name__ == "__main__":
     GPi_Pop.record("soma(0.5).v", sampling_interval=rec_sampling_interval)
     Thalamic_Pop.record("soma(0.5).v", sampling_interval=rec_sampling_interval)
 
+    if Coupled_model:
+        scale_collateral_rx_by_voltage(Cortical_Pop, voltage_data)
+
     # Assign Positions for recording and stimulating electrode point sources
     recording_electrode_1_position = np.array([0, -1500, 250])
     recording_electrode_2_position = np.array([0, 1500, 250])
@@ -222,26 +226,25 @@ if __name__ == "__main__":
     # rho needs units of ohm cm for xtra mechanism (S/m -> S/cm)
     rho = 1 / (sigma * 1e-2)
 
-    if not Coupled_model:
-        # Calculate transfer resistances for each collateral segment for xtra
-        # units are Mohms
-        collateral_rx = (
-            0.01
-            * (rho / (4 * math.pi))
-            * (1 / Cortical_Collateral_stimulating_electrode_distances)
-        )
+    # Calculate transfer resistances for each collateral segment for xtra
+    # units are Mohms
+    collateral_rx = (
+        0.01
+        * (rho / (4 * math.pi))
+        * (1 / Cortical_Collateral_stimulating_electrode_distances)
+    )
 
-        # Convert ndarray to array of Sequence objects - needed to set cortical
-        # collateral transfer resistances
-        collateral_rx_seq = np.ndarray(
-            shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        ).flatten()
-        for ii in range(0, Cortical_Pop.local_size):
-            collateral_rx_seq[ii] = Sequence(collateral_rx[ii, :].flatten())
+    # Convert ndarray to array of Sequence objects - needed to set cortical
+    # collateral transfer resistances
+    collateral_rx_seq = np.ndarray(
+        shape=(1, Cortical_Pop.local_size), dtype=Sequence
+    ).flatten()
+    for ii in range(0, Cortical_Pop.local_size):
+        collateral_rx_seq[ii] = Sequence(collateral_rx[ii, :].flatten())
 
-        # Assign transfer resistances values to collaterals
-        for ii, cell in enumerate(Cortical_Pop):
-            cell.collateral_rx = collateral_rx_seq[ii]
+    # Assign transfer resistances values to collaterals
+    for ii, cell in enumerate(Cortical_Pop):
+        cell.collateral_rx = collateral_rx_seq[ii]
 
     # Create times for when the DBS controller will be called
     # Window length for filtering biomarker
