@@ -192,7 +192,7 @@ def create_network(
 
     # Save the generated cortical xy positions to a text file
     np.savetxt(structure_save_dir / "cortical_xyz_cell_distribution.txt", Cortical_Pop.positions.T, delimiter=",")
-
+    print("Finished assigning the cortical cells.. ")
     for STN_cell in STN_Pop:
         while (
                 (STN_cell.position[0] > 12000)  # Check if x is within bounds
@@ -205,7 +205,7 @@ def create_network(
 
     # Save the generated STN xy positions to a text file
     np.savetxt(structure_save_dir / "STN_xyz_cell_distribution.txt", STN_Pop.positions.T, delimiter=",")
-
+    print("Finished assigning the STN cells.. ")
 
     # Synaptic Connections
     # Add variability to Cortical connections - cortical interneuron
