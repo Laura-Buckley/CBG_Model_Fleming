@@ -53,7 +53,7 @@ def create_network(
     Cortical_height = 8000
     Cortical_depth = 8000
 
-    Cortical_space = space.RandomStructure(boundary=space.Cube(Cortical_width, Cortical_height, Cortical_depth), origin=(0.0, 0.0, 0.0), rng=None)
+    Cortical_space = space.RandomStructure(boundary=space.Cuboid(Cortical_width, Cortical_height, Cortical_depth), origin=(0.0, 0.0, 0.0), rng=None)
 
     # Create the STN space, with a maximal width of 12mm, and height and depth of 4 mm,
     # with an offset origin = (x = -6000, y = 0, z = 0)
@@ -64,7 +64,7 @@ def create_network(
     STN_depth = 4000
 
     offset = 6000.0
-    STN_space = space.RandomStructure(boundary=space.Cube(STN_width, STN_height, STN_depth), origin=(-offset, 0.0, 0.0), rng=None)
+    STN_space = space.RandomStructure(boundary=space.Cuboid(STN_width, STN_height, STN_depth), origin=(-offset, 0.0, 0.0), rng=None)
     # Generate Poisson-distributed Striatal Spike trains
     striatal_spike_times = u.generate_poisson_spike_times(
         Pop_size, steady_state_duration, simulation_runtime, 20, 1.0, rng_seed
