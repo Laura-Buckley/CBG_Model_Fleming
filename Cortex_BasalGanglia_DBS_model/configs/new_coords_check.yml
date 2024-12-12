@@ -1,0 +1,10 @@
+---
+# Simulation
+Controller: OPEN
+RunTime: 500.0
+create_new_network: True 
+SteadyStateDuration: 500.0
+# Controller
+setpoint: 0
+ts: 0.02
+stimulation_amplitude: 1.0

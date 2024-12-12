@@ -45,11 +45,26 @@ def create_network(
     np.random.seed(rng_seed)
     structure_save_dir = Path("network_structure")
 
-    # Sphere with radius 2000 um
-    STN_space = space.RandomStructure(
-        boundary=space.Sphere(2000), rng=NumpyRNG(seed=rng_seed)
-    )
+    # Create a cube for the distribution of the cortical cells in a volume surrounidng the electrode,
+    # centered at the origin (x = 0, y = 0, z = 0)
 
+    # Cortical cube parameters
+    Cortical_width = 8000
+    Cortical_height = 8000
+    Cortical_depth = 8000
+
+    Cortical_space = space.RandomStructure(boundary=space.Cube(Cortical_width, Cortical_height, Cortical_depth), origin=(0.0, 0.0, 0.0), rng=None)
+
+    # Create the STN space, with a maximal width of 12mm, and height and depth of 4 mm,
+    # with an offset origin = (x = -6000, y = 0, z = 0)
+
+    # STN cuboid parameters
+    STN_width = 12000
+    STN_height = 4000
+    STN_depth = 4000
+
+    offset = 6000.0
+    STN_space = space.RandomStructure(boundary=space.Cube(STN_width, STN_height, STN_depth), origin=(-offset, 0.0, 0.0), rng=None)
     # Generate Poisson-distributed Striatal Spike trains
     striatal_spike_times = u.generate_poisson_spike_times(
         Pop_size, steady_state_duration, simulation_runtime, 20, 1.0, rng_seed
@@ -160,35 +175,37 @@ def create_network(
         )
 
     # Position Check -
-    # 1) Make sure cells are bounded in 4mm space in x, y coordinates
-    # 2) Make sure no cells are placed inside the stimulating/recording
-    # electrode -0.5mm<x<0.5mm, -1.5mm<y<2mm
+    # 1) Make sure cells are bounded in 8mm cubic space in x and z coordinates
+    # 2) Make sure no cells are placed inside the stimulating/recording lead -0.965mm < x < 0.965mm and -0.965mm < z < 0.965mm
+
     for Cortical_cell in Cortical_Pop:
         while (
-            (np.abs(Cortical_cell.position[0]) > 2000)
-            or ((np.abs(Cortical_cell.position[1]) > 2000))
-        ) or (
-            (np.abs(Cortical_cell.position[0]) < 500)
-            and (-1500 < Cortical_cell.position[1] < 2000)
+                (np.abs(Cortical_cell.position[0]) > 4000)  # Check if x is within bounds
+                or (np.abs(Cortical_cell.position[2]) > 4000)  # Check if z is within bounds
+                or (
+                        (Cortical_cell.position[0] < 965 and Cortical_cell.position[0] > -965)  # Lead condition for x
+                        and (Cortical_cell.position[2] < 965 and Cortical_cell.position[2] > -965) # Lead condition for z
+                )
         ):
-            Cortical_cell.position = STN_space.generate_positions(1).flatten()
+            Cortical_cell.position = Cortical_space.generate_positions(1).flatten()
+        Cortical_cell.position[1] = -2500  # Axon will extend from -2500 to around 5000.
 
-    # Save the generated cortical xy positions to a textfile
-    np.savetxt(structure_save_dir / "cortical_xy_pos.txt", Cortical_Pop.positions, delimiter=",")
+    # Save the generated cortical xy positions to a text file
+    np.savetxt(structure_save_dir / "cortical_xyz_cell_distribution.txt", Cortical_Pop.positions.T, delimiter=",")
 
     for STN_cell in STN_Pop:
         while (
-            (np.abs(STN_cell.position[0]) > 2000)
-            or ((np.abs(STN_cell.position[1]) > 2000))
-        ) or (
-            (np.abs(STN_cell.position[0]) < 500)
-            and (-1500 < STN_cell.position[1] < 2000)
+                (STN_cell.position[0] > 12000)  # Check if x is within bounds
+                or (STN_cell.position[0] < 0)  # Check if x is less than 0
+                or (STN_cell.position[1] > 0)  # Check if y is within bounds (should be less than 0)
+                or (np.abs(STN_cell.position[2]) > 2000)  # Check if z is within bounds
+                or (STN_cell.position[1] < -4000)  # Check if y is within bounds
         ):
             STN_cell.position = STN_space.generate_positions(1).flatten()
-        STN_cell.position[2] = 500
 
-    # Save the generated STN xy positions to a textfile
-    np.savetxt(structure_save_dir / "STN_xy_pos.txt", STN_Pop.positions, delimiter=",")
+    # Save the generated STN xy positions to a text file
+    np.savetxt(structure_save_dir / "STN_xyz_cell_distribution.txt", STN_Pop.positions.T, delimiter=",")
+
 
     # Synaptic Connections
     # Add variability to Cortical connections - cortical interneuron
