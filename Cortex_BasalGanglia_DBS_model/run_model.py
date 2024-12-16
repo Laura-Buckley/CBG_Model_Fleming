@@ -178,12 +178,11 @@ if __name__ == "__main__":
         if rank == 0:
             print("Network created")
 
-
-    #save coordinate files
+        # save coordinate files
     print('saving cortical coords to output dir')
-    np.savetxt(simulation_output_dir / "cortical_xyz_cell_distribution.txt", Cortical_Pop.positions.T, delimiter=",")
+    np.savetxt(output_dir / "cortical_xyz_cell_distribution.txt", Cortical_Pop.positions.T, delimiter=",")
     print('saving STN coords to output dir')
-    np.savetxt(simulation_output_dir / "STN_xyz_cell_distribution.txt", STN_Pop.positions.T, delimiter=",")
+    np.savetxt(output_dir / "STN_xyz_cell_distribution.txt", STN_Pop.positions.T, delimiter=",")
 
     # Define state variables to record from each population
     if c.save_ctx_voltage:
