@@ -331,27 +331,27 @@ def create_network(
         receptor_type="AMPA",
     )
 
-    # Save the network topology so it can be reloaded
-    # prj_CorticalSpikeSourceCorticalSoma.saveConnections(file="CorticalSpikeSourceCorticalSoma_Connections.txt")
-    prj_CorticalAxon_Interneuron.saveConnections(
-        file=structure_save_dir / "CorticalAxonInterneuron_Connections.txt"
-    )
-    prj_Interneuron_CorticalSoma.saveConnections(
-        file=structure_save_dir / "InterneuronCortical_Connections.txt"
-    )
-    prj_CorticalSTN.saveConnections(file=structure_save_dir / "CorticalSTN_Connections.txt")
-    prj_STNGPe.saveConnections(file=structure_save_dir / "STNGPe_Connections.txt")
-    prj_GPeGPe.saveConnections(file=structure_save_dir / "GPeGPe_Connections.txt")
-    prj_GPeSTN.saveConnections(file=structure_save_dir / "GPeSTN_Connections.txt")
-    prj_StriatalGPe.saveConnections(file=structure_save_dir / "StriatalGPe_Connections.txt")
-    prj_STNGPi.saveConnections(file=structure_save_dir / "STNGPi_Connections.txt")
-    prj_GPeGPi.saveConnections(file=structure_save_dir / "GPeGPi_Connections.txt")
-    prj_GPiThalamic.saveConnections(file=structure_save_dir / "GPiThalamic_Connections.txt")
-    prj_ThalamicCortical.saveConnections(file=structure_save_dir / "ThalamicCorticalSoma_Connections.txt")
-    prj_CorticalThalamic.saveConnections(file=structure_save_dir / "CorticalSomaThalamic_Connections.txt")
-    # Load GPe stimulation order
-    GPe_stimulation_order = np.loadtxt(structure_save_dir / "GPe_Stimulation_Order.txt", delimiter=",")
-    GPe_stimulation_order = [int(index) for index in GPe_stimulation_order]
+    # # Save the network topology so it can be reloaded
+    # # prj_CorticalSpikeSourceCorticalSoma.saveConnections(file="CorticalSpikeSourceCorticalSoma_Connections.txt")
+    # prj_CorticalAxon_Interneuron.saveConnections(
+    #     file=structure_save_dir / "CorticalAxonInterneuron_Connections.txt"
+    # )
+    # prj_Interneuron_CorticalSoma.saveConnections(
+    #     file=structure_save_dir / "InterneuronCortical_Connections.txt"
+    # )
+    # prj_CorticalSTN.saveConnections(file=structure_save_dir / "CorticalSTN_Connections.txt")
+    # prj_STNGPe.saveConnections(file=structure_save_dir / "STNGPe_Connections.txt")
+    # prj_GPeGPe.saveConnections(file=structure_save_dir / "GPeGPe_Connections.txt")
+    # prj_GPeSTN.saveConnections(file=structure_save_dir / "GPeSTN_Connections.txt")
+    # prj_StriatalGPe.saveConnections(file=structure_save_dir / "StriatalGPe_Connections.txt")
+    # prj_STNGPi.saveConnections(file=structure_save_dir / "STNGPi_Connections.txt")
+    # prj_GPeGPi.saveConnections(file=structure_save_dir / "GPeGPi_Connections.txt")
+    # prj_GPiThalamic.saveConnections(file=structure_save_dir / "GPiThalamic_Connections.txt")
+    # prj_ThalamicCortical.saveConnections(file=structure_save_dir / "ThalamicCorticalSoma_Connections.txt")
+    # prj_CorticalThalamic.saveConnections(file=structure_save_dir / "CorticalSomaThalamic_Connections.txt")
+    # # Load GPe stimulation order
+    # GPe_stimulation_order = np.loadtxt(structure_save_dir / "GPe_Stimulation_Order.txt", delimiter=",")
+    # GPe_stimulation_order = [int(index) for index in GPe_stimulation_order]
 
     return (
         striatal_spike_times,
