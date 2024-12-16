@@ -349,9 +349,9 @@ def create_network(
     # prj_GPiThalamic.saveConnections(file=structure_save_dir / "GPiThalamic_Connections.txt")
     # prj_ThalamicCortical.saveConnections(file=structure_save_dir / "ThalamicCorticalSoma_Connections.txt")
     # prj_CorticalThalamic.saveConnections(file=structure_save_dir / "CorticalSomaThalamic_Connections.txt")
-    # # Load GPe stimulation order
-    # GPe_stimulation_order = np.loadtxt(structure_save_dir / "GPe_Stimulation_Order.txt", delimiter=",")
-    # GPe_stimulation_order = [int(index) for index in GPe_stimulation_order]
+    # Load GPe stimulation order
+    GPe_stimulation_order = np.loadtxt(structure_save_dir / "GPe_Stimulation_Order.txt", delimiter=",")
+    GPe_stimulation_order = [int(index) for index in GPe_stimulation_order]
 
     return (
         striatal_spike_times,
