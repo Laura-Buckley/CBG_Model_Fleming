@@ -1,0 +1,10 @@
+---
+# Simulation
+Controller: OPEN
+RunTime: 500.0
+SteadyStateDuration: 500.0
+
+# Controller
+setpoint: 0
+ts: 0.02
+
