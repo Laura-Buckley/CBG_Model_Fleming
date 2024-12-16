@@ -64,7 +64,7 @@ def create_network(
     STN_depth = 4000
 
     offset = 6000.0
-    STN_space = space.RandomStructure(boundary=space.Cuboid(STN_width, STN_height, STN_depth), origin=(-offset, 0.0, 0.0), rng=None)
+    STN_space = space.RandomStructure(boundary=space.Cuboid(STN_width, STN_height, STN_depth), origin=(offset, 0.0, 0.0), rng=None)
     # Generate Poisson-distributed Striatal Spike trains
     striatal_spike_times = u.generate_poisson_spike_times(
         Pop_size, steady_state_duration, simulation_runtime, 20, 1.0, rng_seed
