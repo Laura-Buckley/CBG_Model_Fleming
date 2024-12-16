@@ -178,6 +178,13 @@ if __name__ == "__main__":
         if rank == 0:
             print("Network created")
 
+
+    #save coordinate files
+    print('saving cortical coords to output dir')
+    np.savetxt(structure_save_dir / "cortical_xyz_cell_distribution.txt", Cortical_Pop.positions.T, delimiter=",")
+    print('saving STN coords to output dir')
+    np.savetxt(structure_save_dir / "STN_xyz_cell_distribution.txt", STN_Pop.positions.T, delimiter=",")
+
     # Define state variables to record from each population
     if c.save_ctx_voltage:
         Cortical_Pop.record("soma(0.5).v", sampling_interval=rec_sampling_interval)
