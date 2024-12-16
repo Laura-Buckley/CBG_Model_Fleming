@@ -82,7 +82,7 @@ def create_network(
     Cortical_Pop = Population(
         Pop_size,
         Cortical_Neuron_Type(soma_bias_current_amp=0.245),
-        structure=STN_space,
+        structure=Cortical_space,
         label="Cortical Neurons",
     )
     Interneuron_Pop = Population(
