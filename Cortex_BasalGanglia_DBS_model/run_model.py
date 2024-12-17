@@ -178,38 +178,6 @@ if __name__ == "__main__":
         if rank == 0:
             print("Network created")
 
-        # Initialize arrays to store positions for cortical and STN populations
-        Cortical_positions_array = np.zeros((Cortical_Pop.positions.shape[1], 3))
-        STN_positions_array = np.zeros((STN_Pop.positions.shape[1], 3))
-
-        # Identify local indices for cortical and STN neurons
-        cortical_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
-        stn_local_indices = [cell in STN_Pop for cell in STN_Pop.all_cells]
-
-        # Fill the cortical positions array
-        cortical_row = 0
-        for i in range(Cortical_Pop.positions.shape[1]):  # Loop over all cortical cells
-            if cortical_local_indices[i]:  # Only include local cortical cells
-                Cortical_positions_array[cortical_row, 0] = Cortical_Pop.positions[0, i]  # X position
-                Cortical_positions_array[cortical_row, 1] = Cortical_Pop.positions[1, i]  # Y position
-                Cortical_positions_array[cortical_row, 2] = Cortical_Pop.positions[2, i]  # Z position
-                cortical_row += 1  # Move to the next row
-
-        # Fill the STN positions array
-        stn_row = 0
-        for i in range(STN_Pop.positions.shape[1]):  # Loop over all STN cells
-            if stn_local_indices[i]:  # Only include local STN cells
-                STN_positions_array[stn_row, 0] = STN_Pop.positions[0, i]  # X position
-                STN_positions_array[stn_row, 1] = STN_Pop.positions[1, i]  # Y position
-                STN_positions_array[stn_row, 2] = STN_Pop.positions[2, i]  # Z position
-                stn_row += 1  # Move to the next row
-
-        # Save the cortical and STN coordinates to files
-        print('Saving cortical coordinates to output directory...')
-        np.savetxt(output_dir / "cortical_xyz_cell_distribution.txt", Cortical_positions_array[:cortical_row],
-                   delimiter=",")
-        print('Saving STN coordinates to output directory...')
-        np.savetxt(output_dir / "STN_xyz_cell_distribution.txt", STN_positions_array[:stn_row], delimiter=",")
 
     # Define state variables to record from each population
     if c.save_ctx_voltage:
@@ -233,43 +201,43 @@ if __name__ == "__main__":
     recording_electrode_1_position = np.array([0, -1500, 250])
     recording_electrode_2_position = np.array([0, 1500, 250])
     stimulating_electrode_position = np.array([0, 0, 250])
-
-    (
-        STN_recording_electrode_1_distances,
-        STN_recording_electrode_2_distances,
-        Cortical_Collateral_stimulating_electrode_distances,
-    ) = electrode_distance(
-        recording_electrode_1_position,
-        recording_electrode_2_position,
-        STN_Pop,
-        stimulating_electrode_position,
-        Cortical_Pop,
-    )
-
-    # Conductivity and resistivity values for homogenous, isotropic medium
-    sigma = 0.27  # Latikka et al. 2001 - Conductivity of Brain tissue S/m
-    # rho needs units of ohm cm for xtra mechanism (S/m -> S/cm)
-    rho = 1 / (sigma * 1e-2)
-
-    # Calculate transfer resistances for each collateral segment for xtra
-    # units are Mohms
-    collateral_rx = (
-        0.01
-        * (rho / (4 * math.pi))
-        * (1 / Cortical_Collateral_stimulating_electrode_distances)
-    )
-
-    # Convert ndarray to array of Sequence objects - needed to set cortical
-    # collateral transfer resistances
-    collateral_rx_seq = np.ndarray(
-        shape=(1, Cortical_Pop.local_size), dtype=Sequence
-    ).flatten()
-    for ii in range(0, Cortical_Pop.local_size):
-        collateral_rx_seq[ii] = Sequence(collateral_rx[ii, :].flatten())
-
-    # Assign transfer resistances values to collaterals
-    for ii, cell in enumerate(Cortical_Pop):
-        cell.collateral_rx = collateral_rx_seq[ii]
+    #
+    # (
+    #     STN_recording_electrode_1_distances,
+    #     STN_recording_electrode_2_distances,
+    #     Cortical_Collateral_stimulating_electrode_distances,
+    # ) = electrode_distance(
+    #     recording_electrode_1_position,
+    #     recording_electrode_2_position,
+    #     STN_Pop,
+    #     stimulating_electrode_position,
+    #     Cortical_Pop,
+    # )
+    #
+    # # Conductivity and resistivity values for homogenous, isotropic medium
+    # sigma = 0.27  # Latikka et al. 2001 - Conductivity of Brain tissue S/m
+    # # rho needs units of ohm cm for xtra mechanism (S/m -> S/cm)
+    # rho = 1 / (sigma * 1e-2)
+    #
+    # # Calculate transfer resistances for each collateral segment for xtra
+    # # units are Mohms
+    # collateral_rx = (
+    #     0.01
+    #     * (rho / (4 * math.pi))
+    #     * (1 / Cortical_Collateral_stimulating_electrode_distances)
+    # )
+    #
+    # # Convert ndarray to array of Sequence objects - needed to set cortical
+    # # collateral transfer resistances
+    # collateral_rx_seq = np.ndarray(
+    #     shape=(1, Cortical_Pop.local_size), dtype=Sequence
+    # ).flatten()
+    # for ii in range(0, Cortical_Pop.local_size):
+    #     collateral_rx_seq[ii] = Sequence(collateral_rx[ii, :].flatten())
+    #
+    # # Assign transfer resistances values to collaterals
+    # for ii, cell in enumerate(Cortical_Pop):
+    #     cell.collateral_rx = collateral_rx_seq[ii]
 
     # Create times for when the DBS controller will be called
     # Window length for filtering biomarker
@@ -665,6 +633,39 @@ if __name__ == "__main__":
             STN_Pop.get_data("soma(0.5).v", clear=True)
 
         last_write_time = simulator.state.t
+
+    # Initialize arrays to store positions for cortical and STN populations
+    Cortical_positions_array = np.zeros((Cortical_Pop.positions.shape[1], 3))
+    STN_positions_array = np.zeros((STN_Pop.positions.shape[1], 3))
+
+    # Identify local indices for cortical and STN neurons
+    cortical_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
+    stn_local_indices = [cell in STN_Pop for cell in STN_Pop.all_cells]
+
+    # Fill the cortical positions array
+    cortical_row = 0
+    for i in range(Cortical_Pop.positions.shape[1]):  # Loop over all cortical cells
+        if cortical_local_indices[i]:  # Only include local cortical cells
+            Cortical_positions_array[cortical_row, 0] = Cortical_Pop.positions[0, i]  # X position
+            Cortical_positions_array[cortical_row, 1] = Cortical_Pop.positions[1, i]  # Y position
+            Cortical_positions_array[cortical_row, 2] = Cortical_Pop.positions[2, i]  # Z position
+            cortical_row += 1  # Move to the next row
+
+    # Fill the STN positions array
+    stn_row = 0
+    for i in range(STN_Pop.positions.shape[1]):  # Loop over all STN cells
+        if stn_local_indices[i]:  # Only include local STN cells
+            STN_positions_array[stn_row, 0] = STN_Pop.positions[0, i]  # X position
+            STN_positions_array[stn_row, 1] = STN_Pop.positions[1, i]  # Y position
+            STN_positions_array[stn_row, 2] = STN_Pop.positions[2, i]  # Z position
+            stn_row += 1  # Move to the next row
+
+    # Save the cortical and STN coordinates to files
+    print('Saving cortical coordinates to output directory...')
+    np.savetxt(output_dir / "cortical_xyz_cell_distribution.txt", Cortical_positions_array[:cortical_row],
+               delimiter=",")
+    print('Saving STN coordinates to output directory...')
+    np.savetxt(output_dir / "STN_xyz_cell_distribution.txt", STN_positions_array[:stn_row], delimiter=",")
 
     # Write population membrane voltage data to file
     if c.save_ctx_voltage:
