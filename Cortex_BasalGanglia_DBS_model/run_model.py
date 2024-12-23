@@ -638,34 +638,30 @@ if __name__ == "__main__":
     Cortical_positions_array = np.zeros((Cortical_Pop.positions.shape[1], 3))
     STN_positions_array = np.zeros((STN_Pop.positions.shape[1], 3))
 
-    # Identify local indices for cortical and STN neurons
-    cortical_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
-    stn_local_indices = [cell in STN_Pop for cell in STN_Pop.all_cells]
+    # Print the number of cells in each population
+    print(f"Number of cortical cells: {Cortical_Pop.positions.shape[1]}")
+    print(f"Number of STN cells: {STN_Pop.positions.shape[1]}")
 
     # Fill the cortical positions array
-    cortical_row = 0
     for i in range(Cortical_Pop.positions.shape[1]):  # Loop over all cortical cells
-        if cortical_local_indices[i]:  # Only include local cortical cells
-            Cortical_positions_array[cortical_row, 0] = Cortical_Pop.positions[0, i]  # X position
-            Cortical_positions_array[cortical_row, 1] = Cortical_Pop.positions[1, i]  # Y position
-            Cortical_positions_array[cortical_row, 2] = Cortical_Pop.positions[2, i]  # Z position
-            cortical_row += 1  # Move to the next row
+        Cortical_positions_array[i, 0] = Cortical_Pop.positions[0, i]  # X position
+        Cortical_positions_array[i, 1] = Cortical_Pop.positions[1, i]  # Y position
+        Cortical_positions_array[i, 2] = Cortical_Pop.positions[2, i]  # Z position
 
     # Fill the STN positions array
-    stn_row = 0
     for i in range(STN_Pop.positions.shape[1]):  # Loop over all STN cells
-        if stn_local_indices[i]:  # Only include local STN cells
-            STN_positions_array[stn_row, 0] = STN_Pop.positions[0, i]  # X position
-            STN_positions_array[stn_row, 1] = STN_Pop.positions[1, i]  # Y position
-            STN_positions_array[stn_row, 2] = STN_Pop.positions[2, i]  # Z position
-            stn_row += 1  # Move to the next row
+        STN_positions_array[i, 0] = STN_Pop.positions[0, i]  # X position
+        STN_positions_array[i, 1] = STN_Pop.positions[1, i]  # Y position
+        STN_positions_array[i, 2] = STN_Pop.positions[2, i]  # Z position
 
     # Save the cortical and STN coordinates to files
     print('Saving cortical coordinates to output directory...')
-    np.savetxt(output_dir / "cortical_xyz_cell_distribution.txt", Cortical_positions_array[:cortical_row],
-               delimiter=",")
+    np.savetxt(output_dir / "cortical_xyz_cell_distribution.txt", Cortical_positions_array, delimiter=",")
+    print('Cortical coordinates saved.')
+
     print('Saving STN coordinates to output directory...')
-    np.savetxt(output_dir / "STN_xyz_cell_distribution.txt", STN_positions_array[:stn_row], delimiter=",")
+    np.savetxt(output_dir / "STN_xyz_cell_distribution.txt", STN_positions_array, delimiter=",")
+    print('STN coordinates saved.')
 
     # Write population membrane voltage data to file
     if c.save_ctx_voltage:
