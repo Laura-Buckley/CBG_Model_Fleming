@@ -215,7 +215,7 @@ if __name__ == "__main__":
     # )
     #
     # # Conductivity and resistivity values for homogenous, isotropic medium
-    # sigma = 0.27  # Latikka et al. 2001 - Conductivity of Brain tissue S/m
+    sigma = 0.27  # Latikka et al. 2001 - Conductivity of Brain tissue S/m
     # # rho needs units of ohm cm for xtra mechanism (S/m -> S/cm)
     # rho = 1 / (sigma * 1e-2)
     #
