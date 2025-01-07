@@ -59,12 +59,12 @@ def create_network(
     # with an offset origin = (x = -6000, y = 0, z = 0)
 
     # STN cuboid parameters
-    STN_width = 12000
+    STN_width = 4000
     STN_height = 4000
-    STN_depth = 4000
+    STN_depth = 12000
 
     offset = 6000.0
-    STN_space = space.RandomStructure(boundary=space.Cuboid(STN_width, STN_height, STN_depth), origin=(offset, 0.0, 0.0), rng=None)
+    STN_space = space.RandomStructure(boundary=space.Cuboid(STN_width, STN_height, STN_depth), origin=(0.0, 0.0,offset), rng=None)
     # Generate Poisson-distributed Striatal Spike trains
     striatal_spike_times = u.generate_poisson_spike_times(
         Pop_size, steady_state_duration, simulation_runtime, 20, 1.0, rng_seed
@@ -195,10 +195,10 @@ def create_network(
     print("Finished assigning the cortical cells.. ")
     for STN_cell in STN_Pop:
         while (
-                (STN_cell.position[0] > 12000)  # Check if x is within bounds
-                or (STN_cell.position[0] < 0)  # Check if x is less than 0
-                or (STN_cell.position[1] > 0)  # Check if y is within bounds (should be less than 0)
-                or (np.abs(STN_cell.position[2]) > 2000)  # Check if z is within bounds
+                (STN_cell.position[2] > 12000)  # Check if z is within bounds
+                or (STN_cell.position[2] < 0)  # Check if z is less than 0
+                or (STN_cell.position[1] > 0)  # Check if y is within bounds (should be less than 0, between 0 and -4000)
+                or (np.abs(STN_cell.position[0]) > 2000)  # Check if x is within bounds within -2000 to 2000
                 or (STN_cell.position[1] < -4000)  # Check if y is within bounds
         ):
             STN_cell.position = STN_space.generate_positions(1).flatten()
