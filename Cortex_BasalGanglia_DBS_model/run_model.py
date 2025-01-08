@@ -82,8 +82,18 @@ if __name__ == "__main__":
     model_filename = c.filename
 
     if Coupled_model:
+        print("Coupled_model is True. Preparing to process voltage data...")
+
+        # Process voltage data
         voltage_data = sort_data_by_yz(model_filename)
 
+        # Check if voltage_data was successfully processed
+        if voltage_data is None:
+            print("Error: Voltage data could not be processed. Aborting further steps.")
+            # Optionally handle the error (e.g., log, raise an exception, or terminate)
+            exit(1)  # Exit if voltage_data is critical to the rest of the program
+        else:
+            print(f"Voltage data successfully processed. Total keys: {len(voltage_data)}")
 
     sim_total_time = (
         steady_state_duration + simulation_runtime + timestep
@@ -203,7 +213,14 @@ if __name__ == "__main__":
     Thalamic_Pop.record("soma(0.5).v", sampling_interval=rec_sampling_interval)
 
     if Coupled_model:
-        scale_collateral_rx_by_voltage(Cortical_Pop, voltage_data)
+        print("Scaling collateral_rx values based on voltage data...")
+        try:
+            # Scale collateral_rx values
+            scale_collateral_rx_by_voltage(Cortical_Pop, voltage_data)
+            print("Collateral_rx scaling completed successfully.")
+        except Exception as e:
+            print(f"Error during collateral_rx scaling: {e}")
+            # Handle or log the error here as needed
 
     # Assign Positions for recording and stimulating electrode point sources
     recording_electrode_1_position = np.array([0, -1500, 250])
