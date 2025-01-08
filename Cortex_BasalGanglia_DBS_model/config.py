@@ -110,7 +110,7 @@ class Config(object):
         stage_two_mean={"type": "boolean", "coerce": bool, "default": False},
         debug={"type": "boolean", "coerce": bool, "default": False},
         normalise_error={"type": "boolean", "coerce": bool, "default": True},
-        filename = {"type": "string", "coerce": (str, lambda x: x.lower()), "default": "boston"} #set up filename for coupled model - boston scientific
+        filename = {"type": "string", "coerce": str, "default": "boston"} #set up filename for coupled model - boston scientific
     )
 
     def __init__(self, config_file):
