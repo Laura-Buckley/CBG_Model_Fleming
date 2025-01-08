@@ -2,7 +2,7 @@
 # Simulation
 Controller: OPEN
 RunTime: 2000.0
-SteadyStateDuration: 2000
+SteadyStateDuration: 4000
 Coupled_model: True
 filename: "2202_Mesh0_E1_Coll_V.txt"
 
