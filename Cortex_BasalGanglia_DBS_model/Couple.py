@@ -15,6 +15,7 @@ from pathlib import Path
 def sort_data_by_yz(filename):
     """
     Reads a data file, processes it to group voltage values by (y, z),
+    converts coordinates from mm to um, rounds to 2 decimal places,
     and sorts each group by the x-coordinate.
 
     Args:
@@ -54,10 +55,10 @@ def sort_data_by_yz(filename):
         print("Error: No valid data after removing NaNs.")
         return None
 
-    # Extract x, y, z, and voltage values
-    x_values = data[:, 0]
-    y_values = data[:, 1]
-    z_values = data[:, 2]
+    # Extract x, y, z, and voltage values, converting to um and rounding
+    x_values = np.round(data[:, 0] * 1000, 2)
+    y_values = np.round(data[:, 1] * 1000, 2)
+    z_values = np.round(data[:, 2] * 1000, 2)
     voltage_values = data[:, 3]
 
     # Group data by (y, z)
