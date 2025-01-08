@@ -203,7 +203,7 @@ class Cortical_Neuron(object):
         # Add extracellular mechanisms to collateral
         self.collateral.insert("extracellular")
         #only apply xtra if calculating ex in model
-
+        self.collateral.insert("xtra")
 
 
         # Assign default rx values to the segments rx_xtra
