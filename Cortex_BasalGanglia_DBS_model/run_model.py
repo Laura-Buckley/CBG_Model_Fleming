@@ -81,6 +81,14 @@ if __name__ == "__main__":
     Coupled_model = c.Coupled_model
     model_filename = c.filename
 
+    def check_non_zero_values(vector):
+        non_zero_count = sum(1 for value in vector if value != 0)
+
+        if non_zero_count > 0:
+            print(f"Number of non-zero values: {non_zero_count}")
+        else:
+            print("All values are zero.")
+
     if Coupled_model:
         print("Coupled_model is True. Preparing to process voltage data...")
 
@@ -356,6 +364,7 @@ if __name__ == "__main__":
     DBS_Signal_neuron = h.Vector(DBS_Signal)
     DBS_times_neuron = h.Vector(DBS_times)
 
+    check_non_zero_values(DBS_Signal_neuron)
     # Play DBS signal to global variable is_xtra
     DBS_Signal_neuron.play(h._ref_is_xtra, DBS_times_neuron, 1)
 
