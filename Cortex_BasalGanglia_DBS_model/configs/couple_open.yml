@@ -1,0 +1,11 @@
+---
+# Simulation
+Controller: OPEN
+RunTime: 2000.0
+SteadyStateDuration: 2000
+Coupled_model: True
+filename: "2202_Mesh0_E1_Coll_v.txt"
+
+# Controller
+setpoint: 0
+ts: 0.02
