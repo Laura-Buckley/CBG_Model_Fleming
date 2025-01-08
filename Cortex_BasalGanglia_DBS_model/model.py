@@ -200,6 +200,11 @@ def create_network(
                 or (STN_cell.position[1] > 0)  # Check if y is within bounds (should be less than 0, between 0 and -4000)
                 or (np.abs(STN_cell.position[0]) > 2000)  # Check if x is within bounds within -2000 to 2000
                 or (STN_cell.position[1] < -4000)  # Check if y is within bounds
+                or (
+                        (STN_cell.position[0] < 965 and STN_cell.position[0] > -965)  # Lead condition for x
+                        and (STN_cell.position[2] < 965 and STN_cell.position[2] > -965) # Lead condition for z
+
+                )
         ):
             STN_cell.position = STN_space.generate_positions(1).flatten()
 
