@@ -24,7 +24,7 @@ def sort_data_by_yz(filename):
         dict: Mapping of (y, z) to sorted lists of (x, voltage).
               Returns None if an error occurs.
     """
-    coupled_dir = Path("coupled_models")
+    coupled_dir = Path("network_structure")
     coupled_script = coupled_dir / filename
 
     # Check if the file exists
