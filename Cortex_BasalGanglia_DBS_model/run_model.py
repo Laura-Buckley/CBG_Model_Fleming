@@ -44,7 +44,7 @@ import argparse
 from utils import make_beta_cheby1_filter, calculate_avg_beta_power
 from model import create_network, load_network, electrode_distance
 from config import Config, get_controller_kwargs
-from Couple import sort_data_by_yz, scale_collateral_rx_by_voltage
+from Couple import sort_data_by_yz, scale_by_voltage
 # Import global variables for GPe DBS
 import Global_Variables as GV
 
