@@ -97,30 +97,28 @@ def scale_by_voltage(cortical_population, voltage_data):
     cell_sorted_voltage = np.ones((num_cells, num_segments))  # Initialize with 1.0 for neutral scaling
     print(f"Initialized cell_sorted_voltage: shape={cell_sorted_voltage.shape}")
     for cell_idx, cell in enumerate(cortical_population):
-        print(f"Processing cell {cell_idx}...")
-        print(f"voltage_data key: {cell.position[:2]}")
-        # Get cell position (assumes x-y plane for matching voltage data)
         x, y = cell.position[0], cell.position[1]
-        xy_key = (x, y)
+        xy_key = (y, x)  # Match the order used in sort_data_by_yz
 
-        # Check if voltage data exists for this cell
         if xy_key not in voltage_data:
             print(f"Warning: No voltage data found for cell at x={x}, y={y}. Using 1.0 for scaling.")
             continue
 
-        voltage_values = voltage_data[xy_key]
+        # Extract the voltage values
+        voltage_tuples = voltage_data[xy_key]  # List of (x, voltage) tuples
+        voltage_values = [v for _, v in voltage_tuples]  # Extract only voltage values
 
-        # Ensure the number of segments matches the voltage data length
         if len(voltage_values) != num_segments:
             print(
                 f"Warning: Mismatch in voltage data length ({len(voltage_values)}) and "
-                f"number of segments ({num_segments}) for cell at x={x}, y={y}. Using 1.0 for scaling."
+                f"number of segments ({num_segments}). Using 1.0 for scaling."
             )
             continue
 
-        # Save voltage values for this cell
         cell_sorted_voltage[cell_idx, :] = voltage_values
+        print(f"Updated cell_sorted_voltage[{cell_idx}]: {cell_sorted_voltage[cell_idx, :]}")
 
+    print(f"Final cell_sorted_voltage shape: {cell_sorted_voltage.shape}")
     return cell_sorted_voltage
 
 
