@@ -80,46 +80,47 @@ def sort_data_by_yz(filename):
     return sorted_data
 
 
-def scale_collateral_rx_by_voltage(cortical_population, voltage_data):
+def scale_by_voltage(cortical_population, voltage_data):
     """
-    Scale the collateral_rx values of each cell in the cortical population based on voltage data.
+    Generate an array of sorted voltage values for each cell's collateral segments.
+    Cells without voltage data will have all segments set to 1.0 for neutral scaling.
 
     Args:
-        cortical_population: List or iterable of cortical cells, each with `position` and `collateral` attributes.
+        cortical_population: List or iterable of cortical cells, each with `position` attribute.
         voltage_data: Dictionary mapping (y, z) -> list of voltage values ordered by x-coordinates.
 
     Returns:
-        None: Updates the `xtra.rx` values of each collateral segment in place.
+        np.ndarray: An array of shape (number_of_cells, number_of_segments) with voltage values.
     """
-    if voltage_data is None:
-        print("Error: voltage_data is None. Ensure sort_data_by_yz returned valid data.")
-        return
+    num_cells = cortical_population.local_size
+    num_segments = 11  # Assuming each collateral has 11 segments
+    cell_sorted_voltage = np.ones((num_cells, num_segments))  # Initialize with 1.0 for neutral scaling
 
-    for cell in cortical_population:
+    for cell_idx, cell in enumerate(cortical_population):
+        # Get cell position (assumes x-y plane for matching voltage data)
         x, y = cell.position[0], cell.position[1]
         xy_key = (x, y)
 
+        # Check if voltage data exists for this cell
         if xy_key not in voltage_data:
-            print(f"Warning: No voltage data found for cell at x={x}, y={y}. Skipping.")
+            print(f"Warning: No voltage data found for cell at x={x}, y={y}. Using 1.0 for scaling.")
             continue
 
         voltage_values = voltage_data[xy_key]
 
-        if len(voltage_values) != len(cell.collateral):
+        # Ensure the number of segments matches the voltage data length
+        if len(voltage_values) != num_segments:
             print(
                 f"Warning: Mismatch in voltage data length ({len(voltage_values)}) and "
-                f"collateral segments ({len(cell.collateral)}) for cell at x={x}, y={y}."
+                f"number of segments ({num_segments}) for cell at x={x}, y={y}. Using 1.0 for scaling."
             )
             continue
 
-        for seg_idx, seg in enumerate(cell.collateral):
-            try:
-                seg.xtra.rx *= voltage_values[seg_idx]
-            except Exception as e:
-                print(
-                    f"Error: Failed to scale rx for cell at x={x}, y={y}, segment {seg_idx}. "
-                    f"Error: {e}"
-                )
+        # Save voltage values for this cell
+        cell_sorted_voltage[cell_idx, :] = voltage_values
+
+    return cell_sorted_voltage
+
 
 
 
