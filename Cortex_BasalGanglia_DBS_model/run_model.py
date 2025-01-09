@@ -260,7 +260,16 @@ if __name__ == "__main__":
         * (1 / Cortical_Collateral_stimulating_electrode_distances)
     )
     if Coupled_model:
+        # Debugging: Ensure shapes match
+        print(f"collateral_rx shape: {collateral_rx.shape}")
+        print(f"cell_sorted_voltage shape: {cell_sorted_voltage.shape}")
+        if collateral_rx.shape != cell_sorted_voltage.shape:
+            raise ValueError(
+                f"Shape mismatch: collateral_rx {collateral_rx.shape}, "
+                f"cell_sorted_voltage {cell_sorted_voltage.shape}"
+            )
         collateral_rx = collateral_rx * cell_sorted_voltage
+        print("Collateral_rx scaling completed successfully.")
 
     # Convert ndarray to array of Sequence objects - needed to set cortical
     # collateral transfer resistances
