@@ -98,7 +98,7 @@ def scale_by_voltage(cortical_population, voltage_data):
     print(f"Initialized cell_sorted_voltage: shape={cell_sorted_voltage.shape}")
     for cell_idx, cell in enumerate(cortical_population):
         x, y = cell.position[0], cell.position[1]
-        xy_key = (y, x)  # Match the order used in sort_data_by_yz
+        xy_key = (x, y)  # Match the order used in sort_data_by_yz
 
         if xy_key not in voltage_data:
             print(f"Warning: No voltage data found for cell at x={x}, y={y}. Using 1.0 for scaling.")
