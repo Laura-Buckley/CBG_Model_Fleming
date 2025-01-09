@@ -259,7 +259,7 @@ if __name__ == "__main__":
         * (rho / (4 * math.pi))
         * (1 / Cortical_Collateral_stimulating_electrode_distances)
     )
-    if Coupled:
+    if Coupled_model:
         collateral_rx = collateral_rx * cell_sorted_voltage
 
     # Convert ndarray to array of Sequence objects - needed to set cortical
