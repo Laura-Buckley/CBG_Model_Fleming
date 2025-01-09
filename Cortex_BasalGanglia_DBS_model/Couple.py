@@ -95,8 +95,10 @@ def scale_by_voltage(cortical_population, voltage_data):
     num_cells = cortical_population.local_size
     num_segments = 11  # Assuming each collateral has 11 segments
     cell_sorted_voltage = np.ones((num_cells, num_segments))  # Initialize with 1.0 for neutral scaling
-
+    print(f"Initialized cell_sorted_voltage: shape={cell_sorted_voltage.shape}")
     for cell_idx, cell in enumerate(cortical_population):
+        print(f"Processing cell {cell_idx}...")
+        print(f"voltage_data key: {cell.position[:2]}")
         # Get cell position (assumes x-y plane for matching voltage data)
         x, y = cell.position[0], cell.position[1]
         xy_key = (x, y)
