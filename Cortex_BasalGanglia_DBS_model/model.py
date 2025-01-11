@@ -54,6 +54,13 @@ def create_network(
 
     np.random.seed(rng_seed)
     structure_save_dir = Path("network_structure")
+    # Check if directory exists
+    if not structure_save_dir.exists():
+        print(f"Directory '{structure_save_dir}' does not exist. Creating it now...")
+        structure_save_dir.mkdir(parents=True, exist_ok=True)
+        print(f"Directory '{structure_save_dir}' created.")
+    else:
+        print(f"Directory '{structure_save_dir}' already exists.")
 
     # Sphere with radius 2000 um
     STN_space = space.RandomStructure(
@@ -232,6 +239,23 @@ def create_network(
 
     # Save the generated STN xy positions to a textfile
     np.savetxt(structure_save_dir / "STN_xy_pos.txt", STN_Pop.positions, delimiter=",")
+
+    # # ensure inside -1500<x<1500, 4000<y<7000, and not inside electrode positions -0.5mm<x<0.5mm
+    # for Interneuron_cell in Interneuron_Pop:
+    #     while (
+    #         (Interneuron_cell.position[1] > 7000 )
+    #         or (Interneuron_cell.position[1] < 4000)
+    #         or  (np.abs(Interneuron_cell.position[0]) > 1500)
+    #     ) or (
+    #         (np.abs(Interneuron_cell.position[0]) < 500)
+    #         and (-1500 < Interneuron_cell.position[1] < 2000)
+    #     ):
+    #         Interneuron_cell.position = cortical_layers_space.generate_positions(1).flatten()
+    #     Interneuron_cell.position[2] = 500
+    #
+    # # Save the generated STN xy positions to a textfile
+    # np.savetxt(structure_save_dir / "Interneuron_xy_pos.txt", Interneuron_Pop.positions, delimiter=",")
+
 
     # Synaptic Connections
     # Add variability to Cortical connections - cortical interneuron
@@ -633,13 +657,17 @@ def load_network(
         j = 0
         print("Assigning positions to cortical cells...")
         for ii, cell in enumerate(Cortical_Pop):
-
+        #     initial_position = cell.position.copy()  # Keep initial for comparison
+        #
             # Assign loaded positions
             cell.position[0] = Cortical_Neuron_x_Positions[ii]
             cell.position[1] = Cortical_Neuron_y_Positions[ii]
             cell.position[2] = Cortical_Neuron_z_Positions[ii]
             j+=1
-
+        #     # Debug: Compare before and after for Y coordinate
+        #     if cell.position[1] != initial_position[1]:
+        #         print(f"Cell {ii} Y position changed from {initial_position[1]} to {cell.position[1]}")
+        #     print(f"Cell {ii} assigned position: {cell.position}")
         print(f"Total number of cells assigned positions was {j}")
 
         cortical_y = None
@@ -662,6 +690,18 @@ def load_network(
         cell.position[1] = STN_Neuron_y_Positions[ii]
         cell.position[2] = 500
 
+
+    # # Load Interneuron positions - Comment/Remove to generate new positions
+    # Interneuron_xy_Positions = np.loadtxt(structure_save_dir / "Interneuron_xy_pos.txt", delimiter=",")
+    # interneuron_local_indices = [cell in Interneuron_Pop for cell in Interneuron_Pop.all_cells]
+    # Interneuron_x_Positions = Interneuron_xy_Positions[0, interneuron_local_indices]
+    # Interneuron_y_Positions = Interneuron_xy_Positions[1, interneuron_local_indices]
+    #
+    # # Set Interneuron xy positions to those loaded in
+    # for ii, cell in enumerate(Interneuron_Pop):
+    #     cell.position[0] = Interneuron_x_Positions[ii]
+    #     cell.position[1] = Interneuron_y_Positions[ii]
+    #     cell.position[2] = 500
 
     # Synaptic Connections
     # Add variability to Cortical connections - cortical interneuron
@@ -857,7 +897,8 @@ def electrode_distance(
         print('calculating ctx axon distances...')
         (
             segment_electrode_distances_nodes,
-            segment_electrode_distances_ais
+            segment_electrode_distances_ais,
+            segment_electrode_distances_soma
         ) = axon_distances_to_electrode(
             stimulating_electrode_position,
             Cortical_Pop,
@@ -867,12 +908,13 @@ def electrode_distance(
             soma_L = 35,
             myelin_L_0 = 80,
             num_axon_compartments = 10,
-            ais_nseg = 5
+            ais_nseg = 5,
+            soma_nseg = 1
         )
         return_values.extend([
             segment_electrode_distances_nodes,
-            segment_electrode_distances_ais
-
+            segment_electrode_distances_ais,
+            segment_electrode_distances_soma
         ])
 
     return tuple(return_values)
