@@ -553,8 +553,6 @@ if __name__ == "__main__":
         ctx_Signal_neuron = h.Vector(ctx_Signal)
         ctx_times_neuron = h.Vector(ctx_times)
 
-        check_non_zero_values(ctx_Signal_neuron)
-
         # Play ctx signal to global variable is_xtra
         ctx_Signal_neuron.play(h._ref_is_xtra, ctx_times_neuron, 1)
 
