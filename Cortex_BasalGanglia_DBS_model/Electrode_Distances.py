@@ -135,7 +135,7 @@ def collateral_distances_to_electrode(src_electrode, tgt_pop, L, nseg):
     return segment_electrode_distances
 
 def axon_distances_to_electrode(src_electrode, tgt_pop, node_L, myelin_L, ais_L, soma_L,myelin_L_0,
-                                num_axon_compartments, ais_nseg, soma_nseg):
+                                num_axon_compartments, ais_nseg):
     """
         Return an nd-array of the Euclidian distances from a point source
         electrode to a population of cells. Each row corresponds to an axon
