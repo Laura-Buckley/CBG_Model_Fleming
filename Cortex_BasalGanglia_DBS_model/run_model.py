@@ -100,15 +100,6 @@ if __name__ == "__main__":
     stimulation_frequency = c.stimulation_frequency
 
 
-    def check_non_zero_values(vector):
-        non_zero_count = sum(1 for value in vector if value != 0)
-
-        if non_zero_count > 0:
-            print(f"Number of non-zero values: {non_zero_count}")
-        else:
-            print("All values are zero.")
-
-
     sim_total_time = (
         steady_state_duration + simulation_runtime + timestep
     )  # Total simulation time
@@ -211,13 +202,6 @@ if __name__ == "__main__":
         if rank == 0:
             print("Network created")
 
-    cortical_y = Cortical_Pop.positions[1, :]
-    count = 0
-    for i in cortical_y:
-        if i != 0:
-            print(f"non zero y position present, y is {i}, before sim")
-            count += 1
-    print(f"total cells with y not at zero is {count}, before sim")
 
     # Define state variables to record from each population
     if c.save_ctx_voltage:
@@ -277,14 +261,8 @@ if __name__ == "__main__":
     if ctx_stimulation:
         segment_electrode_distances_nodes = distances[start_index]
         segment_electrode_distances_ais = distances[start_index + 1]
-        segment_electrode_distances_soma = distances[start_index + 2]
 
-    count = 0
-    for cell in Cortical_Pop:
-        if cell.position[1] != 0:
-            print(f"non zero y position present, y is {cell.position[1]}, after dist calc")
-            count += 1
-    print(f"total cells with y not at zero is {count}, after dist calc")
+
 
     # Conductivity and resistivity values for homogenous, isotropic medium
     sigma = 0.27  # Latikka et al. 2001 - Conductivity of Brain tissue S/m
@@ -314,7 +292,6 @@ if __name__ == "__main__":
             cell.collateral_rx = collateral_rx_seq[ii]
 
 
-    print(f"ctx is {ctx_stimulation} before inserting rx")
     if ctx_stimulation:
 
         # Calculate transfer resistances for each node segment for xtra
@@ -354,53 +331,6 @@ if __name__ == "__main__":
         for ii, cell in enumerate(Cortical_Pop):
             cell.ais_rx = ais_rx_seq[ii]
 
-        # # Calculate transfer resistances for each soma segments for xtra
-        # soma_rx = (
-        #         0.01
-        #         * (rho / (4 * math.pi))
-        #         * (1 / segment_electrode_distances_soma)
-        # )
-        # check_for_invalid_values(soma_rx, "soma_rx")
-        #
-        # # Convert ndarray to array of Sequence objects - needed to set cortical
-        # # soma transfer resistances
-        # soma_rx_seq = np.ndarray(
-        #     shape=(1, Cortical_Pop.local_size), dtype=Sequence
-        # ).flatten()
-        # for ii in range(0, Cortical_Pop.local_size):
-        #     soma_rx_seq[ii] = Sequence(soma_rx[ii, :].flatten())
-        #
-        # # Assign transfer resistances values to somas
-        # for ii, cell in enumerate(Interneuron_Pop):
-        #     cell.soma_rx = soma_rx_seq[ii]
-
-        # # Calculate transfer resistances for each segment in the Interneurons for xtra
-        # inter_rx = (
-        #         0.01
-        #         * (rho / (4 * math.pi))
-        #         * (1 / Interneuron_electrode_distances)
-        # )
-        # check_for_invalid_values(inter_rx, "inter_rx")
-        # #
-        # # Convert ndarray to array of Sequence objects - needed to set
-        # # interneurons transfer resistances
-        # inter_rx_seq = np.ndarray(
-        #     shape=(1, Interneuron_Pop.local_size), dtype=Sequence
-        # ).flatten()
-        # for ii in range(0, Interneuron_Pop.local_size):
-        #     inter_rx_seq[ii] = Sequence(inter_rx[ii, :].flatten())
-        #
-        # # Assign transfer resistances values to interneurons
-        # for ii, cell in enumerate(Interneuron_Pop):
-        #     cell.inter_rx = inter_rx_seq[ii]
-    # cortical_y = None
-    # cortical_y = Cortical_Pop.positions[1, :]
-    # count = 0
-    # for i in cortical_y:
-    #     if i != 0:
-    #         print(f"non zero y position present, y is {i}, after rx")
-    #         count += 1
-    # print(f"total cells with y not at zero is {count}, after rx")
 
     # Create times for when the DBS controller will be called
     # Window length for filtering biomarker
@@ -572,10 +502,7 @@ if __name__ == "__main__":
             # of GPe stimulation signals
             updated_GPe_DBS_signal.append(GPe_DBS_Signal_neuron[i].as_numpy())
 
-    print(f"Ctx Stimulation amplitude: {stimulation_amplitude}")
-    print(f"Ctx Stimulation frequency: {stimulation_frequency}")
 
-    print(f"ctx is {ctx_stimulation} before ctx signal")
     if ctx_stimulation:
 
         # Generate an equivalent signal for the cortex
@@ -982,14 +909,6 @@ if __name__ == "__main__":
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_GABAa_i.mat"), "GABAa.i", clear=False)
         Interneuron_Pop.write_data(str(simulation_output_dir / "Interneuron_Pop" / "Interneuron_AMPA_i.mat"), "AMPA.i", clear=False)
 
-    # cortical_y = None
-    # cortical_y = Cortical_Pop.positions[1, :]
-    # count = 0
-    # for i in cortical_y:
-    #     if i != 0:
-    #         print(f"non zero y position present, y is {i}, before saving")
-    #         count += 1
-    # print(f"total cells with y not at zero is {count}, before saving")
 
     if DBS_stimulation or ctx_stimulation:
         print("Saving collateral and soma currents...")
@@ -997,28 +916,29 @@ if __name__ == "__main__":
         Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_collateral_im.mat"), "collateral(0.5).i_membrane_", clear=False)
         # Cortical_Pop.write_data(str(simulation_output_dir / "Cortical_Pop" / "Ctx_node_ex.mat"), "middle_node(0.5).ref_e_extracellular", clear=False)
 
-    # Saving cortical cells
-    print("Saving cortical cell positions for storage")
-    print("Shape of Cortical_Pop.positions:", Cortical_Pop.positions.shape)
+    if ctx_stimulation and create_new_network:
+        # Saving cortical cells
+        print("Saving cortical cell positions for storage")
+        print("Shape of Cortical_Pop.positions:", Cortical_Pop.positions.shape)
 
-    # Initialize the 100x3 array to store positions for all cells
-    Cortical_positions_array = np.zeros((100, 3))
+        # Initialize the 100x3 array to store positions for all cells
+        Cortical_positions_array = np.zeros((100, 3))
 
-    # Identify local indices for cortical neurons
-    cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
+        # Identify local indices for cortical neurons
+        cortex_local_indices = [cell in Cortical_Pop for cell in Cortical_Pop.all_cells]
 
-    # Fill the array row-by-row, where each row represents a cell's [x, y, z] position
-    row = 0
-    for i in range(Cortical_Pop.positions.shape[1]):  # Loop over all cells
-        if cortex_local_indices[i]:  # Only include local cells
-            # Extract x, y, z for the current cell and assign it to the row in the array
-            Cortical_positions_array[row, 0] = Cortical_Pop.positions[0, i]  # X position
-            Cortical_positions_array[row, 1] = Cortical_Pop.positions[1, i]  # Y position
-            Cortical_positions_array[row, 2] = Cortical_Pop.positions[2, i]  # Z position
-            row += 1  # Move to the next row
+        # Fill the array row-by-row, where each row represents a cell's [x, y, z] position
+        row = 0
+        for i in range(Cortical_Pop.positions.shape[1]):  # Loop over all cells
+            if cortex_local_indices[i]:  # Only include local cells
+                # Extract x, y, z for the current cell and assign it to the row in the array
+                Cortical_positions_array[row, 0] = Cortical_Pop.positions[0, i]  # X position
+                Cortical_positions_array[row, 1] = Cortical_Pop.positions[1, i]  # Y position
+                Cortical_positions_array[row, 2] = Cortical_Pop.positions[2, i]  # Z position
+                row += 1  # Move to the next row
 
-    # Save to file, ensuring x, y, z are in columns and each row corresponds to a cell
-    np.savetxt(simulation_output_dir / "cortical_new_pos_transposed.txt", Cortical_positions_array, delimiter=",")
+        # Save to file, ensuring x, y, z are in columns and each row corresponds to a cell
+        np.savetxt(simulation_output_dir / "cortical_new_pos_transposed.txt", Cortical_positions_array, delimiter=",")
 
     # Write controller values to csv files
     controller_measured_beta_values = np.asarray(controller.state_history)
