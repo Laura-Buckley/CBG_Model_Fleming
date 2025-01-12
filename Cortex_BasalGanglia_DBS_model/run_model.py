@@ -53,13 +53,6 @@ import Global_Variables as GV
 h = neuron.h
 comm = MPI.COMM_WORLD
 
-# Accessing default parameters of Cortical_Neuron_Type
-ais_nseg = Cortical_Neuron_Type.default_parameters["ais_nseg"]
-soma_nseg = Cortical_Neuron_Type.default_parameters["soma_nseg"]
-collateral_nseg = Cortical_Neuron_Type.default_parameters["collateral_nseg"]
-num_axon_compartments = Cortical_Neuron_Type.default_parameters["num_axon_compartments"]
-
-
 if __name__ == "__main__":
     os.chdir(oldpwd)
     parser = argparse.ArgumentParser(description="CBG Model")
