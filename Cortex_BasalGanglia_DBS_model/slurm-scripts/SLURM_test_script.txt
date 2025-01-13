@@ -1,0 +1,48 @@
+#!/bin/bash -l
+#SBATCH --job-name=test_frequency_analysis
+
+# Specify the number of nodes to use
+#SBATCH -N 1
+
+# Run 10 tasks for a single amplitude and frequency
+#SBATCH --array=1-10
+
+#SBATCH --ntasks-per-node=40
+
+# Notifications for job status
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=laura.buckley1@ucdconnect.ie
+
+# Load the required modules
+module load python/3.9.15-with-shared
+module load openmpi/3.1.4
+
+# Load Python environment for NEURON
+source ~/cbg-environment/bin/activate
+
+# Set the amplitude and frequency for the test
+amplitude=100
+frequency=100
+
+# Calculate the repetition number based on task ID
+rep=$SLURM_ARRAY_TASK_ID
+
+# Save output immediately
+export PYTHONUNBUFFERED=yes
+
+# Directory for configuration files and results
+configdir=~/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model/configs
+outputdir=~/scratch/test-results/${amplitude}uA-${frequency}Hz-rep${rep}
+mkdir -p $outputdir
+
+# Specify the configuration file
+configfile=${configdir}/${amplitude}uA-${frequency}Hz-rep${rep}.yml
+
+# Navigate to the model directory
+cd ~/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model
+
+# Run the model using MPI
+mpirun -n ${SLURM_NTASKS} ./run_model.py -o $outputdir $configfile
+
+# Save the SLURM output file with an appropriate name
+cp ~/slurm-${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}.out ${outputdir}/slurm-test-${amplitude}uA-${frequency}Hz-rep${rep}.out
