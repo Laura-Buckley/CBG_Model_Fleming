@@ -1,14 +1,15 @@
-Controller:
-  setpoint: 0
-  stimulation_amplitude: 0.15
-  stimulation_frequency: 90.0
-  ts: 0.02
-Simulation:
-  Controller: OPEN
-  DBS_stimulation: false
-  RandomSeed: 5782
-  RunTime: 10000.0
-  SteadyStateDuration: 6000
-  ctx_stimulation: true
-  save_ctx_lfp: true
-  save_ctx_voltage: true
+---
+# Simulation
+Controller: OPEN
+RunTime: 11000.0
+SteadyStateDuration: 6000.0
+ctx_stimulation: True
+DBS_stimulation: False
+save_ctx_voltage: True
+save_ctx_lfp: True
+
+# Controller
+setpoint: 0
+ts: 0.02
+stimulation_amplitude: 0.15
+stimulation_frequency: 90.0
