@@ -1,0 +1,41 @@
+#!/bin/bash -l
+#SBATCH --job-name=frequency_analysis
+#SBATCH -N 1
+#SBATCH --array=1-480
+#SBATCH --ntasks-per-node=40
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=laura.buckley1@ucdconnect.ie
+#SBATCH --output=~/scratch/results/slurm-%A_%a.out
+#SBATCH --error=~/scratch/results/slurm-%A_%a.err
+
+module load openmpi/3.1.4
+module load python/3.9.15-with-shared
+source ~/cbg-environment/bin/activate
+
+export PYTHONUNBUFFERED=yes
+
+configdir=~/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model/configs
+resultdir=~/scratch/results
+mkdir -p $resultdir
+
+amplitudes=(25 50 100 150)
+frequencies=(20 30 40 50 60 70 80 90 100 110 120 130)
+configs_per_rep=$(( ${#amplitudes[@]} * ${#frequencies[@]} ))
+rep=$(( ($SLURM_ARRAY_TASK_ID - 1) / $configs_per_rep + 1 ))
+config_index=$(( ($SLURM_ARRAY_TASK_ID - 1) % $configs_per_rep ))
+
+amp_idx=$(( $config_index / ${#frequencies[@]} ))
+freq_idx=$(( $config_index % ${#frequencies[@]} ))
+
+amplitude=${amplitudes[$amp_idx]}
+frequency=${frequencies[$freq_idx]}
+
+configfile=${configdir}/${amplitude}uA-${frequency}Hz-rep${rep}.yml
+outputdir=${resultdir}/${amplitude}uA-${frequency}Hz-rep${rep}
+mkdir -p $outputdir
+
+cd ~/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model
+
+mpirun -n ${SLURM_NTASKS} ./run_model.py -o $outputdir $configfile
+
+cp ~/scratch/results/slurm-${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}.out ${outputdir}/slurm-${amplitude}uA-${frequency}Hz-rep${rep}.out
