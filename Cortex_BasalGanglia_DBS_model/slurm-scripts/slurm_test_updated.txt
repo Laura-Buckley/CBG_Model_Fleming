@@ -14,7 +14,7 @@ source ~/cbg-environment/bin/activate
 
 export PYTHONUNBUFFERED=yes
 
-configdir=~/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model/configs
+configdir=/home/people/19331426/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model/configs
 resultdir=/home/people/19331426/scratch/results
 mkdir -p $resultdir
 
@@ -34,14 +34,19 @@ configfile=${configdir}/${amplitude}uA-${frequency}Hz-rep${rep}.yml
 outputdir=${resultdir}/${amplitude}uA-${frequency}Hz-rep${rep}
 mkdir -p $outputdir
 
-# Debugging: Check if configuration file exists
+# Debugging: Log task details
+echo "Running task with amplitude=${amplitude}, frequency=${frequency}, repetition=${rep}" >> ${outputdir}/debug.log
+
+# Check if configuration file exists
 if [ ! -f "$configfile" ]; then
     echo "Configuration file not found: $configfile" >> ${outputdir}/error.log
     exit 1
 fi
 
-cd ~/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model
+cd /home/people/19331426/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model
 
-mpirun -n ${SLURM_NTASKS} ./run_model.py -o $outputdir $configfile
+# Ensure SLURM_NTASKS is defined, default to 40
+mpirun -n ${SLURM_NTASKS:-40} ./run_model.py -o $outputdir $configfile
 
+# Copy SLURM output file to the results directory
 cp /home/people/19331426/scratch/results/slurm-${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}.out ${outputdir}/slurm-${amplitude}uA-${frequency}Hz-rep${rep}.out
