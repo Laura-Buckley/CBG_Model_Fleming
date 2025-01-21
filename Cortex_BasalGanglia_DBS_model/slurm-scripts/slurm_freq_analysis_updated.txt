@@ -5,8 +5,8 @@
 #SBATCH --ntasks-per-node=40
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=laura.buckley1@ucdconnect.ie
-#SBATCH --output=~/scratch/results/slurm-%A_%a.out
-#SBATCH --error=~/scratch/results/slurm-%A_%a.err
+#SBATCH --output=/home/people/19331426/scratch/results/slurm-%A_%a.out
+#SBATCH --error=/home/people/19331426/scratch/results/slurm-%A_%a.err
 
 module load openmpi/3.1.4
 module load python/3.9.15-with-shared
@@ -14,8 +14,8 @@ source ~/cbg-environment/bin/activate
 
 export PYTHONUNBUFFERED=yes
 
-configdir=~/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model/configs
-resultdir=~/scratch/results
+configdir=/home/people/19331426/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model/configs
+resultdir=/home/people/19331426/scratch/results
 mkdir -p $resultdir
 
 amplitudes=(25 50 100 150)
@@ -34,8 +34,19 @@ configfile=${configdir}/${amplitude}uA-${frequency}Hz-rep${rep}.yml
 outputdir=${resultdir}/${amplitude}uA-${frequency}Hz-rep${rep}
 mkdir -p $outputdir
 
-cd ~/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model
+# Debugging: Log task details
+echo "Running task with amplitude=${amplitude}, frequency=${frequency}, repetition=${rep}" >> ${outputdir}/debug.log
 
-mpirun -n ${SLURM_NTASKS} ./run_model.py -o $outputdir $configfile
+# Check if configuration file exists
+if [ ! -f "$configfile" ]; then
+    echo "Configuration file not found: $configfile" >> ${outputdir}/error.log
+    exit 1
+fi
 
-cp ~/scratch/results/slurm-${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}.out ${outputdir}/slurm-${amplitude}uA-${frequency}Hz-rep${rep}.out
+cd /home/people/19331426/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model
+
+# Ensure SLURM_NTASKS is defined, default to 40
+mpirun -n ${SLURM_NTASKS:-40} ./run_model.py -o $outputdir $configfile
+
+# Copy SLURM output file to the results directory
+cp /home/people/19331426/scratch/results/slurm-${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}.out ${outputdir}/slurm-${amplitude}uA-${frequency}Hz-rep${rep}.out
