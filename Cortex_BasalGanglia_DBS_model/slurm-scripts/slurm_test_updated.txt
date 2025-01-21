@@ -1,52 +1,47 @@
 #!/bin/bash -l
-#SBATCH --job-name=test_frequency_analysis
-
-# Specify the number of nodes to use
+#SBATCH --job-name=frequency_analysis
 #SBATCH -N 1
-
-# Run 10 tasks for a single amplitude and frequency
-#SBATCH --array=1-10
-
+#SBATCH --array=1-480
 #SBATCH --ntasks-per-node=40
-
-# Notifications for job status
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=laura.buckley1@ucdconnect.ie
+#SBATCH --output=/home/people/19331426/scratch/results/slurm-%A_%a.out
+#SBATCH --error=/home/people/19331426/scratch/results/slurm-%A_%a.err
 
-# Explicitly specify SLURM output files
-#SBATCH --output=~/scratch/test-results/slurm-%A_%a.out
-#SBATCH --error=~/scratch/test-results/slurm-%A_%a.err
-
-# Load the required modules
-module load python/3.9.15-with-shared
 module load openmpi/3.1.4
-
-# Load Python environment for NEURON
+module load python/3.9.15-with-shared
 source ~/cbg-environment/bin/activate
 
-# Set the amplitude and frequency for the test
-amplitude=100
-frequency=100
-
-# Calculate the repetition number based on task ID
-rep=$SLURM_ARRAY_TASK_ID
-
-# Save output immediately
 export PYTHONUNBUFFERED=yes
 
-# Directory for configuration files and results
 configdir=~/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model/configs
-outputdir=~/scratch/test-results/${amplitude}uA-${frequency}Hz-rep${rep}
+resultdir=/home/people/19331426/scratch/results
+mkdir -p $resultdir
+
+amplitudes=(25 50 100 150)
+frequencies=(20 30 40 50 60 70 80 90 100 110 120 130)
+configs_per_rep=$(( ${#amplitudes[@]} * ${#frequencies[@]} ))
+rep=$(( ($SLURM_ARRAY_TASK_ID - 1) / $configs_per_rep + 1 ))
+config_index=$(( ($SLURM_ARRAY_TASK_ID - 1) % $configs_per_rep ))
+
+amp_idx=$(( $config_index / ${#frequencies[@]} ))
+freq_idx=$(( $config_index % ${#frequencies[@]} ))
+
+amplitude=${amplitudes[$amp_idx]}
+frequency=${frequencies[$freq_idx]}
+
+configfile=${configdir}/${amplitude}uA-${frequency}Hz-rep${rep}.yml
+outputdir=${resultdir}/${amplitude}uA-${frequency}Hz-rep${rep}
 mkdir -p $outputdir
 
-# Specify the configuration file
-configfile=${configdir}/${amplitude}uA-${frequency}Hz-rep${rep}.yml
+# Debugging: Check if configuration file exists
+if [ ! -f "$configfile" ]; then
+    echo "Configuration file not found: $configfile" >> ${outputdir}/error.log
+    exit 1
+fi
 
-# Navigate to the model directory
 cd ~/CBG_Model_Fleming/Cortex_BasalGanglia_DBS_model
 
-# Run the model using MPI
 mpirun -n ${SLURM_NTASKS} ./run_model.py -o $outputdir $configfile
 
-# Save the SLURM output file with an appropriate name
-cp ~/scratch/test-results/slurm-${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}.out ${outputdir}/slurm-test-${amplitude}uA-${frequency}Hz-rep${rep}.out
+cp /home/people/19331426/scratch/results/slurm-${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}.out ${outputdir}/slurm-${amplitude}uA-${frequency}Hz-rep${rep}.out
